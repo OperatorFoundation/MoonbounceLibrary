@@ -15,8 +15,9 @@ import SwiftQueue
 import LoggerQueue
 import Flower
 import Transmission
+import TunnelClientMock
 
-class PacketTunnelProvider: NEPacketTunnelProvider
+class PacketTunnelProvider: MockPacketTunnelProvider
 {
     private var networkMonitor: NWPathMonitor?
     

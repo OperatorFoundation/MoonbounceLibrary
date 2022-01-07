@@ -58,6 +58,7 @@ let package = Package(
                 "Chord",
                 "Net",
                 "TunnelClient",
+                .product(name: "TunnelClientMock", package: "TunnelClient")
             ]),
         .target(
             name: "MoonbounceNetworkExtensionLibrary",

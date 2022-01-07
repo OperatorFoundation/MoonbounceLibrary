@@ -105,7 +105,7 @@
         "repositoryURL": "https://github.com/OperatorFoundation/ReplicantSwiftClient.git",
         "state": {
           "branch": "main",
-          "revision": "42f9c439390cb8d35e6a6a1e8ebb0fc225a32727",
+          "revision": "2923fcbf5cdcd46b7e8923407a611920321c12b2",
           "version": null
         }
       },
@@ -191,20 +191,11 @@
         }
       },
       {
-        "package": "Transport",
-        "repositoryURL": "https://github.com/OperatorFoundation/Transport.git",
-        "state": {
-          "branch": null,
-          "revision": "bd0ce93e7b0bb17a1e01f09f03be07b34187249a",
-          "version": "2.3.12"
-        }
-      },
-      {
         "package": "TunnelClient",
         "repositoryURL": "https://github.com/OperatorFoundation/TunnelClient.git",
         "state": {
           "branch": "main",
-          "revision": "19b99c3c6aab150c244d22bd3667871a1f70ad12",
+          "revision": "f0a88e97dca7f09f87917290dc8bf84d58e38808",
           "version": null
         }
       },
