@@ -17,7 +17,7 @@ import Flower
 import Transmission
 import TunnelClientMock
 
-class PacketTunnelProvider: MockPacketTunnelProvider
+class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
 {
     private var networkMonitor: NWPathMonitor?
     
@@ -49,7 +49,7 @@ class PacketTunnelProvider: MockPacketTunnelProvider
     var logQueue: LoggerQueue
     var log: Logger!
 
-    override init()
+    public override init()
     {
         logQueue = LoggerQueue(label: loggerLabel)
         super.init()
@@ -72,7 +72,7 @@ class PacketTunnelProvider: MockPacketTunnelProvider
         networkMonitor?.cancel()
     }
 
-    override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
+    public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
         log.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
         
@@ -92,7 +92,7 @@ class PacketTunnelProvider: MockPacketTunnelProvider
         // Save the completion handler for when the tunnel is fully established.
         pendingStartCompletion = completionHandler
         
-        guard let tunnelProviderProtocol = protocolConfiguration as? NETunnelProviderProtocol
+        guard let tunnelProviderProtocol = self.configuration as? TunnelProviderProtocol
         else
         {
             log.debug("PacketTunnelProviderError: savedProtocolConfigurationIsInvalid")
@@ -101,7 +101,7 @@ class PacketTunnelProvider: MockPacketTunnelProvider
             return
         }
         
-        guard let serverAddress: String = self.protocolConfiguration.serverAddress
+        guard let serverAddress: String = self.configuration.serverAddress
             else
         {
             log.error("Unable to get the server address.")
@@ -152,8 +152,8 @@ class PacketTunnelProvider: MockPacketTunnelProvider
         isConnected = ConnectState(state: .success, stage: .statusCodes)
         waitForIPAssignment()
     }
-    
-    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
+
+    public override func stopTunnel(with reason: ProviderStopReason, completionHandler: @escaping () -> Void)
     {
         networkMonitor?.cancel()
         networkMonitor = nil
@@ -181,11 +181,11 @@ class PacketTunnelProvider: MockPacketTunnelProvider
     func writePackets(packetDatas: [Data], protocolNumbers: [NSNumber])
     {
         log.debug("Writing packets.")
-        packetFlow.writePackets(packetDatas, withProtocols: protocolNumbers)
+        self.packets.writePackets(packetDatas, withProtocols: protocolNumbers)
     }
     
     /// Handle IPC messages from the app.
-    override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
+    public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
     {
         switch connectionAttemptStatus
         {
@@ -287,7 +287,7 @@ class PacketTunnelProvider: MockPacketTunnelProvider
         log.debug("(setTunnelSettings) host: \(host), tunnelAddress: \(tunnelAddress)")
         
         // Set the virtual interface settings.
-        setTunnelNetworkSettings(settings, completionHandler: tunnelSettingsCompleted)
+        self.setNetworkSettings(settings, completionHandler: tunnelSettingsCompleted)
     }
     
     func tunnelSettingsCompleted(maybeError: Error?)
@@ -311,7 +311,7 @@ class PacketTunnelProvider: MockPacketTunnelProvider
         connectionAttemptStatus = .ready
         startCompletion(nil)
         
-        let newConnection = ClientTunnelConnection(clientPacketFlow: self.packetFlow, flowerConnection: self.flowerConnection!, logger: log)
+        let newConnection = ClientTunnelConnection(clientPacketFlow: self.packets, flowerConnection: self.flowerConnection!, logger: log)
 
         self.log.debug("\n🚀 Connection to server complete! 🚀\n")
         self.tunnelConnection = newConnection

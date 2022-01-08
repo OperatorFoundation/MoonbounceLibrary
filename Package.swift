@@ -86,7 +86,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "MoonbounceLibraryTests",
-            dependencies: ["MoonbounceLibrary"]),
+            dependencies: ["MoonbounceLibrary", "MoonbounceNetworkExtensionLibrary"]),
     ],
     swiftLanguageVersions: [.v5]
 )

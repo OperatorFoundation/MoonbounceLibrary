@@ -15,7 +15,7 @@ import MoonbounceShared
 // FIXME: replace applogs with actual logs
 class NetworkExtensionConfigController
 {
-    public static func getMoonbounceConfig(fromProtocolConfiguration protocolConfiguration: NETunnelProviderProtocol) -> MoonbounceConfig?
+    public static func getMoonbounceConfig(fromProtocolConfiguration protocolConfiguration: TunnelProviderProtocol) -> MoonbounceConfig?
     {
         guard let providerConfiguration = protocolConfiguration.providerConfiguration
             else

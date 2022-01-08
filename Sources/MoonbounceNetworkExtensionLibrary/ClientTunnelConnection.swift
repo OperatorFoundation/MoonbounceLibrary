@@ -17,7 +17,7 @@ import InternetProtocols
 public class ClientTunnelConnection
 {
     /// The flow of IP packets.
-    let packetFlow: NEPacketTunnelFlow
+    let packetFlow: PacketTunnelFlow
     let log: Logger
     let flowerConnection: FlowerConnection
     var ipAllocationMessage: Message? = nil
@@ -25,7 +25,7 @@ public class ClientTunnelConnection
     let packetsToMessagesQueue = DispatchQueue(label: "clientTunnelConnection: packetsToMessages")
     
     // MARK: Initializers
-    public init(clientPacketFlow: NEPacketTunnelFlow, flowerConnection: FlowerConnection, logger: Logger)
+    public init(clientPacketFlow: PacketTunnelFlow, flowerConnection: FlowerConnection, logger: Logger)
     {
         self.log = logger
         self.packetFlow = clientPacketFlow
