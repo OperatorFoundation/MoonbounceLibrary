@@ -141,7 +141,7 @@ class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
         
         log.debug("2. Connect to server called.")
         
-        guard let replicantConnection = ReplicantConnection(host: NWEndpoint.Host(host), port: NWEndpoint.Port(integerLiteral: port), type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
+        guard let replicantConnection = ReplicantConnection(type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
             log.error("could not initialize replicant connection")
             return
         }

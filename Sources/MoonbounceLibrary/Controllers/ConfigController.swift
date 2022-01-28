@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import Network
+
 import TunnelClient
 import ZIPFoundation
 import ReplicantSwift
@@ -179,7 +181,7 @@ public class ConfigController
                     
                     // FIXME: Replicant Config from JSON
                     //let replicantConfig = ReplicantConfig(withConfigAtPath: configURL.appendingPathComponent(file1).path)
-                    let replicantConfig: ReplicantConfig<SilverClientConfig>? = nil
+                    let replicantConfig: ReplicantConfig? = nil
                     let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, clientConfig: clientConfig, replicantConfig: replicantConfig)
                     
                     self.configs.append(moonbounceConfig)
@@ -229,8 +231,8 @@ public class ConfigController
             })
             {
                 //Verify  that each of the following files are present as all config files are neccessary for successful connection:
-                let file1 = "replicantclient.config"
-                //let file2 = "replicant.config"
+                //let clientConfigFileName = "client.config"
+                let replicantConfigFileName = "replicant.config"
                 
                 var fileNames = [String]()
                 for case let fileURL as URL in fileEnumerator
@@ -244,22 +246,21 @@ public class ConfigController
                 }
                 
                 //If all required files are present refresh server select button
-                if fileNames.contains(file1)
+                if fileNames.contains(replicantConfigFileName)
                 {
-                    guard let clientConfig = ClientConfig(withConfigAtPath: configURL.appendingPathComponent(file1).path)
-                        
-                        else
-                    {
-                        appLog.error("Unable to create replicant config from file at \(configURL.appendingPathComponent(file1))")
-                        
+                    guard let replicantConfig = ReplicantConfig(withConfigAtPath: configURL.appendingPathComponent(replicantConfigFileName).path) else {
+                        appLog.error("Unable to create replicant config from file at \(configURL.appendingPathComponent(replicantConfigFileName))")
                         return nil
                     }
                     
-                    // FIXME: Replicant config from file
-                    let replicantConfig = ReplicantConfig<SilverClientConfig>(polish: nil, toneBurst: nil)
+                    let serverIP = NWEndpoint.Host(replicantConfig.serverIP)
+                    guard let serverPort = NWEndpoint.Port(rawValue: replicantConfig.port) else {
+                        appLog.error("unable to create a moonbounce config with the provided port")
+                        return nil
+                    }
                     
+                    let clientConfig = ClientConfig(withPort: serverPort, andHost: serverIP)
                     let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, clientConfig: clientConfig, replicantConfig: replicantConfig)
-                    
                     
                     return moonbounceConfig
                 }
@@ -282,22 +283,16 @@ public class ConfigController
             return nil
         }
         
-        // FIXME: Replicant config from JSON
+        // Replicant config from JSON
         
-//        guard let replicantConfigJSON = providerConfiguration[Keys.replicantConfigKey.rawValue] as? Data
-//            else
-//        {
-//            appLog.error("Unable to get ReplicantConfig JSON from provider config")
-//            return nil
-//        }
-//
-//        guard let replicantConfig = ReplicantConfig.parse(jsonData: replicantConfigJSON)
-//            else
-//        {
-//            return nil
-//        }
-        
-        guard let replicantConfig = ReplicantConfig<SilverClientConfig>(polish: nil, toneBurst: nil)
+        guard let replicantConfigJSON = providerConfiguration[Keys.replicantConfigKey.rawValue] as? Data
+            else
+        {
+            appLog.error("Unable to get ReplicantConfig JSON from provider config")
+            return nil
+        }
+
+        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
             else
         {
             return nil

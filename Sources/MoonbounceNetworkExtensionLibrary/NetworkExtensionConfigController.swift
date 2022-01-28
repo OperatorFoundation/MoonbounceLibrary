@@ -24,7 +24,14 @@ class NetworkExtensionConfigController
             return nil
         }
 
-        guard let replicantConfig = ReplicantConfig<SilverClientConfig>(polish: nil, toneBurst: nil)
+        guard let replicantConfigJSON = providerConfiguration[Keys.replicantConfigKey.rawValue] as? Data
+        else
+        {
+            appLog.error("unable to load replicant config from provider configuration")
+            return nil
+        }
+        
+        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
             else
         {
             return nil
