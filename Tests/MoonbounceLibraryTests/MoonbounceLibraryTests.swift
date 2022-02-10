@@ -20,7 +20,15 @@ final class MoonbounceLibraryTests: XCTestCase {
         
         let nsNumber = NSNumber(value: 4)
         let mptp = MoonbouncePacketTunnelProvider()
-
+        mptp.configuration.serverAddress = "138.197.196.245"
+        guard let tunnelProviderProtocol = mptp.configuration as? TunnelProviderProtocol else {
+            return
+        }
+        guard var providerConfiguration = tunnelProviderProtocol.providerConfiguration // FIXME: put in a Replicant json config
+        else {
+            return
+        }
+        providerConfiguration["ReplicantConfiguration"] = "{\"host\" : \"138.197.196.245\",\"port\" : 1234}"
         // call startTunnel()
         mptp.startTunnel
         {

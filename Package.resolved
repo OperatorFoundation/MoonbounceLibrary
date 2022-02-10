@@ -191,6 +191,15 @@
         }
       },
       {
+        "package": "Transport",
+        "repositoryURL": "https://github.com/OperatorFoundation/Transport.git",
+        "state": {
+          "branch": null,
+          "revision": "bd0ce93e7b0bb17a1e01f09f03be07b34187249a",
+          "version": "2.3.12"
+        }
+      },
+      {
         "package": "TunnelClient",
         "repositoryURL": "https://github.com/OperatorFoundation/TunnelClient.git",
         "state": {
