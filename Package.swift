@@ -27,7 +27,7 @@ let package = Package(
         .package(url: "https://github.com/OperatorFoundation/Transmission.git", from: "1.2.10"),
         .package(url: "https://github.com/OperatorFoundation/InternetProtocols.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/SwiftHexTools.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/ReplicantSwift.git", branch: "experimentalConfigs"),
+        .package(url: "https://github.com/OperatorFoundation/ReplicantSwift.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/ReplicantSwiftClient.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/TransmissionTransport.git", branch: "main"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
