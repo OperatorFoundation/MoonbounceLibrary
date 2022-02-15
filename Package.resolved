@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Chord.git",
         "state": {
           "branch": "main",
-          "revision": "756eeb26b10016784e6dc7cfce33068b36e49f39",
+          "revision": "138ce98ef8d12a989e526073d9c386174b6d1df2",
           "version": null
         }
       },
@@ -33,7 +33,7 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Flower.git",
         "state": {
           "branch": "main",
-          "revision": "e7bc62b65c61bae9e4dd23f6d0ac0af496e6afdc",
+          "revision": "f50f39cded6c647ed1349256d32e2b515d84780f",
           "version": null
         }
       },
@@ -78,7 +78,7 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Monolith.git",
         "state": {
           "branch": "main",
-          "revision": "e66c2d7697f028215589b8687c17c2ac3188bedc",
+          "revision": "9d4c3ec061914ee10e43fdd30585e4aca5318d79",
           "version": null
         }
       },
@@ -95,8 +95,8 @@
         "package": "ReplicantSwift",
         "repositoryURL": "https://github.com/OperatorFoundation/ReplicantSwift.git",
         "state": {
-          "branch": "experimentalConfigs",
-          "revision": "067dfa9fb095f797a88774d3d0f4a3e4d6caf1a7",
+          "branch": "main",
+          "revision": "2faac30a7ad1b0a1bc540b11f31b8f977e3d6213",
           "version": null
         }
       },
@@ -105,7 +105,7 @@
         "repositoryURL": "https://github.com/OperatorFoundation/ReplicantSwiftClient.git",
         "state": {
           "branch": "main",
-          "revision": "daf79e3eb691e404c596b60a726983fd623576c6",
+          "revision": "90d4593ff6d53ded912b94da0a181f8a832dc177",
           "version": null
         }
       },
@@ -114,7 +114,7 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Song.git",
         "state": {
           "branch": "main",
-          "revision": "30e043dc38908eb882f3991eb2af9249ec8988ce",
+          "revision": "68145b93c775e1537df75a7af356890bcdbe30bf",
           "version": null
         }
       },
@@ -122,18 +122,9 @@
         "package": "swift-ast",
         "repositoryURL": "https://github.com/OperatorFoundation/swift-ast.git",
         "state": {
-          "branch": null,
+          "branch": "main",
           "revision": "d7e0cf0d9d3b90831a1c297ce911a338a4bd44f3",
-          "version": "0.19.12"
-        }
-      },
-      {
-        "package": "swift-crypto",
-        "repositoryURL": "https://github.com/apple/swift-crypto.git",
-        "state": {
-          "branch": null,
-          "revision": "a8911e0fadc25aef1071d582355bd1037a176060",
-          "version": "2.0.4"
+          "version": null
         }
       },
       {
@@ -188,6 +179,15 @@
           "branch": null,
           "revision": "b5b5974bee1d79b9eb19c8ba5707dd1b6ac349a1",
           "version": "0.0.1"
+        }
+      },
+      {
+        "package": "Transport",
+        "repositoryURL": "https://github.com/OperatorFoundation/Transport.git",
+        "state": {
+          "branch": null,
+          "revision": "bd0ce93e7b0bb17a1e01f09f03be07b34187249a",
+          "version": "2.3.12"
         }
       },
       {
