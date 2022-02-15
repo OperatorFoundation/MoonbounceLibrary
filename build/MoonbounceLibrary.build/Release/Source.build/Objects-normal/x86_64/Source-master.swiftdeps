@@ -1,0 +1,14 @@
+version: "Apple Swift version 5.5.2 (swiftlang-1300.0.47.5 clang-1300.0.29.30)"
+options: "541d44efb766fda55173f20c22bb6a7390ab2fbdd6a5c4711386407e9b750feb"
+build_start_time: [1644877660, 656960010]
+build_end_time: [1644877660, 892966032]
+inputs:
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/Comment.swift": [1644877568, 796863555]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/CommentSet.swift": [1644877568, 796922683]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/Shebang.swift": [1644877568, 796986579]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/SourceError.swift": [1644877568, 797045230]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/SourceFile.swift": [1644877568, 797098159]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/SourceLocatable.swift": [1644877568, 797158241]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/SourceLocation.swift": [1644877568, 797219753]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/SourceRange.swift": [1644877568, 797287464]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Source/SourceReader.swift": [1644877568, 797358274]

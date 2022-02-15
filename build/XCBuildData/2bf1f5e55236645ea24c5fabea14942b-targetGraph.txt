@@ -1,0 +1,11 @@
+Target dependency graph (4 targets)
+Bocho in MoonbounceLibrary, no dependencies
+Source in MoonbounceLibrary, depends on:
+Bocho in MoonbounceLibrary (explicit)
+Diagnostic in MoonbounceLibrary, depends on:
+Source in MoonbounceLibrary (explicit)
+Bocho in MoonbounceLibrary (explicit)
+AST in MoonbounceLibrary, depends on:
+Diagnostic in MoonbounceLibrary (explicit)
+Source in MoonbounceLibrary (explicit)
+Bocho in MoonbounceLibrary (explicit)

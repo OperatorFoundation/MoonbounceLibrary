@@ -182,7 +182,7 @@ public class ConfigController
                     // FIXME: Replicant Config from JSON
                     //let replicantConfig = ReplicantConfig(withConfigAtPath: configURL.appendingPathComponent(file1).path)
                     let replicantConfig: ReplicantConfig? = nil
-                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, clientConfig: clientConfig, replicantConfig: replicantConfig)
+                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, replicantConfig: replicantConfig)
                     
                     self.configs.append(moonbounceConfig)
                     
@@ -260,7 +260,7 @@ public class ConfigController
                     }
                     
                     let clientConfig = ClientConfig(withPort: serverPort, andHost: serverIP)
-                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, clientConfig: clientConfig, replicantConfig: replicantConfig)
+                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, replicantConfig: replicantConfig)
                     
                     return moonbounceConfig
                 }
@@ -318,7 +318,7 @@ public class ConfigController
             return nil
         }
         
-        let moonbounceConfig = MoonbounceConfig(name: name, clientConfig: clientConfig, replicantConfig: replicantConfig)
+        let moonbounceConfig = MoonbounceConfig(name: name, replicantConfig: replicantConfig)
         
         return moonbounceConfig
     }

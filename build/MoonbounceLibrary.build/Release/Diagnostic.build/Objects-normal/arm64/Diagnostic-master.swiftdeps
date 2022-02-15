@@ -1,0 +1,9 @@
+version: "Apple Swift version 5.5.2 (swiftlang-1300.0.47.5 clang-1300.0.29.30)"
+options: "541d44efb766fda55173f20c22bb6a7390ab2fbdd6a5c4711386407e9b750feb"
+build_start_time: [1644877661, 91703891]
+build_end_time: [1644877661, 381661891]
+inputs:
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Diagnostic/Diagnostic.swift": [1644877568, 791368961]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Diagnostic/DiagnosticConsumer.swift": [1644877568, 791469097]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Diagnostic/DiagnosticKind.swift": [1644877568, 791550636]
+  "/Users/bluesaxorcist/MoonbounceLibrary/.build/checkouts/swift-ast/Sources/Diagnostic/DiagnosticPool.swift": [1644877568, 791622877]

@@ -37,18 +37,18 @@ class NetworkExtensionConfigController
             return nil
         }
         
-        guard let clientConfigJSON = providerConfiguration[Keys.clientConfigKey.rawValue] as? Data
-            else
-        {
-            // appLog.error("Unable to get ClientConfig JSON from provider config")
-            return nil
-        }
+//        guard let clientConfigJSON = providerConfiguration[Keys.clientConfigKey.rawValue] as? Data
+//            else
+//        {
+//            // appLog.error("Unable to get ClientConfig JSON from provider config")
+//            return nil
+//        }
         
-        guard let clientConfig = ClientConfig.parse(jsonData: clientConfigJSON)
-            else
-        {
-            return nil
-        }
+//        guard let clientConfig = ClientConfig.parse(jsonData: clientConfigJSON)
+//            else
+//        {
+//            return nil
+//        }
         
         guard let name = providerConfiguration[Keys.tunnelNameKey.rawValue] as? String
         else
@@ -57,7 +57,7 @@ class NetworkExtensionConfigController
             return nil
         }
         
-        let moonbounceConfig = MoonbounceConfig(name: name, clientConfig: clientConfig, replicantConfig: replicantConfig)
+        let moonbounceConfig = MoonbounceConfig(name: name, replicantConfig: replicantConfig)
         
         return moonbounceConfig
     }

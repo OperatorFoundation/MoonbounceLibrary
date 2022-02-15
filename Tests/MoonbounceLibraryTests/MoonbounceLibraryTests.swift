@@ -1,6 +1,7 @@
 import XCTest
 @testable import MoonbounceLibrary
 @testable import MoonbounceNetworkExtensionLibrary
+import MoonbounceShared
 import TunnelClientMock
 import TunnelClient
 import TunnelClientMacOS
@@ -21,14 +22,16 @@ final class MoonbounceLibraryTests: XCTestCase {
         let nsNumber = NSNumber(value: 4)
         let mptp = MoonbouncePacketTunnelProvider()
         mptp.configuration.serverAddress = "138.197.196.245"
-        guard let tunnelProviderProtocol = mptp.configuration as? TunnelProviderProtocol else {
+        guard var tunnelProviderProtocol = mptp.configuration as? TunnelProviderProtocol else {
             return
         }
-        guard var providerConfiguration = tunnelProviderProtocol.providerConfiguration // FIXME: put in a Replicant json config
-        else {
-            return
-        }
-        providerConfiguration["ReplicantConfiguration"] = "{\"host\" : \"138.197.196.245\",\"port\" : 1234}"
+        
+        var map = [String:Any]()
+        map[Keys.replicantConfigKey.rawValue] = "{\"serverIP\" : \"138.197.196.245\",\"port\" : 1234}".data
+        map[Keys.tunnelNameKey.rawValue] = "Moonbounce"
+        
+        tunnelProviderProtocol.providerConfiguration = map
+        
         // call startTunnel()
         mptp.startTunnel
         {
@@ -47,5 +50,31 @@ final class MoonbounceLibraryTests: XCTestCase {
         }
         
         wait(for: [pongReceived], timeout: 15) // 15 seconds
+    }
+    func testReplicantSwiftServer()
+    {
+        guard let transmissionConnection: Transmission.Connection = TransmissionConnection(host: "138.197.196.245", port: 1234) else
+
+        {
+            XCTFail()
+            return
+        }
+        
+        let flowerConnection = FlowerConnection(connection: transmissionConnection, log: nil)
+        let data = "a".data
+        let message = Message.IPDataV4(data)
+
+        print("wrote")
+
+        flowerConnection.writeMessage(message: message)
+
+        guard let ipAssign = flowerConnection.readMessage() else
+        {
+          XCTFail()
+          return
+        }
+
+        print(ipAssign)
+        print("read")
     }
 }

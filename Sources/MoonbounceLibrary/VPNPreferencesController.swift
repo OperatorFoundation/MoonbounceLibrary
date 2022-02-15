@@ -177,14 +177,8 @@ class VPNPreferencesController
         let appId = Bundle.main.bundleIdentifier!
         appLog.debug("\n----->Setting the providerBundleIdentifier to \(appId).NetworkExtension")
         protocolConfiguration.providerBundleIdentifier = "\(appId).NetworkExtension"
-        protocolConfiguration.serverAddress = "\(moonbounceConfig.clientConfig.host)"
+        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
         protocolConfiguration.includeAllNetworks = true
-        
-        guard let clientConfigJSON = moonbounceConfig.clientConfig.createJSON()
-            else
-        {
-            return nil
-        }
 
         // FIXME: Replicant JSON needed here
         
@@ -210,7 +204,6 @@ class VPNPreferencesController
         
         let replicantConfigString = "{}"
         protocolConfiguration.providerConfiguration = [
-                        Keys.clientConfigKey.rawValue: clientConfigJSON,
                         Keys.replicantConfigKey.rawValue: replicantConfigString.data,
                         Keys.tunnelNameKey.rawValue: moonbounceConfig.name]
                 

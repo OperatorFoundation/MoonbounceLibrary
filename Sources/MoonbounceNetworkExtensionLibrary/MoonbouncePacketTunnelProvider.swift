@@ -128,8 +128,8 @@ class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
             return
         }
         
-        let host = moonbounceConfig.clientConfig.host
-        let port = moonbounceConfig.clientConfig.port
+        let host = moonbounceConfig.replicantConfig?.serverIP
+        let port = moonbounceConfig.replicantConfig?.port
         
         self.log.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
         self.networkMonitor = NWPathMonitor()
