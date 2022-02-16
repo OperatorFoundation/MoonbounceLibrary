@@ -10,6 +10,7 @@ import TunnelClient
 import TunnelClientMacOS
 import Chord
 import NetworkExtension
+import ReplicantSwift
 
 final class MoonbounceLibraryTests: XCTestCase
 {
@@ -26,26 +27,43 @@ final class MoonbounceLibraryTests: XCTestCase
         }
         
         let nsNumber = NSNumber(value: 4)
-        let mptp = MoonbouncePacketTunnelProvider()
-        mptp.configuration.serverAddress = ""
-        guard var tunnelProviderProtocol = mptp.configuration as? TunnelProviderProtocol else {
+        let
+        moonbouncePacketTunnelProvider = MoonbouncePacketTunnelProvider()
+        moonbouncePacketTunnelProvider.configuration.serverAddress = ""
+        guard var tunnelProviderProtocol = moonbouncePacketTunnelProvider.configuration as? TunnelProviderProtocol else
+        {
+            print("failed to cast moonbouncePacketTunnelProvider to a TunnelProviderProtocol")
+            XCTFail()
             return
         }
         
+        let configDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop/Configs", isDirectory: true)
+        let configPath = configDirectory.appendingPathComponent("FixedByteTypeReplicantClient.json", isDirectory: false).path
+        
+        guard let replicantConfig = ReplicantConfig(withConfigAtPath: configPath) else
+        {
+            print("failed to parse replicantConfig at path: \(configPath)")
+            XCTFail()
+            return
+        }
+        
+        let replicantConfigData = replicantConfig.createJSON()
+        
         var map = [String:Any]()
-        map[Keys.replicantConfigKey.rawValue] = "{\"serverIP\" : \"10.0.0.1\",\"port\" : 1234}".data
+        map[Keys.replicantConfigKey.rawValue] = replicantConfigData
+//        map[Keys.replicantConfigKey.rawValue] = "{\"serverIP\" : \"10.0.0.1\",\"port\" : 1234}".data
         map[Keys.tunnelNameKey.rawValue] = "Moonbounce"
         
         tunnelProviderProtocol.providerConfiguration = map
         
         // call startTunnel()
-        mptp.startTunnel
+        moonbouncePacketTunnelProvider.startTunnel
         {
             maybeError in
             
             print("ready to go!")
             
-            if let flow = mptp.packets as? MockPacketTunnelFlow
+            if let flow = moonbouncePacketTunnelProvider.packets as? MockPacketTunnelFlow
             {
                 // give the queue a packet to read
                 flow.readQueue.enqueue(element: (pingPacket, nsNumber))
@@ -85,6 +103,7 @@ final class MoonbounceLibraryTests: XCTestCase
         print(ipAssign)
         print("read")
     }
+    
     
     
 }
