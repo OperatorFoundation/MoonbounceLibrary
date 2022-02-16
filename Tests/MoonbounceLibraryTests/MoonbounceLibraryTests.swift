@@ -61,7 +61,7 @@ final class MoonbounceLibraryTests: XCTestCase
     
     func testReplicantSwiftServer()
     {
-        guard let transmissionConnection: Transmission.Connection = TransmissionConnection(host: "138.197.196.245", port: 1234) else
+        guard let transmissionConnection: Transmission.Connection = TransmissionConnection(host: "host", port: 1234) else
 
         {
             XCTFail()
@@ -85,4 +85,6 @@ final class MoonbounceLibraryTests: XCTestCase
         print(ipAssign)
         print("read")
     }
+    
+    
 }
