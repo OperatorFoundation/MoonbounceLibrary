@@ -3,7 +3,7 @@
 
 import TunnelClient
 
-class ErrorNotifier {
+public class ErrorNotifier {
     let activationAttemptId: String?
 
     init(activationAttemptId: String?) {
