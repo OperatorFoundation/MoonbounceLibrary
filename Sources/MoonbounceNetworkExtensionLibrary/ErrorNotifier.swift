@@ -19,7 +19,7 @@ public class ErrorNotifier {
         FileManager.default.createFile(atPath: lastErrorFilePath, contents: errorMessageData, attributes: nil)
     }
 
-    static func removeLastErrorFile() {
+    public static func removeLastErrorFile() {
         if let lastErrorFileURL = FileManager.networkExtensionLastErrorFileURL {
             _ = FileManager.deleteFile(at: lastErrorFileURL)
         }
