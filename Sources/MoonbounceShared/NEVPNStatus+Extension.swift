@@ -11,7 +11,7 @@ import TunnelClient
 
 extension NEVPNStatus
 {
-    var stringValue: String
+    public var stringValue: String
     {
         switch self
         {
