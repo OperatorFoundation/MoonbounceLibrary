@@ -10,49 +10,49 @@ import Cocoa
 import Logging
 import Net
 
-var appLog = Logger(label: "org.OperatorFoundation.Moonbounce.MacOS")
+public var appLog = Logger(label: "org.OperatorFoundation.Moonbounce.MacOS")
 
-let mbPink = NSColor(red:0.92, green:0.55, blue:0.73, alpha:1.0)
-let mbDarkBlue = NSColor(red:0.00, green:0.06, blue:0.16, alpha:1.0)
-let mbBlue = NSColor(red:0.16, green:0.20, blue:0.48, alpha:1.0)
-let mbWhite = NSColor(red:0.97, green:0.97, blue:0.98, alpha:1.0)
+public let mbPink = NSColor(red:0.92, green:0.55, blue:0.73, alpha:1.0)
+public let mbDarkBlue = NSColor(red:0.00, green:0.06, blue:0.16, alpha:1.0)
+public let mbBlue = NSColor(red:0.16, green:0.20, blue:0.48, alpha:1.0)
+public let mbWhite = NSColor(red:0.97, green:0.97, blue:0.98, alpha:1.0)
 
-let kConnectionStatusNotification = "ConnectionStatusChanged"
-let kServerIPAvailableNotification = "PTServerIPAvailable"
-let kNewServerAddedNotification = "NewServerHasBeenAdded"
-let serverManagerReadyNotification = "ServerFinishedInit"
-let userTokenKey = "UserDoToken"
-let userDirectoryName = "User"
-let importedDirectoryName = "Imported"
-let defaultDirectoryName = "Default"
-let defaultTunnelName = "Default"
-let clientConfigFileName = "replicantclient.config"
-let replicantConfigFileName = "replicant.config"
-let moonbounceExtension = "moonbounce"
+public let kConnectionStatusNotification = "ConnectionStatusChanged"
+public let kServerIPAvailableNotification = "PTServerIPAvailable"
+public let kNewServerAddedNotification = "NewServerHasBeenAdded"
+public let serverManagerReadyNotification = "ServerFinishedInit"
+public let userTokenKey = "UserDoToken"
+public let userDirectoryName = "User"
+public let importedDirectoryName = "Imported"
+public let defaultDirectoryName = "Default"
+public let defaultTunnelName = "Default"
+public let clientConfigFileName = "replicantclient.config"
+public let replicantConfigFileName = "replicant.config"
+public let moonbounceExtension = "moonbounce"
 
 //let serverManager = ServerController(completionHandler: {NotificationCenter.default.post(Notification(name: Notification.Name(serverManagerReadyNotification)))})
 
-let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+public let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
 
-var moonbounceDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Moonbounce.macOS", isDirectory: true)
+public var moonbounceDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Moonbounce.macOS", isDirectory: true)
 
 // Parent config files directory - One directory to rule them all
-let configFilesDirectory = moonbounceDirectory.appendingPathComponent("ConfigFiles", isDirectory: true)
+public let configFilesDirectory = moonbounceDirectory.appendingPathComponent("ConfigFiles", isDirectory: true)
 
 //Default Config file directory - This is the config we supply for the demo server we run
-let defaultConfigDirectory = configFilesDirectory.appendingPathComponent(defaultDirectoryName
+public let defaultConfigDirectory = configFilesDirectory.appendingPathComponent(defaultDirectoryName
     , isDirectory: true)
 
 // Imported config files directory - Configurations imported by the user via the file system
-var importedConfigDirectory = configFilesDirectory.appendingPathComponent(importedDirectoryName, isDirectory: true)
+public var importedConfigDirectory = configFilesDirectory.appendingPathComponent(importedDirectoryName, isDirectory: true)
 
 // User Config Directory - Created when the user launches a Digital Ocean server through our app
-var userConfigDirectory = configFilesDirectory.appendingPathComponent(userDirectoryName + "/DO", isDirectory: true)
+public var userConfigDirectory = configFilesDirectory.appendingPathComponent(userDirectoryName + "/DO", isDirectory: true)
 
 //var currentConfigDirectory = defaultConfigDirectory
 
-var currentHost: NWEndpoint.Host?
-var userHost: NWEndpoint.Host?
+public var currentHost: NWEndpoint.Host?
+public var userHost: NWEndpoint.Host?
 {
     didSet
     {

@@ -3,7 +3,7 @@
 
 import TunnelClient
 
-class ErrorNotifier {
+public class ErrorNotifier {
     let activationAttemptId: String?
 
     init(activationAttemptId: String?) {
@@ -19,7 +19,7 @@ class ErrorNotifier {
         FileManager.default.createFile(atPath: lastErrorFilePath, contents: errorMessageData, attributes: nil)
     }
 
-    static func removeLastErrorFile() {
+    public static func removeLastErrorFile() {
         if let lastErrorFileURL = FileManager.networkExtensionLastErrorFileURL {
             _ = FileManager.deleteFile(at: lastErrorFileURL)
         }

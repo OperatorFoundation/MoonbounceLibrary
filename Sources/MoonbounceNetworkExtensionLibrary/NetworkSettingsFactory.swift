@@ -21,7 +21,7 @@ let tunIPSubnetMask = "255.255.255.255"
 let tunIPv6RouteAddress = ""
 
 /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".
-func makeNetworkSettings(host: String, tunnelAddress: TunnelAddress) -> NEPacketTunnelNetworkSettings?
+public func makeNetworkSettings(host: String, tunnelAddress: TunnelAddress) -> NEPacketTunnelNetworkSettings?
 {
     let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: host)
     

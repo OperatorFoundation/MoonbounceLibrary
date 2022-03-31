@@ -8,12 +8,11 @@
 
 import Foundation
 import TunnelClient
-import ZIPFoundation
 import ReplicantSwift
 import MoonbounceShared
 
 // FIXME: replace applogs with actual logs
-class NetworkExtensionConfigController
+public class NetworkExtensionConfigController
 {
     public static func getMoonbounceConfig(fromProtocolConfiguration protocolConfiguration: TunnelProviderProtocol) -> MoonbounceConfig?
     {
@@ -24,24 +23,31 @@ class NetworkExtensionConfigController
             return nil
         }
 
-        guard let replicantConfig = ReplicantConfig<SilverClientConfig>(polish: nil, toneBurst: nil)
+        guard let replicantConfigJSON = providerConfiguration[Keys.replicantConfigKey.rawValue] as? Data
+        else
+        {
+            appLog.error("unable to load replicant config from provider configuration")
+            return nil
+        }
+        
+        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
             else
         {
             return nil
         }
         
-        guard let clientConfigJSON = providerConfiguration[Keys.clientConfigKey.rawValue] as? Data
-            else
-        {
-            // appLog.error("Unable to get ClientConfig JSON from provider config")
-            return nil
-        }
+//        guard let clientConfigJSON = providerConfiguration[Keys.clientConfigKey.rawValue] as? Data
+//            else
+//        {
+//            // appLog.error("Unable to get ClientConfig JSON from provider config")
+//            return nil
+//        }
         
-        guard let clientConfig = ClientConfig.parse(jsonData: clientConfigJSON)
-            else
-        {
-            return nil
-        }
+//        guard let clientConfig = ClientConfig.parse(jsonData: clientConfigJSON)
+//            else
+//        {
+//            return nil
+//        }
         
         guard let name = providerConfiguration[Keys.tunnelNameKey.rawValue] as? String
         else
@@ -50,7 +56,7 @@ class NetworkExtensionConfigController
             return nil
         }
         
-        let moonbounceConfig = MoonbounceConfig(name: name, clientConfig: clientConfig, replicantConfig: replicantConfig)
+        let moonbounceConfig = MoonbounceConfig(name: name, replicantConfig: replicantConfig)
         
         return moonbounceConfig
     }
