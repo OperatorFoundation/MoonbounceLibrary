@@ -331,8 +331,7 @@ public class ConfigController
     
 }
 
-
-enum ConfigDirectory: String
+public enum ConfigDirectory: String
 {
     case importedDirectory = "Imported"
     case defaultDirectory = "Default"
