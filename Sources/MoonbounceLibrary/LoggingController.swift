@@ -8,7 +8,6 @@
 
 import Foundation
 import Logging
-import MoonbounceLibrary
 import MoonbounceShared
 import NetworkExtension
 
@@ -21,11 +20,11 @@ public class LoggingController
     }
 
     // This allows us to see print statements for debugging
-    @objc public func startLoggingLoop()
+    public func startLoggingLoop(vpnPreferencesController: VPNPreferencesController)
     {
         loggingEnabled = true
         
-        guard let vpnPreference = VPNPreferencesController.shared.maybeVPNPreference
+        guard let vpnPreference = vpnPreferencesController.maybeVPNPreference
         else
         {
             appLog.error("\nUnable to start communications with extension, vpnPreference is nil.\n")

@@ -7,18 +7,23 @@
 //
 
 import Foundation
+import Logging
 import MoonbounceShared
 import TunnelClient
 
 /// All of these functions must be called from the main thread
 public class VPNPreferencesController
 {
-    public static let shared = VPNPreferencesController()
-    
     public var maybeVPNPreference: NETunnelProviderManager?
+
+    let logger: Logger
+
+    public init(logger: Logger)
+    {
+        self.logger = logger
+    }
     
     // MARK: Public Functions
-    
     public func setup(moonbounceConfig: MoonbounceConfig, completionHandler: @escaping ((Either<NETunnelProviderManager>) -> Void))
     {
         // Doing this because we believe NetworkExtension requires it
@@ -28,26 +33,26 @@ public class VPNPreferencesController
             
             switch eitherVPNPreference
             {
-            case .error(_):
-                completionHandler(eitherVPNPreference)
-                return
-            case .value(let vpnPreference):
-                self.updateConfiguration(moonbounceConfig: moonbounceConfig)
-                {
-                    (maybeError) in
-                    
-                    if let error = maybeError
+                case .error(_):
+                    completionHandler(eitherVPNPreference)
+                    return
+                case .value(let vpnPreference):
+                    self.updateConfiguration(moonbounceConfig: moonbounceConfig)
                     {
-                        completionHandler(Either<NETunnelProviderManager>.error(error))
-                        return
-                    }
-                    else
-                    {
-                        completionHandler(Either<NETunnelProviderManager>.value(vpnPreference))
-                        return
-                    }
+                        (maybeError) in
 
-                }
+                        if let error = maybeError
+                        {
+                            completionHandler(Either<NETunnelProviderManager>.error(error))
+                            return
+                        }
+                        else
+                        {
+                            completionHandler(Either<NETunnelProviderManager>.value(vpnPreference))
+                            return
+                        }
+
+                    }
             }
         }
     }
@@ -66,12 +71,12 @@ public class VPNPreferencesController
                 
                 switch eitherVPNPreference
                 {
-                case .error(let error):
-                    completionHandler(error)
-                    return
-                case .value(let vpnPreference):
-                    self.maybeVPNPreference = vpnPreference
-                    self.updateConfiguration(vpnPreference: vpnPreference, moonbounceConfig: moonbounceConfig, completionHandler: completionHandler)
+                    case .error(let error):
+                        completionHandler(error)
+                        return
+                    case .value(let vpnPreference):
+                        self.maybeVPNPreference = vpnPreference
+                        self.updateConfiguration(vpnPreference: vpnPreference, moonbounceConfig: moonbounceConfig, completionHandler: completionHandler)
                 }
             }
         }
@@ -131,8 +136,7 @@ public class VPNPreferencesController
     
     public func save(completionHandler: @escaping ((Error?) -> Void))
     {
-        guard let vpnPreference = maybeVPNPreference
-        else
+        guard let vpnPreference = maybeVPNPreference else
         {
             completionHandler(VPNPreferencesError.nilVPNPreference)
             return
@@ -147,8 +151,7 @@ public class VPNPreferencesController
         {
             maybeError in
             
-            guard maybeError == nil
-                else
+            guard maybeError == nil else
             {
                 appLog.error("\nFailed to save the configuration: \(maybeError!)\n")
                 completionHandler(maybeError)
@@ -210,9 +213,6 @@ public class VPNPreferencesController
                 
         return protocolConfiguration
     }
-    
-    
-    
 }
 
 public enum VPNPreferencesError: Error
@@ -225,13 +225,12 @@ public enum VPNPreferencesError: Error
     {
         switch self
         {
-            
-        case .protocolConfiguration:
-            return NSLocalizedString("Failed to initialize a NETunnelProviderProtocol", comment: "")
-        case .nilVPNPreference:
-            return NSLocalizedString("Cannot save a nil preference.", comment: "")
-        case .unexpectedNilValue:
-            return NSLocalizedString("We got a nil value that should be impossible.", comment: "")
+            case .protocolConfiguration:
+                return NSLocalizedString("Failed to initialize a NETunnelProviderProtocol", comment: "")
+            case .nilVPNPreference:
+                return NSLocalizedString("Cannot save a nil preference.", comment: "")
+            case .unexpectedNilValue:
+                return NSLocalizedString("We got a nil value that should be impossible.", comment: "")
         }
     }
 }
