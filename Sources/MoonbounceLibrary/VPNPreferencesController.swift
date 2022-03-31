@@ -27,10 +27,14 @@ public class VPNPreferencesController
     public func setup(moonbounceConfig: MoonbounceConfig, completionHandler: @escaping ((Either<NETunnelProviderManager>) -> Void))
     {
         // Doing this because we believe NetworkExtension requires it
+        logger.debug("VPNPreferencesController.setup, loading...")
+
         load
         {
            (eitherVPNPreference) in
-            
+
+            self.logger.debug("VPNPreferencesController.setup, loaded.")
+
             switch eitherVPNPreference
             {
                 case .error(_):
@@ -59,6 +63,8 @@ public class VPNPreferencesController
     
     public func updateConfiguration(moonbounceConfig: MoonbounceConfig, isEnabled: Bool = false, completionHandler: @escaping ((Error?) -> Void))
     {
+        logger.debug("VPNPreferencesController.updateConfiguration 1")
+
         if let vpnPreference = maybeVPNPreference
         {
             updateConfiguration(vpnPreference: vpnPreference, moonbounceConfig: moonbounceConfig, completionHandler: completionHandler)
@@ -84,6 +90,8 @@ public class VPNPreferencesController
     
     private func updateConfiguration(vpnPreference: NETunnelProviderManager, moonbounceConfig: MoonbounceConfig, isEnabled: Bool = true, completionHandler: @escaping ((Error?) -> Void))
     {
+        logger.debug("VPNPreferencesController.updateConfiguration 2")
+
         guard let protocolConfiguration = self.newProtocolConfiguration(moonbounceConfig: moonbounceConfig)
         else
         {
@@ -100,6 +108,8 @@ public class VPNPreferencesController
     
     public func deactivate(completionHandler: @escaping ((Error?) -> Void))
     {
+        logger.debug("VPNPreferencesController.deactivate")
+
         if let vpnPreference = maybeVPNPreference
         {
             vpnPreference.isEnabled = false
@@ -113,6 +123,8 @@ public class VPNPreferencesController
 
     public func load(completionHandler: @escaping ((Either<NETunnelProviderManager>) -> Void))
     {
+        logger.debug("VPNPreferencesController.load")
+
         let newManager = NETunnelProviderManager()
 
          newManager.loadFromPreferences
@@ -136,6 +148,8 @@ public class VPNPreferencesController
     
     public func save(completionHandler: @escaping ((Error?) -> Void))
     {
+        logger.debug("VPNPreferencesController.save 1")
+
         guard let vpnPreference = maybeVPNPreference else
         {
             completionHandler(VPNPreferencesError.nilVPNPreference)
@@ -147,6 +161,8 @@ public class VPNPreferencesController
     
     public func save(vpnPreference: NETunnelProviderManager, completionHandler: @escaping ((Error?) -> Void))
     {
+        logger.debug("VPNPreferencesController.save 2")
+
         vpnPreference.saveToPreferences
         {
             maybeError in
@@ -176,6 +192,8 @@ public class VPNPreferencesController
     
     public func newProtocolConfiguration(moonbounceConfig: MoonbounceConfig) -> NETunnelProviderProtocol?
     {
+        logger.debug("VPNPreferencesController.newProtocolConfiguration")
+
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
         let appId = Bundle.main.bundleIdentifier!
         appLog.debug("\n----->Setting the providerBundleIdentifier to \(appId).NetworkExtension")
