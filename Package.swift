@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "MoonbounceLibrary",
-    platforms: [.macOS(.v10_15)],
+    platforms: [.macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -19,22 +19,22 @@ let package = Package(
             targets: ["MoonbounceShared"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/weichsel/ZIPFoundation.git", from: "0.9.11"),
-        .package(url: "https://github.com/OperatorFoundation/Datable", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/SwiftQueue.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/Flower.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/Transport.git", from: "2.3.12"),
-        .package(url: "https://github.com/OperatorFoundation/Transmission.git", from: "1.2.10"),
-        .package(url: "https://github.com/OperatorFoundation/InternetProtocols.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/SwiftHexTools.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/ReplicantSwift.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/ReplicantSwiftClient.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/TransmissionTransport.git", branch: "main"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
-        .package(url: "https://github.com/OperatorFoundation/LoggerQueue.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Chord.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/Datable", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/Flower.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/InternetProtocols.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/LoggerQueue.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Net.git", branch: "main"),
+        //        .package(url: "https://github.com/OperatorFoundation/ReplicantSwift.git", branch: "main"),
+        //        .package(url: "https://github.com/OperatorFoundation/ReplicantSwiftClient.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/SwiftHexTools.git", branch: "main"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
+        .package(url: "https://github.com/OperatorFoundation/SwiftQueue.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/Transmission.git", from: "1.2.10"),
+        .package(url: "https://github.com/OperatorFoundation/TransmissionTransport.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/Transport.git", from: "2.3.12"),
         .package(url: "https://github.com/OperatorFoundation/TunnelClient.git", branch: "main"),
+        .package(url: "https://github.com/weichsel/ZIPFoundation.git", from: "0.9.11"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -50,9 +50,9 @@ let package = Package(
                 "Transport",
                 "InternetProtocols",
                 "SwiftHexTools",
-                "ReplicantSwift",
+//                "ReplicantSwift",
                 "TransmissionTransport",
-                "ReplicantSwiftClient",
+//                "ReplicantSwiftClient",
                 .product(name: "Logging", package: "swift-log"),
                 "LoggerQueue",
                 "Chord",
@@ -65,8 +65,8 @@ let package = Package(
                 "MoonbounceShared",
                 .product(name: "Logging", package: "swift-log"),
                 "Net",
-                "ReplicantSwiftClient",
-                "ReplicantSwift",
+//                "ReplicantSwiftClient",
+//                "ReplicantSwift",
                 "SwiftQueue",
                 "LoggerQueue",
                 "Flower",
@@ -80,8 +80,8 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
                 "Net",
-                "ReplicantSwiftClient",
-                "ReplicantSwift",
+//                "ReplicantSwiftClient",
+//                "ReplicantSwift",
                 "TunnelClient",
             ]),
         .testTarget(

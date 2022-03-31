@@ -7,12 +7,11 @@
 //
 
 import Foundation
-import Network
-
+import MoonbounceShared
+import Net
+//import ReplicantSwift
 import TunnelClient
 import ZIPFoundation
-import ReplicantSwift
-import MoonbounceShared
 
 public class ConfigController
 {
@@ -181,8 +180,8 @@ public class ConfigController
                     
                     // FIXME: Replicant Config from JSON
                     //let replicantConfig = ReplicantConfig(withConfigAtPath: configURL.appendingPathComponent(file1).path)
-                    let replicantConfig: ReplicantConfig? = nil
-                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, replicantConfig: replicantConfig)
+//                    let replicantConfig: ReplicantConfig? = nil
+                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent/*, replicantConfig: replicantConfig*/)
                     
                     self.configs.append(moonbounceConfig)
                     
@@ -248,19 +247,22 @@ public class ConfigController
                 //If all required files are present refresh server select button
                 if fileNames.contains(replicantConfigFileName)
                 {
-                    guard let replicantConfig = ReplicantConfig(withConfigAtPath: configURL.appendingPathComponent(replicantConfigFileName).path) else {
-                        appLog.error("Unable to create replicant config from file at \(configURL.appendingPathComponent(replicantConfigFileName))")
-                        return nil
-                    }
+//                    guard let replicantConfig = ReplicantConfig(withConfigAtPath: configURL.appendingPathComponent(replicantConfigFileName).path) else {
+//                        appLog.error("Unable to create replicant config from file at \(configURL.appendingPathComponent(replicantConfigFileName))")
+//                        return nil
+//                    }
                     
-                    let serverIP = NWEndpoint.Host(replicantConfig.serverIP)
-                    guard let serverPort = NWEndpoint.Port(rawValue: replicantConfig.port) else {
-                        appLog.error("unable to create a moonbounce config with the provided port")
-                        return nil
-                    }
-                    
+//                    let serverIP = NWEndpoint.Host(replicantConfig.serverIP)
+                    let serverIP = "127.0.0.1"
+//                    guard let serverPort = NWEndpoint.Port(rawValue: replicantConfig.port) else {
+//                        appLog.error("unable to create a moonbounce config with the provided port")
+//                        return nil
+//                    }
+
+                    let serverPort = UInt16(1234)
+
                     let clientConfig = ClientConfig(withPort: serverPort, andHost: serverIP)
-                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent, replicantConfig: replicantConfig)
+                    let moonbounceConfig = MoonbounceConfig(name: configURL.lastPathComponent/*, replicantConfig: replicantConfig*/)
                     
                     return moonbounceConfig
                 }
@@ -292,11 +294,11 @@ public class ConfigController
             return nil
         }
 
-        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
-            else
-        {
-            return nil
-        }
+//        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
+//            else
+//        {
+//            return nil
+//        }
         
         guard let clientConfigJSON = providerConfiguration[Keys.clientConfigKey.rawValue] as? Data
             else
@@ -318,7 +320,7 @@ public class ConfigController
             return nil
         }
         
-        let moonbounceConfig = MoonbounceConfig(name: name, replicantConfig: replicantConfig)
+        let moonbounceConfig = MoonbounceConfig(name: name/*, replicantConfig: replicantConfig*/)
         
         return moonbounceConfig
     }

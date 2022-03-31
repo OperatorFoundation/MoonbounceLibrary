@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import TunnelClient
 import MoonbounceShared
+import TunnelClient
 
 /// All of these functions must be called from the main thread
 public class VPNPreferencesController
@@ -177,7 +177,8 @@ public class VPNPreferencesController
         let appId = Bundle.main.bundleIdentifier!
         appLog.debug("\n----->Setting the providerBundleIdentifier to \(appId).NetworkExtension")
         protocolConfiguration.providerBundleIdentifier = "\(appId).NetworkExtension"
-        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
+//        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
+        protocolConfiguration.serverAddress = "127.0.0.1"
         protocolConfiguration.includeAllNetworks = true
 
         // FIXME: Replicant JSON needed here

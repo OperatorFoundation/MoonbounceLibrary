@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import TunnelClient
-import ReplicantSwift
 import MoonbounceShared
+//import ReplicantSwift
+import TunnelClient
 
 // FIXME: replace applogs with actual logs
 public class NetworkExtensionConfigController
@@ -30,11 +30,11 @@ public class NetworkExtensionConfigController
             return nil
         }
         
-        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
-            else
-        {
-            return nil
-        }
+//        guard let replicantConfig = ReplicantConfig(from: replicantConfigJSON)
+//            else
+//        {
+//            return nil
+//        }
         
 //        guard let clientConfigJSON = providerConfiguration[Keys.clientConfigKey.rawValue] as? Data
 //            else
@@ -56,7 +56,7 @@ public class NetworkExtensionConfigController
             return nil
         }
         
-        let moonbounceConfig = MoonbounceConfig(name: name, replicantConfig: replicantConfig)
+        let moonbounceConfig = MoonbounceConfig(name: name/*, replicantConfig: replicantConfig*/)
         
         return moonbounceConfig
     }

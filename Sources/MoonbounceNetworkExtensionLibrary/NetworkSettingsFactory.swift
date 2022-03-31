@@ -6,12 +6,11 @@
 //  Copyright © 2020 operatorfoundation.org. All rights reserved.
 //
 
-import Foundation
-import TunnelClient
-
 import Flower
-import ReplicantSwift
+import Foundation
+//import ReplicantSwift
 import SwiftQueue
+import TunnelClient
 
 let googleDNSipv4 = "8.8.8.8"
 let googleDNS2ipv4 = "8.8.4.4"

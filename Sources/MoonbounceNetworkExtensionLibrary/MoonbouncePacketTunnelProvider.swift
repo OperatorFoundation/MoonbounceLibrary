@@ -6,15 +6,15 @@
 //  Copyright © 2019 operatorfoundation.org. All rights reserved.
 //
 
-import Logging
-import TunnelClient
-import Net
-import ReplicantSwiftClient
-import ReplicantSwift
-import SwiftQueue
-import LoggerQueue
 import Flower
+import LoggerQueue
+import Logging
+import Net
+//import ReplicantSwift
+//import ReplicantSwiftClient
+import SwiftQueue
 import Transmission
+import TunnelClient
 import TunnelClientMock
 
 class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
@@ -120,16 +120,19 @@ class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
             return
         }
 
-        guard let replicantConfig = moonbounceConfig.replicantConfig
-            else
-        {
-            self.log.debug("start tunnel failed to find a replicant configuration")
-            completionHandler(TunnelError.badConfiguration)
-            return
-        }
+//        guard let replicantConfig = moonbounceConfig.replicantConfig
+//            else
+//        {
+//            self.log.debug("start tunnel failed to find a replicant configuration")
+//            completionHandler(TunnelError.badConfiguration)
+//            return
+//        }
         
-        let host = moonbounceConfig.replicantConfig?.serverIP
-        let port = moonbounceConfig.replicantConfig?.port
+//        let host = moonbounceConfig.replicantConfig?.serverIP
+//        let port = moonbounceConfig.replicantConfig?.port
+
+        let host = "127.0.0.1"
+        let port = 1234
         
         self.log.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
         self.networkMonitor = NWPathMonitor()
@@ -141,7 +144,12 @@ class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
         
         log.debug("2. Connect to server called.")
         
-        guard let replicantConnection = ReplicantConnection(type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
+//        guard let replicantConnection = ReplicantConnection(type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
+//            log.error("could not initialize replicant connection")
+//            return
+//        }
+        guard let replicantConnection = TransmissionConnection(host: "127.0.0.1", port: 1234) else
+        {
             log.error("could not initialize replicant connection")
             return
         }

@@ -8,8 +8,8 @@
 
 import Foundation
 import TunnelClient
-import ReplicantSwiftClient
-import ReplicantSwift
+//import ReplicantSwiftClient
+//import ReplicantSwift
 import Net
 
 public enum Keys: String

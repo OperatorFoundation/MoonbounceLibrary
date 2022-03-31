@@ -6,12 +6,12 @@
 //  Copyright © 2019 Operator Foundation. All rights reserved.
 //
 
+import InternetProtocols
+import Flower
 import Foundation
 import Logging
+//import ReplicantSwiftClient
 import TunnelClient
-import ReplicantSwiftClient
-import Flower
-import InternetProtocols
 
 /// An object used to tunnel IP packets using the SimpleTunnel protocol.
 public class ClientTunnelConnection

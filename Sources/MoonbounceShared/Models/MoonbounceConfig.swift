@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import ReplicantSwift
+//import ReplicantSwift
 import Net
 import TunnelClient
 
@@ -16,13 +16,13 @@ public class MoonbounceConfig: NSObject
     static let filenameExtension = "moonbounce"
     
     let fileManager = FileManager.default
-    public let replicantConfig: ReplicantConfig?
+//    public let replicantConfig: ReplicantConfig?
     public var name: String
 
-    public init(name: String, replicantConfig: ReplicantConfig?)
+    public init(name: String/*, replicantConfig: ReplicantConfig?*/)
     {
         self.name = name
-        self.replicantConfig = replicantConfig
+//        self.replicantConfig = replicantConfig
     }
 }
 

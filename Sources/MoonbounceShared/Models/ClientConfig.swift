@@ -35,10 +35,10 @@ public class ClientConfig: NSObject, Codable, NSSecureCoding
     public let host: String
     public let port: UInt16
     
-    public init(withPort port: NWEndpoint.Port, andHost host: NWEndpoint.Host)
+    public init(withPort port: UInt16, andHost host: String)
     {
-        self.port = port.rawValue
-        self.host = "\(host)"
+        self.port = port
+        self.host = host
     }
     
     public init?(withConfigAtPath path: String)

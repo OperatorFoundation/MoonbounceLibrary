@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import Net
 import MoonbounceShared
+import Net
 
 func checkForServerIP()
 {
