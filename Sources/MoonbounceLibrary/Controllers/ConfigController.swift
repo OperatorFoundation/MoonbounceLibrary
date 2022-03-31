@@ -22,7 +22,7 @@ public class ConfigController
     {
     }
 
-    func getDefaultMoonbounceConfig()-> MoonbounceConfig?
+    public func getDefaultMoonbounceConfig()-> MoonbounceConfig?
     {
         let fileManager = FileManager.default
 
@@ -86,7 +86,7 @@ public class ConfigController
         return nil
     }
     
-    func addConfig(atURL url: URL) -> Bool
+    public func addConfig(atURL url: URL) -> Bool
     {
         let configName = fileManager.displayName(atPath: url.path)
             //url.deletingPathExtension().lastPathComponent
@@ -126,7 +126,7 @@ public class ConfigController
         return false
     }
     
-    func removeConfig(atURL url: URL) -> Bool
+    public func removeConfig(atURL url: URL) -> Bool
     {
         do
         {
@@ -140,7 +140,7 @@ public class ConfigController
         }
     }
     
-    func configFilesAreValid(atURL configURL: URL) -> Bool
+    public func configFilesAreValid(atURL configURL: URL) -> Bool
     {
         do
         {
@@ -201,7 +201,7 @@ public class ConfigController
         return false
     }
     
-    func get(configDirectory: ConfigDirectory) -> URL?
+    public func get(configDirectory: ConfigDirectory) -> URL?
     {
         let thisDirectory = configFilesDirectory.appendingPathComponent(configDirectory.rawValue)
         
@@ -217,7 +217,7 @@ public class ConfigController
         }
     }
     
-    func createMoonbounceConfigFromFiles(atURL configURL: URL) -> MoonbounceConfig?
+    public func createMoonbounceConfigFromFiles(atURL configURL: URL) -> MoonbounceConfig?
     {
         do
         {
