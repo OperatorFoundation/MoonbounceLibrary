@@ -15,7 +15,11 @@ import NetworkExtension
 public class LoggingController
 {
     var loggingEnabled = true
-    
+
+    public init()
+    {
+    }
+
     // This allows us to see print statements for debugging
     @objc public func startLoggingLoop()
     {
