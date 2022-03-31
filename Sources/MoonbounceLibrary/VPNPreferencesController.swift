@@ -161,12 +161,14 @@ public class VPNPreferencesController
     
     public func save(vpnPreference: NETunnelProviderManager, completionHandler: @escaping ((Error?) -> Void))
     {
-        logger.debug("VPNPreferencesController.save 2")
+        logger.debug("VPNPreferencesController.save 2, vpnPreference.saveToPreferences...")
 
         vpnPreference.saveToPreferences
         {
             maybeError in
-            
+
+            logger.debug("VPNPreferencesController.save vpnPreferences.saveToPreferences callback.")
+
             guard maybeError == nil else
             {
                 appLog.error("\nFailed to save the configuration: \(maybeError!)\n")
