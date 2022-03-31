@@ -17,7 +17,7 @@ import Transmission
 import TunnelClient
 import TunnelClientMock
 
-public class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
+open class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
 {
     private var networkMonitor: NWPathMonitor?
     
