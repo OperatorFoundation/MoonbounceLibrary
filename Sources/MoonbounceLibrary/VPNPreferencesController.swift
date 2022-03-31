@@ -167,7 +167,7 @@ public class VPNPreferencesController
         {
             maybeError in
 
-            logger.debug("VPNPreferencesController.save vpnPreferences.saveToPreferences callback.")
+            self.logger.debug("VPNPreferencesController.save vpnPreferences.saveToPreferences callback.")
 
             guard maybeError == nil else
             {
@@ -179,7 +179,9 @@ public class VPNPreferencesController
             vpnPreference.loadFromPreferences(completionHandler:
             {
                 (maybeError) in
-                
+
+                self.logger.debug("VPNPreferencesController.save vpnPreferences.loadFromPreferences callback.")
+
                 if let error = maybeError
                 {
                     appLog.error("\nError loading from preferences!\(error)\n")
