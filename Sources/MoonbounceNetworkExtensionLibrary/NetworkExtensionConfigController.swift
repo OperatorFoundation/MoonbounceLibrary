@@ -8,10 +8,8 @@
 
 import Foundation
 import TunnelClient
-import ZIPFoundation
 import ReplicantSwift
 import MoonbounceShared
-import MoonbounceLibrary
 
 // FIXME: replace applogs with actual logs
 public class NetworkExtensionConfigController
