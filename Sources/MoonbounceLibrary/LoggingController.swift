@@ -12,12 +12,12 @@ import MoonbounceLibrary
 import MoonbounceShared
 import NetworkExtension
 
-class LoggingController
+public class LoggingController
 {
     var loggingEnabled = true
     
     // This allows us to see print statements for debugging
-    @objc func startLoggingLoop()
+    @objc public func startLoggingLoop()
     {
         loggingEnabled = true
         
@@ -89,7 +89,7 @@ class LoggingController
         }
     }
     
-    func updateStatus(state: NEVPNStatus)
+    public func updateStatus(state: NEVPNStatus)
     {
         switch state
         {
@@ -110,7 +110,7 @@ class LoggingController
         }
     }
 
-    func stopLoggingLoop()
+    public func stopLoggingLoop()
     {
         loggingEnabled = false
     }
