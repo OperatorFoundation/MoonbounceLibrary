@@ -17,7 +17,11 @@ public class ConfigController
 {
     let fileManager = FileManager.default
     var configs = [MoonbounceConfig]()
-    
+
+    public init()
+    {
+    }
+
     func getDefaultMoonbounceConfig()-> MoonbounceConfig?
     {
         let fileManager = FileManager.default
