@@ -21,6 +21,7 @@ public class NetworkExtensionModule: Module
     let appMessageQueue = BlockingQueue<Data?>()
     var flow: NEPacketTunnelFlow? = nil
     var packetBuffer: [NEPacket] = []
+    var provider: NEPacketTunnelProvider? = nil
 
     public init()
     {
@@ -51,6 +52,9 @@ public class NetworkExtensionModule: Module
             case let writePacketRequest as WritePacketRequest:
                 return writePacket(writePacketRequest)
 
+            case let setNetworkTunnelSettingsRequest as SetNetworkTunnelSettingsRequest:
+                return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
+
             default:
                 print("Unknown effect \(effect)")
                 return Failure(effect.id)
@@ -65,6 +69,11 @@ public class NetworkExtensionModule: Module
     public func setConfiguration(_ configuration: NETunnelProviderProtocol)
     {
         self.configuration = configuration
+    }
+
+    public func setProvider(_ provider: NEPacketTunnelProvider)
+    {
+        self.provider = provider
     }
 
     public func setFlow(_ flow: NEPacketTunnelFlow)
@@ -161,4 +170,85 @@ public class NetworkExtensionModule: Module
 
         return WritePacketResponse(effect.id)
     }
+
+    func setNetworkTunnelSettings(_ effect: SetNetworkTunnelSettingsRequest) -> Event?
+    {
+        guard let provider = self.provider else
+        {
+            return Failure(effect.id)
+        }
+
+        let settings = self.makeNetworkSettings(host: effect.host, tunnelAddress: effect.tunnelAddress)
+
+        let maybeError = Synchronizer.sync
+        {
+            (completionHandler: @escaping (Error?) -> Void) in
+
+            provider.setNetworkSettings(settings, completionHandler: completionHandler)
+        }
+
+        if maybeError != nil
+        {
+            return Failure(effect.id)
+        }
+        else
+        {
+            return SetNetworkTunnelSettingsResponse(effect.id)
+        }
+    }
+
+    /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".
+    func makeNetworkSettings(host: String, tunnelAddress: TunnelAddress) -> NEPacketTunnelNetworkSettings?
+    {
+        let googleDNSipv4 = "8.8.8.8"
+        let googleDNS2ipv4 = "8.8.4.4"
+        let googleDNSipv6 = "2001:4860:4860::8888"
+        let googleDNS2ipv6 = "2001:4860:4860::8844"
+        let tunIPSubnetMask = "255.255.255.255"
+        let tunIPv6RouteAddress = ""
+
+        let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: host)
+
+        // These are the Google DNS Settings, we will use these for now
+        let dnsServerStrings = [googleDNSipv4, googleDNS2ipv4, googleDNSipv6, googleDNS2ipv6]
+        let dnsSettings = NEDNSSettings(servers: dnsServerStrings)
+        // dnsSettings.matchDomains = [""] // All DNS queries must first go through the tunnel's DNS
+        networkSettings.dnsSettings = dnsSettings
+
+        switch tunnelAddress
+        {
+            case .ipV4(let tunIPv4Address):
+                let ipv4Settings = NEIPv4Settings(addresses: ["\(tunIPv4Address)"], subnetMasks: [tunIPSubnetMask])
+                // No routes specified, use the default route.
+                ipv4Settings.includedRoutes = [NEIPv4Route.default()]
+                networkSettings.ipv4Settings = ipv4Settings
+            case .ipV6(let tunIPv6Address):
+                let ipv6Settings = NEIPv6Settings(addresses: ["\(tunIPv6Address)"], networkPrefixLengths: [64])
+                ipv6Settings.includedRoutes = [NEIPv6Route.default()]
+                networkSettings.ipv6Settings = ipv6Settings
+            case .dualStack(let tunIPv4Address, let tunIPv6Address):
+                // IPv4
+                let ipv4Settings = NEIPv4Settings(addresses: ["\(tunIPv4Address)"], subnetMasks: [tunIPSubnetMask])
+                // No routes specified, use the default route.
+                ipv4Settings.includedRoutes = [NEIPv4Route.default()]
+                networkSettings.ipv4Settings = ipv4Settings
+
+                // IPv6
+                let ipv6Settings = NEIPv6Settings(addresses: ["\(tunIPv6Address)"], networkPrefixLengths: [64])
+                ipv6Settings.includedRoutes = [NEIPv6Route.default()]
+                networkSettings.ipv6Settings = ipv6Settings
+        }
+
+        // FIXME: These should be set later when we have a ReplicantConnection
+        //    // This should be derived from the specific polish specified by the replicant config
+        //    networkSettings.tunnelOverheadBytes = 0
+        //
+        //    if let polish = replicantConfig.polish as? SilverClientConfig
+        //    {
+        //        networkSettings.mtu = NSNumber(value: polish.chunkSize)
+        //    }
+
+        return networkSettings
+    }
+
 }

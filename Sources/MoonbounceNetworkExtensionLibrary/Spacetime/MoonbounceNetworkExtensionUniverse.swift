@@ -20,9 +20,10 @@ public class MoonbounceNetworkExtensionUniverse: Universe
 {
     let appLog: Logger
     let logQueue: LoggerQueue
-
     var network: Transmission.Connection? = nil
     var flower: FlowerConnection? = nil
+    let messagesToPacketsQueue = DispatchQueue(label: "clientTunnelConnection: messagesToPackets")
+    let packetsToMessagesQueue = DispatchQueue(label: "clientTunnelConnection: packetsToMessages")
 
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger, logQueue: LoggerQueue)
     {
@@ -101,14 +102,13 @@ public class MoonbounceNetworkExtensionUniverse: Universe
             return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
         }
 
-        let remoteHost = serverAddress
         self.appLog.debug("Server address: \(serverAddress)")
 
-        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
-        {
-            appLog.error("Unable to get moonbounce config from protocol.")
-            return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
-        }
+//        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
+//        {
+//            appLog.error("Unable to get moonbounce config from protocol.")
+//            return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
+//        }
 
         //        guard let replicantConfig = moonbounceConfig.replicantConfig
         //            else
@@ -132,7 +132,8 @@ public class MoonbounceNetworkExtensionUniverse: Universe
         //            log.error("could not initialize replicant connection")
         //            return
         //        }
-        guard let replicantConnection = TransmissionConnection(host: "127.0.0.1", port: 1234) else
+
+        guard let replicantConnection = TransmissionConnection(host: host, port: port) else
         {
             appLog.error("could not initialize replicant connection")
             return MoonbounceUniverseError.connectionFailed
@@ -142,9 +143,46 @@ public class MoonbounceNetworkExtensionUniverse: Universe
         self.flower = FlowerConnection(connection: replicantConnection)
 
         self.appLog.debug("\n3. 🌲 Connection state is ready 🌲\n")
+        self.appLog.debug("Waiting for IP assignment")
+        guard let flower = self.flower else
+        {
+            self.appLog.error("🛑 Current connection is nil, giving up. 🛑")
+            return TunnelError.disconnected
+        }
 
-        return nil
-        //return self.waitForIPAssignment()
+        self.appLog.debug("calling flowerConnection.readMessage()")
+        let message = flower.readMessage()
+        self.appLog.debug("finished calling flowerConnection.readMessage()")
+
+        let tunnelAddress: TunnelAddress
+        switch message
+        {
+            case .IPAssignV4(let ipv4Address):
+                tunnelAddress = .ipV4(ipv4Address)
+
+            case .IPAssignV6(let ipv6Address):
+                tunnelAddress = .ipV6(ipv6Address)
+
+            case .IPAssignDualStack(let ipv4Address, let ipv6Address):
+                tunnelAddress = .dualStack(ipv4Address, ipv6Address)
+
+            default:
+                return MoonbounceUniverseError.noIpAssignment
+        }
+
+        self.appLog.debug("(setTunnelSettings) host: \(host), tunnelAddress: \(tunnelAddress)")
+
+        do
+        {
+            // Set the virtual interface settings.
+            try self.setNetworkTunnelSettings(host, tunnelAddress)
+        }
+        catch
+        {
+            return MoonbounceUniverseError.failure
+        }
+
+        return nil // Success!
     }
 
     public func stopTunnel(with: NEProviderStopReason)
@@ -206,10 +244,107 @@ public class MoonbounceNetworkExtensionUniverse: Universe
                 throw MoonbounceUniverseError.failure
         }
     }
+
+    public func setNetworkTunnelSettings(_ host: String, _ tunnelAddress: TunnelAddress) throws
+    {
+        let response = processEffect(SetNetworkTunnelSettingsRequest(host, tunnelAddress))
+        switch response
+        {
+            case is SetNetworkTunnelSettingsResponse:
+                return
+
+            default:
+                throw MoonbounceUniverseError.failure
+        }
+    }
+
+    /// Make the initial readPacketsWithCompletionHandler call.
+    public func startHandlingPackets()
+    {
+        self.appLog.debug("7. Start handling packets called.")
+
+        packetsToMessagesQueue.async
+        {
+            self.appLog.debug("calling packetsToMessages async")
+
+            do
+            {
+                try self.packetsToMessages()
+            }
+            catch
+            {
+                return
+            }
+        }
+
+        messagesToPacketsQueue.async
+        {
+            self.appLog.debug("calling messagesToPackets async")
+
+            do
+            {
+                try self.messagesToPackets()
+            }
+            catch
+            {
+                return
+            }
+        }
+    }
+
+    /// Handle packets coming from the packet flow.
+    func packetsToMessages() throws
+    {
+        self.appLog.debug("8. Handle Packets Called")
+
+        guard let flower = self.flower else
+        {
+            return
+        }
+
+        while true
+        {
+            let data = try self.readPacket()
+
+            // Encapsulates packages into Messages (using Flower)
+            self.appLog.debug("packet: \(data)")
+            let message = Message.IPDataV4(data)
+            self.appLog.debug("🌷 encapsulated into Flower Message: \(message.description) 🌷")
+
+            flower.writeMessage(message: message)
+        }
+    }
+
+    func messagesToPackets() throws
+    {
+        guard let flower = self.flower else
+        {
+            return
+        }
+
+        while true
+        {
+            guard let message = flower.readMessage() else {return}
+
+            self.appLog.debug("🌷 replicantConnection.readMessages callback message: \(message.description) 🌷")
+            switch message
+            {
+                case .IPDataV4(let data):
+                    self.appLog.debug("IPDataV4 calling write packets.")
+                    try self.writePacket(data)
+
+//                case .IPDataV6(let data): // FIXME - support IPv6
+
+                default:
+                    self.appLog.error("unsupported message type")
+            }
+        }
+    }
 }
 
 public enum MoonbounceUniverseError: Error
 {
     case failure
     case connectionFailed
+    case noIpAssignment
 }

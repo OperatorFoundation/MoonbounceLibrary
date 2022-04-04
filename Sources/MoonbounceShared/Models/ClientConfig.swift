@@ -9,6 +9,8 @@
 import Foundation
 import Net
 
+let clientConfigKey = "ClientConfig"
+
 public class ClientConfig: NSObject, Codable, NSSecureCoding
 {
     public static var supportsSecureCoding = true
@@ -31,7 +33,6 @@ public class ClientConfig: NSObject, Codable, NSSecureCoding
         }
     }
     
-    let clientConfigKey = "ClientConfig"
     public let host: String
     public let port: UInt16
     
@@ -64,9 +65,8 @@ public class ClientConfig: NSObject, Codable, NSSecureCoding
             let serverConfigData = try encoder.encode(self)
             return serverConfigData
         }
-        catch (let error)
+        catch
         {
-            // appLog.error("Failed to encode Server config into JSON format: \(error)")
             return nil
         }
     }
@@ -97,9 +97,8 @@ public class ClientConfig: NSObject, Codable, NSSecureCoding
             let config = try decoder.decode(ClientConfig.self, from: jsonData)
             return config
         }
-        catch (let error)
+        catch
         {
-            // appLog.error("\nUnable to decode JSON into ClientConfig: \(error)\n")
             return nil
         }
     }

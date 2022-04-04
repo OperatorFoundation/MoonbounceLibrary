@@ -68,7 +68,7 @@ public class LoggingController
                 if newStatus != currentStatus
                 {
                     currentStatus = newStatus
-                    self.logger.debug("\nCurrent Status Changed: \(currentStatus.stringValue)\n")
+                    self.logger.debug("\nCurrent Status Changed: \(currentStatus)\n")
                 }
                 
                 let message = "Hello Provider".data
