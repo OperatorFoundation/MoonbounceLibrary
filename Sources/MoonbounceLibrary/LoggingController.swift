@@ -6,6 +6,7 @@
 //  Copyright © 2020 operatorfoundation.org. All rights reserved.
 //
 
+import Datable
 import Foundation
 import Logging
 import MoonbounceShared
@@ -14,102 +15,74 @@ import NetworkExtension
 public class LoggingController
 {
     var loggingEnabled = true
+    let universe: MoonbounceUniverse
+    let queue: DispatchQueue = DispatchQueue(label: "LoggingController")
+    let logger: Logger
 
-    public init()
+    public init(universe: MoonbounceUniverse, logger: Logger)
     {
+        self.universe = universe
+        self.logger = logger
     }
 
     // This allows us to see print statements for debugging
-    public func startLoggingLoop(vpnPreferencesController: VPNPreferencesController)
+    public func startLoggingLoop()
     {
         loggingEnabled = true
-        
-        guard let vpnPreference = vpnPreferencesController.maybeVPNPreference
-        else
+
+        let status: NEVPNStatus
+        do
         {
-            appLog.error("\nUnable to start communications with extension, vpnPreference is nil.\n")
+            status = try self.universe.connectionStatus()
+        }
+        catch
+        {
+            self.logger.error("LoggingController.startLoggingLoop - error: \(error)")
             return
         }
-        
-        // Send a simple IPC message to the provider, handle the response.
-        guard let session = vpnPreference.connection as? NETunnelProviderSession
-            else
+
+        guard status != .invalid else
         {
-            appLog.error("\nStart logging loop failed:")
-            appLog.error("Unable to send a message, vpnPreference.connection could not be unwrapped as a NETunnelProviderSession.")
-            appLog.error("\(vpnPreference.connection)\n")
+            self.logger.error("LoggingController.startLoggingLoop - Invalid connection status")
             return
         }
-        
-        guard vpnPreference.connection.status != .invalid
-            else
-        {
-            appLog.error("\nInvalid connection status")
-            return
-        }
-        
-        DispatchQueue.global(qos: .background).async
+
+        self.queue.async
         {
             var currentStatus: NEVPNStatus = .invalid
             while self.loggingEnabled
             {
                 sleep(1)
-                
-                if vpnPreference.connection.status != currentStatus
-                {
-                    currentStatus = vpnPreference.connection.status
-                    appLog.debug("\nCurrent Status Changed: \(currentStatus.stringValue)\n")
-                    self.updateStatus(state: vpnPreference.connection.status)
-                }
-                
-                guard let message = "Hello Provider".data(using: String.Encoding.utf8)
-                    else
-                {
-                    continue
-                }
-                
+
+                let newStatus: NEVPNStatus
                 do
                 {
-                    try session.sendProviderMessage(message)
-                    {
-                        response in
-                        
-                        if response != nil
-                        {
-                            let responseString: String = NSString(data: response!, encoding: String.Encoding.utf8.rawValue)! as String
-                            if responseString != ""
-                            {
-                                appLog.debug("\(responseString)")
-                            }
-                        }
-                    }
+                    newStatus = try self.universe.connectionStatus()
                 }
                 catch
                 {
-                    NSLog("Failed to send a message to the provider")
+                    self.logger.error("LoggingController.startLoggingLoop - error: \(error)")
+                    return
+                }
+
+                if newStatus != currentStatus
+                {
+                    currentStatus = newStatus
+                    self.logger.debug("\nCurrent Status Changed: \(currentStatus.stringValue)\n")
+                }
+                
+                let message = "Hello Provider".data
+
+                do
+                {
+                    let response = try self.universe.sendProviderMessage(message).string
+                    self.logger.debug("\(response)")
+                }
+                catch
+                {
+                    self.logger.error("LoggingController.startLoggingLoop - Failed to send a message to the provider: \(error)")
                 }
             }
-        }
-    }
-    
-    public func updateStatus(state: NEVPNStatus)
-    {
-        switch state
-        {
-        case .connected:
-            isConnected = ConnectState(state: .success, stage: .statusCodes)
-        case .connecting:
-            isConnected = ConnectState(state: .trying, stage: .statusCodes)
-        case .disconnected:
-            isConnected = ConnectState(state: .failed, stage: .statusCodes)
-        case .disconnecting:
-            isConnected = ConnectState(state: .trying, stage: .statusCodes)
-        case .invalid:
-            isConnected = ConnectState(state: .failed, stage: .statusCodes)
-        case .reasserting:
-            isConnected = ConnectState(state: .start, stage: .statusCodes)
-        default:
-            isConnected = ConnectState(state: .failed, stage: .statusCodes)
         }
     }
 
@@ -117,5 +90,4 @@ public class LoggingController
     {
         loggingEnabled = false
     }
-
 }

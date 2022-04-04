@@ -10,15 +10,24 @@ import Flower
 import LoggerQueue
 import Logging
 import Net
+import NetworkExtension
 //import ReplicantSwift
 //import ReplicantSwiftClient
+import Simulation
+import Spacetime
 import SwiftQueue
 import Transmission
-import TunnelClient
-import TunnelClientMock
+import Universe
 
-open class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
+open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 {
+    let neModule: NetworkExtensionModule
+    let simulation: Simulation
+    let universe: MoonbounceNetworkExtensionUniverse
+    let loggerLabel = "org.OperatorFoundation.Moonbounce.MacOS.NetworkExtension"
+    var logQueue: LoggerQueue
+    var log: Logger!
+
     private var networkMonitor: NWPathMonitor?
     
     private var ifname: String?
@@ -45,26 +54,29 @@ open class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
     /// The address of the tunnel server.
     open var remoteHost: String?
     
-    let loggerLabel = "org.OperatorFoundation.Moonbounce.MacOS.NetworkExtension"
-    var logQueue: LoggerQueue
-    var log: Logger!
 
     public override init()
     {
-        logQueue = LoggerQueue(label: loggerLabel)
-        super.init()
-        
+        let logQueue = LoggerQueue(label: self.loggerLabel)
+        self.logQueue = logQueue
+
         LoggingSystem.bootstrap
         {
             (label) in
-            
-            self.logQueue.queue.enqueue(LoggerQueueMessage(message: "Bootstrap closure."))
-            return self.logQueue
+
+            logQueue.queue.enqueue(LoggerQueueMessage(message: "Bootstrap closure."))
+            return logQueue
         }
-        
-        log = Logger(label: loggerLabel)
-        log.logLevel = .debug
-        logQueue.queue.enqueue(LoggerQueueMessage(message: "Initialized PacketTunnelProvider"))
+
+        self.log = Logger(label: self.loggerLabel)
+        self.log.logLevel = .debug
+        self.logQueue.queue.enqueue(LoggerQueueMessage(message: "Initialized PacketTunnelProvider"))
+
+        self.neModule = NetworkExtensionModule()
+        self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.display.rawValue, NetworkExtensionModule.name), userModules: [neModule])
+        self.universe = MoonbounceNetworkExtensionUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: self.log, logQueue: self.logQueue)
+
+        super.init()
     }
     
     deinit
@@ -74,116 +86,13 @@ open class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
 
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
-        log.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
-        
-        switch connectionAttemptStatus
-        {
-            case .initialized:
-                // Start the tunnel
-                connectionAttemptStatus = .started
-            case .failed:
-                // Start the tunnel
-                connectionAttemptStatus = .started
-            default:
-                log.debug("start tunnel called when tunnel was already started.")
-                return
-        }
-        
-        // Save the completion handler for when the tunnel is fully established.
-        pendingStartCompletion = completionHandler
-        
-        guard let tunnelProviderProtocol = self.configuration as? TunnelProviderProtocol
-        else
-        {
-            log.debug("PacketTunnelProviderError: savedProtocolConfigurationIsInvalid")
-            //errorNotifier.notify(PacketTunnelProviderError.savedProtocolConfigurationIsInvalid)
-            completionHandler(PacketTunnelProviderError.savedProtocolConfigurationIsInvalid)
-            return
-        }
-        
-        guard let serverAddress: String = self.configuration.serverAddress
-            else
-        {
-            log.error("Unable to get the server address.")
-            completionHandler(PacketTunnelProviderError.savedProtocolConfigurationIsInvalid)
-            return
-        }
-        
-        self.remoteHost = serverAddress
-        self.log.debug("Server address: \(serverAddress)")
-        
-        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: tunnelProviderProtocol)
-            else
-        {
-            log.error("Unable to get moonbounce config from protocol.")
-            completionHandler(PacketTunnelProviderError.savedProtocolConfigurationIsInvalid)
-            return
-        }
-
-//        guard let replicantConfig = moonbounceConfig.replicantConfig
-//            else
-//        {
-//            self.log.debug("start tunnel failed to find a replicant configuration")
-//            completionHandler(TunnelError.badConfiguration)
-//            return
-//        }
-        
-//        let host = moonbounceConfig.replicantConfig?.serverIP
-//        let port = moonbounceConfig.replicantConfig?.port
-
-        let host = "127.0.0.1"
-        let port = 1234
-        
-        self.log.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
-        self.networkMonitor = NWPathMonitor()
-        self.networkMonitor!.start(queue: DispatchQueue(label: "NetworkMonitor"))
-    
-        pendingStartCompletion = completionHandler
-        
-        connectionAttemptStatus = .connecting
-        
-        log.debug("2. Connect to server called.")
-        
-//        guard let replicantConnection = ReplicantConnection(type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
-//            log.error("could not initialize replicant connection")
-//            return
-//        }
-        guard let replicantConnection = TransmissionConnection(host: "127.0.0.1", port: 1234) else
-        {
-            log.error("could not initialize replicant connection")
-            return
-        }
-        self.replicantConnection = replicantConnection
-        self.flowerConnection = FlowerConnection(connection: replicantConnection)
-
-        self.log.debug("\n3. 🌲 Connection state is ready 🌲\n")
-        isConnected = ConnectState(state: .success, stage: .statusCodes)
-        waitForIPAssignment()
+        self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
     }
 
-    public override func stopTunnel(with reason: ProviderStopReason, completionHandler: @escaping () -> Void)
-    {
-        networkMonitor?.cancel()
-        networkMonitor = nil
-        
-        ErrorNotifier.removeLastErrorFile()
 
-        log.debug("closeTunnel Called")
-        
-        // Clear out any pending start completion handler.
-        pendingStartCompletion?(TunnelError.internalError)
-        pendingStartCompletion = nil
-        
-        // Close the tunnel connection.
-//        if let replicantConnection = self.replicantConnection
-//        {
-//            // FIXME: make transmission cancellable
-//            // replicantConnection.cancel()
-//        }
-        
-        connectionAttemptStatus = .initialized
-        pendingStopCompletion?()
-        completionHandler()
+    public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
+    {
+        self.neModule.stopTunnel(events: self.simulation.events, reason: reason, completionHandler: completionHandler)
     }
     
     func writePackets(packetDatas: [Data], protocolNumbers: [NSNumber])
@@ -195,42 +104,12 @@ open class MoonbouncePacketTunnelProvider: MockPacketTunnelProvider
     /// Handle IPC messages from the app.
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
     {
-        switch connectionAttemptStatus
+        guard let handler = completionHandler else
         {
-            case .initialized:
-                log.debug("handleAppMessage called before start tunnel. Doing nothing...")
-            case .started:
-                log.debug("Connection attempt started.")
-            case .connecting:
-                break
-            case .connected:
-                log.debug("### Connection is connected ###")
-            case .ipAssigned( _):
-                log.debug("Received IP assignment from the server.")
-            case .ready:
-                log.debug("!!! Connection is ready !!!")
-            case .stillReady:
-                break
-            case .failed:
-                log.debug("~~~ Connection failed ~~~")
-        }
-        
-        var responseString = "Nothing to see here!"
-        
-        if let logMessage = self.logQueue.dequeue()
-        {
-            responseString = "\n*******\(logMessage)*******\n"
-        }
-        
-        guard let responseData = responseString.data(using: String.Encoding.utf8)
-        else
-        {
-            let someData = "Failed to encode message".data
-            completionHandler?(someData)
             return
         }
-        
-        completionHandler?(responseData)
+
+        self.neModule.handleAppMessage(events: self.simulation.events, data: messageData, completionHandler: handler)
     }
     
     open func closeTunnelWithError(_ error: Error?)

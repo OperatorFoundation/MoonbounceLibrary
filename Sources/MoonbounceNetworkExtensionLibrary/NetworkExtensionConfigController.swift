@@ -8,13 +8,13 @@
 
 import Foundation
 import MoonbounceShared
+import NetworkExtension
 //import ReplicantSwift
-import TunnelClient
 
 // FIXME: replace applogs with actual logs
 public class NetworkExtensionConfigController
 {
-    public static func getMoonbounceConfig(fromProtocolConfiguration protocolConfiguration: TunnelProviderProtocol) -> MoonbounceConfig?
+    public static func getMoonbounceConfig(fromProtocolConfiguration protocolConfiguration: NETunnelProviderProtocol) -> MoonbounceConfig?
     {
         guard let providerConfiguration = protocolConfiguration.providerConfiguration
             else
