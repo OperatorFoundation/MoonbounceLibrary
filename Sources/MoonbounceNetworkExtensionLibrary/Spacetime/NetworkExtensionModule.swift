@@ -19,6 +19,8 @@ public class NetworkExtensionModule: Module
     let startTunnelQueue = BlockingQueue<Error?>()
     let stopTunnelLock = DispatchSemaphore(value: 0)
     let appMessageQueue = BlockingQueue<Data?>()
+    var flow: NEPacketTunnelFlow? = nil
+    var packetBuffer: [NEPacket] = []
 
     public init()
     {
@@ -43,6 +45,12 @@ public class NetworkExtensionModule: Module
             case let appMessageRequest as AppMessageRequest:
                 return appMessageRequestHandler(appMessageRequest)
 
+            case let readPacketRequest as ReadPacketRequest:
+                return readPacket(readPacketRequest)
+
+            case let writePacketRequest as WritePacketRequest:
+                return writePacket(writePacketRequest)
+
             default:
                 print("Unknown effect \(effect)")
                 return Failure(effect.id)
@@ -57,6 +65,11 @@ public class NetworkExtensionModule: Module
     public func setConfiguration(_ configuration: NETunnelProviderProtocol)
     {
         self.configuration = configuration
+    }
+
+    public func setFlow(_ flow: NEPacketTunnelFlow)
+    {
+        self.flow = flow
     }
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
@@ -103,5 +116,49 @@ public class NetworkExtensionModule: Module
     {
         appMessageQueue.enqueue(element: effect.data)
         return AppMessageResponse(effect.id)
+    }
+
+    func readPacket(_ effect: ReadPacketRequest) -> Event?
+    {
+        if self.packetBuffer.isEmpty
+        {
+            guard let flow = self.flow else
+            {
+                return Failure(effect.id)
+            }
+
+            var packets: [NEPacket] = Synchronizer.sync(flow.readPacketObjects)
+            if packets.isEmpty
+            {
+                return Failure(effect.id)
+            }
+
+            let packet = packets[0]
+            packets = [NEPacket](packets[1...])
+
+            self.packetBuffer.append(contentsOf: packets)
+
+            return ReadPacketResponse(effect.id, packet.data) // FIXME - support IPv6
+        }
+        else
+        {
+            let packet = self.packetBuffer[0]
+            self.packetBuffer = [NEPacket](self.packetBuffer[1...])
+
+            return ReadPacketResponse(effect.id, packet.data)
+        }
+    }
+
+    func writePacket(_ effect: WritePacketRequest) -> Event?
+    {
+        guard let flow = self.flow else
+        {
+            return Failure(effect.id)
+        }
+
+        let packet = NEPacket(data: effect.data, protocolFamily: 4) // FIXME - support IPv6
+        flow.writePacketObjects([packet])
+
+        return WritePacketResponse(effect.id)
     }
 }

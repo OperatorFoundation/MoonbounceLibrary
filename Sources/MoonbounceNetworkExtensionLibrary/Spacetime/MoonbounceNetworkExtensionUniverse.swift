@@ -180,6 +180,32 @@ public class MoonbounceNetworkExtensionUniverse: Universe
 
         return responseString.data
     }
+
+    public func readPacket() throws -> Data
+    {
+        let response = processEffect(ReadPacketRequest())
+        switch response
+        {
+            case let readPacketResponse as ReadPacketResponse:
+                return readPacketResponse.data
+
+            default:
+                throw MoonbounceUniverseError.failure
+        }
+    }
+
+    public func writePacket(_ data: Data) throws
+    {
+        let response = processEffect(WritePacketRequest(data))
+        switch response
+        {
+            case is WritePacketResponse:
+                return
+
+            default:
+                throw MoonbounceUniverseError.failure
+        }
+    }
 }
 
 public enum MoonbounceUniverseError: Error
