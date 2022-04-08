@@ -65,7 +65,7 @@ public class VPNModule: Module
         {
             let manager = NETunnelProviderManager()
 
-            let maybeError = Synchronizer.sync(manager.loadFromPreferences)
+            let maybeError = MainThreadSynchronizer.sync(manager.loadFromPreferences)
             if let error = maybeError
             {
                 print("VPNModule.savePreferences - error: \(error)")
@@ -111,7 +111,7 @@ public class VPNModule: Module
         manager.localizedDescription = effect.preferences.description
         manager.isEnabled = effect.preferences.enabled
 
-        if let error = Synchronizer.sync(manager.saveToPreferences)
+        if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.savePreferences - error: \(error)")
             return Failure(effect.id)
@@ -129,7 +129,7 @@ public class VPNModule: Module
 
         manager.isEnabled = true
 
-        if let error = Synchronizer.sync(manager.saveToPreferences)
+        if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.enable - error: \(error)")
             return Failure(effect.id)
@@ -147,7 +147,7 @@ public class VPNModule: Module
 
         manager.isEnabled = false
 
-        if let error = Synchronizer.sync(manager.saveToPreferences)
+        if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.disable - error: \(error)")
             return Failure(effect.id)
