@@ -65,7 +65,9 @@ public class MoonbounceUniverse: Universe
 
     public func loadPreferences() throws -> VPNPreferences
     {
-        let response = processEffect(LoadPreferencesRequest())
+        let request = LoadPreferencesRequest()
+        let response = processEffect(request)
+        
         switch response
         {
             case let loadPreferencesResponse as LoadPreferencesResponse:
