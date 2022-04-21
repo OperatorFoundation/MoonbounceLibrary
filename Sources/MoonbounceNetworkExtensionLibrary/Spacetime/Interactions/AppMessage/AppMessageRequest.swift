@@ -12,6 +12,11 @@ public class AppMessageRequest: Effect
 {
     let data: Data?
 
+    public override var description: String
+    {
+        return "\(self.module).SendProviderMessageRequest[id: \(self.id), data: \(self.data)]"
+    }
+
     public init(_ data: Data?)
     {
         self.data = data

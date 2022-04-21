@@ -10,6 +10,11 @@ import Spacetime
 
 public class DisableRequest: Effect
 {
+    public override var description: String
+    {
+        return "\(self.module).DisableRequest[id: \(self.id)]"
+    }
+
     public init()
     {
         super.init(module: VPNModule.name)

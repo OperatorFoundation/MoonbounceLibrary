@@ -13,6 +13,11 @@ public class StopTunnelEvent: Event
 {
     let reason: NEProviderStopReason
 
+    public override var description: String
+    {
+        return "\(self.module).StopTunnelEvent[reason: \(self.reason)]"
+    }
+
     public init(_ reason: NEProviderStopReason)
     {
         self.reason = reason

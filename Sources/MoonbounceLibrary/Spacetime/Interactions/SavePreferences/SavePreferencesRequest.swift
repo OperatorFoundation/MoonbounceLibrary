@@ -13,6 +13,11 @@ public class SavePreferencesRequest: Effect
 {
     let preferences: VPNPreferences
 
+    public override var description: String
+    {
+        return "\(self.module).SavePreferencesRequest[id: \(self.id), preferences: \(self.preferences)]"
+    }
+
     public init(_ preferences: VPNPreferences)
     {
         self.preferences = preferences

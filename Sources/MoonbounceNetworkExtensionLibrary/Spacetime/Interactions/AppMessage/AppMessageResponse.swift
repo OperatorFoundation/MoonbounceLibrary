@@ -10,6 +10,11 @@ import Spacetime
 
 public class AppMessageResponse: Event
 {
+    public override var description: String
+    {
+        return "\(self.module).AppMessageResponse[effectID: \(String(describing: self.effectId))]"
+    }
+
     public init(_ effectId: UUID)
     {
         super.init(effectId, module: NetworkExtensionModule.name)

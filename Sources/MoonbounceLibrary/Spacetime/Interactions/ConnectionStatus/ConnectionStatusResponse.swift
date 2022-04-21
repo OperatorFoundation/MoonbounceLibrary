@@ -13,6 +13,11 @@ public class ConnectionStatusResponse: Event
 {
     let status: NEVPNStatus
 
+    public override var description: String
+    {
+        return "\(self.module).ConnectionStatusResponse[effectID: \(String(describing: self.effectId)), status: \(self.status)]"
+    }
+
     public init(_ effectId: UUID, _ status: NEVPNStatus)
     {
         self.status = status

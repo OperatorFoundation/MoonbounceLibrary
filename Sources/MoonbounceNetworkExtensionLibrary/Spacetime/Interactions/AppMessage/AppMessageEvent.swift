@@ -12,6 +12,11 @@ public class AppMessageEvent: Event
 {
     let data: Data
 
+    public override var description: String
+    {
+        return "\(self.module).AppMessageEvent[data: \(self.data)]"
+    }
+
     public init(_ data: Data)
     {
         self.data = data

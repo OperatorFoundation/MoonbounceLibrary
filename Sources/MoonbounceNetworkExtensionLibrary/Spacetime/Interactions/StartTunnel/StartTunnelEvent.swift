@@ -12,6 +12,11 @@ public class StartTunnelEvent: Event
 {
     let options: [String : NSObject]?
 
+    public override var description: String
+    {
+        return "\(self.module).StartTunnelEvent[options: \(self.options)]"
+    }
+
     public init(options: [String : NSObject]? = nil)
     {
         self.options = options

@@ -10,6 +10,11 @@ import Spacetime
 
 public class GetConfigurationRequest: Effect
 {
+    public override var description: String
+    {
+        return "\(self.module).GetConfigurationRequest[id: \(self.id)]"
+    }
+
     public init()
     {
         super.init(module: NetworkExtensionModule.name)

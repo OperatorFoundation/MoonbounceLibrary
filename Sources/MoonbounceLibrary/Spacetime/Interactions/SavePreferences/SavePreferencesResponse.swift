@@ -11,6 +11,11 @@ import Spacetime
 
 public class SavePreferencesResponse: Event
 {
+    public override var description: String
+    {
+        return "\(self.module).SavePreferencesResponse[effectID: \(String(describing: self.effectId))]"
+    }
+
     public init(_ effectId: UUID)
     {
         super.init(effectId, module: VPNModule.name)

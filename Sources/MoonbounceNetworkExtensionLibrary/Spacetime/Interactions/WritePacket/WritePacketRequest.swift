@@ -9,6 +9,11 @@ public class WritePacketRequest: Effect
 {
     public let data: Data
 
+    public override var description: String
+    {
+        return "\(self.module).GetConfigurationRequest[id: \(self.id), data: \(self.data)]"
+    }
+
     public init(_ data: Data)
     {
         self.data = data

@@ -11,6 +11,11 @@ import NetworkExtension
 
 public class StopTunnelResponse: Event
 {
+    public override var description: String
+    {
+        return "\(self.module).StopTunnelResponse[effectID: \(String(describing: self.effectId))]"
+    }
+
     public init(_ effectId: UUID)
     {
         super.init(effectId, module: NetworkExtensionModule.name)
