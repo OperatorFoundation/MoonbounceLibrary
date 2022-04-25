@@ -61,6 +61,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
+        completionHandler(nil)
         self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
     }
 
