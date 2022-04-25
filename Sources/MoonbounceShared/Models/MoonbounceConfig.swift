@@ -18,10 +18,12 @@ public class MoonbounceConfig: NSObject
     let fileManager = FileManager.default
 //    public let replicantConfig: ReplicantConfig?
     public var name: String
+    public var providerBundleIdentifier: String
 
-    public init(name: String/*, replicantConfig: ReplicantConfig?*/)
+    public init(name: String, providerBundleIdentifier: String/*, replicantConfig: ReplicantConfig?*/)
     {
         self.name = name
+        self.providerBundleIdentifier = providerBundleIdentifier
 //        self.replicantConfig = replicantConfig
     }
 }

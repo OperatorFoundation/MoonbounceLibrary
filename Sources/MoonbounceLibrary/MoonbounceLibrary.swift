@@ -58,8 +58,8 @@ public class MoonbounceLibrary
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
         let appId = Bundle.main.bundleIdentifier!
-        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(appId).NetworkExtension")
-        protocolConfiguration.providerBundleIdentifier = "\(appId).NetworkExtension"
+        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(appId).\(moonbounceConfig.providerBundleIdentifier)")
+        protocolConfiguration.providerBundleIdentifier = "\(appId).\(moonbounceConfig.providerBundleIdentifier)"
         //        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
         protocolConfiguration.serverAddress = "127.0.0.1"
         protocolConfiguration.includeAllNetworks = true
