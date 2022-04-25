@@ -42,14 +42,14 @@ public class MoonbounceLibrary
 
     public func startVPN() throws
     {
-        self.loggingController.startLoggingLoop()
         try self.universe.enable()
+        self.loggingController.startLoggingLoop()
     }
 
     public func stopVPN() throws
     {
-        self.loggingController.stopLoggingLoop()
         try self.universe.disable()
+        self.loggingController.stopLoggingLoop()
     }
 
     func newProtocolConfiguration(moonbounceConfig: MoonbounceConfig) -> VPNPreferences?
