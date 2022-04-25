@@ -109,7 +109,7 @@ final class MoonbounceLibraryTests: XCTestCase
         let moonbounce = MoonbounceLibrary()
         do
         {
-            let moonbounceConfig = MoonbounceConfig(name: "default")
+            let moonbounceConfig = MoonbounceConfig(name: "default", providerBundleIdentifier: "NetworkExtension")
             try moonbounce.configure(moonbounceConfig)
         }
         catch

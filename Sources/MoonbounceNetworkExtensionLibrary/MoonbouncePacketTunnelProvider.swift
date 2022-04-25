@@ -61,25 +61,26 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
-        completionHandler(nil)
-        self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
+        let maybeError = self.universe.startTunnel(options: options)
+        completionHandler(maybeError)
     }
 
 
     public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
     {
-        self.neModule.stopTunnel(events: self.simulation.events, reason: reason, completionHandler: completionHandler)
+        self.universe.stopTunnel(with: reason)
     }
     
     /// Handle IPC messages from the app.
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
     {
-        guard let handler = completionHandler else
+        let result = self.universe.handleAppMessage(data: messageData)
+
+        if let handler = completionHandler
         {
+            handler(result)
             return
         }
-
-        self.neModule.handleAppMessage(events: self.simulation.events, data: messageData, completionHandler: handler)
     }
 
     open override func cancelTunnelWithError(_ error: Error?)
