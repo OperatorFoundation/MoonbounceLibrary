@@ -86,6 +86,8 @@ public class MoonbounceNetworkExtensionUniverse: Universe
     {
         appLog.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
 
+        return nil
+
         let configuration: NETunnelProviderProtocol
         do
         {
