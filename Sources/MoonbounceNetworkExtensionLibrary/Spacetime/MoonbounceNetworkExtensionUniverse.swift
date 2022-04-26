@@ -86,8 +86,6 @@ public class MoonbounceNetworkExtensionUniverse: Universe
     {
         appLog.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
 
-        return nil
-
         let configuration: NETunnelProviderProtocol
         do
         {
@@ -142,6 +140,8 @@ public class MoonbounceNetworkExtensionUniverse: Universe
         }
         self.network = replicantConnection
 
+        return nil
+
         self.flower = FlowerConnection(connection: replicantConnection)
 
         self.appLog.debug("\n3. 🌲 Connection state is ready 🌲\n")
@@ -151,6 +151,7 @@ public class MoonbounceNetworkExtensionUniverse: Universe
             self.appLog.error("🛑 Current connection is nil, giving up. 🛑")
             return TunnelError.disconnected
         }
+
 
         self.appLog.debug("calling flowerConnection.readMessage()")
         let message = flower.readMessage()
