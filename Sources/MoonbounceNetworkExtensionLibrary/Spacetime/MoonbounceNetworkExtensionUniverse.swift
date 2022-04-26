@@ -121,8 +121,8 @@ public class MoonbounceNetworkExtensionUniverse: Universe
         //        let host = moonbounceConfig.replicantConfig?.serverIP
         //        let port = moonbounceConfig.replicantConfig?.port
 
-        let host = "127.0.0.1"
-        let port = 1234
+        let host = "128.199.9.9"
+        let port = 80
 
         self.appLog.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
 
