@@ -26,7 +26,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     let universe: MoonbounceNetworkExtensionUniverse
     let loggerLabel = "org.OperatorFoundation.Moonbounce.MacOS.NetworkExtension"
     var logQueue: LoggerQueue
-    var log: Logger!
+    var logger: Logger!
 
     /// The tunnel connection.
     var replicantConnection: Transmission.Connection?
@@ -48,13 +48,13 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             return logQueue
         }
 
-        self.log = Logger(label: self.loggerLabel)
-        self.log.logLevel = .debug
+        self.logger = Logger(label: self.loggerLabel)
+        self.logger.logLevel = .debug
         self.logQueue.queue.enqueue(LoggerQueueMessage(message: "Initialized PacketTunnelProvider"))
 
         self.neModule = NetworkExtensionModule()
         self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule])
-        self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.log, logQueue: self.logQueue)
+        self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger, logQueue: self.logQueue)
 
         super.init()
     }
@@ -79,7 +79,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     open override func cancelTunnelWithError(_ error: Error?)
     {
-        log.error("Closing the tunnel with error: \(String(describing: error))")
+        logger.error("Closing the tunnel with error: \(String(describing: error))")
         self.stopTunnel(with: NEProviderStopReason.userInitiated)
         {
             return
