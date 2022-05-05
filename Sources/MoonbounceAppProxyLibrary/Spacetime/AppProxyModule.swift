@@ -124,6 +124,17 @@ public class AppProxyModule: Module
         return response
     }
 
+    func sleep(completionHandler: @escaping () -> Void)
+    {
+        // Add code here to get ready to sleep.
+        completionHandler()
+    }
+
+    func wake()
+    {
+        // Add code here to wake up.
+    }
+
     // Private functions
     func startProxyRequestHandler(_ effect: StartProxyRequest) -> Event?
     {

@@ -16,7 +16,7 @@ import Spacetime
 import Transmission
 import Universe
 
-public class MoonbounceAppProxyUniverse: Universe
+open class MoonbounceAppProxyUniverse: Universe
 {
     let appLog: Logger
     let logQueue: LoggerQueue
@@ -199,6 +199,17 @@ public class MoonbounceAppProxyUniverse: Universe
     {
         // FIXME
         return false
+    }
+
+    public func sleep(completionHandler: @escaping () -> Void)
+    {
+        // Add code here to get ready to sleep.
+        completionHandler()
+    }
+
+    public func wake()
+    {
+        // Add code here to wake up.
     }
 }
 

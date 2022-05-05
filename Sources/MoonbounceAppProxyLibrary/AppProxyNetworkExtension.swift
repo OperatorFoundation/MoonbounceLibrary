@@ -16,7 +16,7 @@ import Spacetime
 import Transmission
 import Universe
 
-public class AppProxyNetworkExtension: MoonbounceAppProxyUniverse
+open class AppProxyNetworkExtension: MoonbounceAppProxyUniverse
 {
     override public func startProxy(options: [String: Any]?) throws
     {
@@ -112,5 +112,16 @@ public class AppProxyNetworkExtension: MoonbounceAppProxyUniverse
         }
 
         return responseString.data
+    }
+
+    override public func sleep(completionHandler: @escaping () -> Void)
+    {
+        // Add code here to get ready to sleep.
+        completionHandler()
+    }
+
+    override public func wake()
+    {
+        // Add code here to wake up.
     }
 }
