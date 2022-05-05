@@ -54,33 +54,27 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
         self.neModule = NetworkExtensionModule()
         self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule])
-        self.universe = MoonbounceNetworkExtensionUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: self.log, logQueue: self.logQueue)
+        self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.log, logQueue: self.logQueue)
 
         super.init()
     }
-    
+
+    // NEPacketTunnelProvide
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
-        let maybeError = self.universe.startTunnel(options: options)
-        completionHandler(maybeError)
+        self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
     }
 
 
     public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
     {
-        self.universe.stopTunnel(with: reason)
+        self.neModule.stopTunnel(events: self.simulation.events, reason: reason, completionHandler: completionHandler)
     }
     
     /// Handle IPC messages from the app.
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
     {
-        let result = self.universe.handleAppMessage(data: messageData)
-
-        if let handler = completionHandler
-        {
-            handler(result)
-            return
-        }
+        self.neModule.handleAppMessage(events: self.simulation.events, data: messageData, completionHandler: completionHandler)
     }
 
     open override func cancelTunnelWithError(_ error: Error?)
@@ -91,6 +85,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             return
         }
     }
+    // End NEPacketTunnelProvider
 }
 
 public enum TunnelError: Error

@@ -23,6 +23,10 @@ public class NetworkExtensionModule: Module
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
 
+    let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
+    let stopTunnelDispatchQueue = DispatchQueue(label: "StopTunnel")
+    let handleAppMessageDispatchQueue = DispatchQueue(label: "HandleAppMessage")
+
     public init()
     {
     }
@@ -83,29 +87,41 @@ public class NetworkExtensionModule: Module
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
-        let event = StartTunnelEvent(options: options)
-        events.enqueue(element: event)
+        self.startTunnelDispatchQueue.async
+        {
+            let event = StartTunnelEvent(options: options)
+            events.enqueue(element: event)
 
-        let response = startTunnelQueue.dequeue()
-        completionHandler(response)
+            let response = self.startTunnelQueue.dequeue()
+            completionHandler(response)
+        }
     }
 
     public func stopTunnel(events: BlockingQueue<Event>, reason: NEProviderStopReason, completionHandler: @escaping () -> Void )
     {
-        let event = StopTunnelEvent(reason)
-        events.enqueue(element: event)
+        self.stopTunnelDispatchQueue.async
+        {
+            let event = StopTunnelEvent(reason)
+            events.enqueue(element: event)
 
-        self.stopTunnelLock.wait()
-        completionHandler()
+            self.stopTunnelLock.wait()
+            completionHandler()
+        }
     }
 
-    public func handleAppMessage(events: BlockingQueue<Event>, data: Data, completionHandler: @escaping (Data?) -> Void)
+    public func handleAppMessage(events: BlockingQueue<Event>, data: Data, completionHandler: ((Data?) -> Void)?)
     {
-        let event = AppMessageEvent(data)
-        events.enqueue(element: event)
+        self.handleAppMessageDispatchQueue.async
+        {
+            let event = AppMessageEvent(data)
+            events.enqueue(element: event)
 
-        let response = appMessageQueue.dequeue()
-        completionHandler(response)
+            let response = self.appMessageQueue.dequeue()
+            if let handler = completionHandler
+            {
+                handler(response)
+            }
+        }
     }
 
     // Private functions

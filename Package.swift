@@ -15,6 +15,9 @@ let package = Package(
             name: "MoonbounceNetworkExtensionLibrary",
             targets: ["MoonbounceNetworkExtensionLibrary"]),
         .library(
+            name: "MoonbounceAppProxyLibrary",
+            targets: ["MoonbounceAppProxyLibrary"]),
+        .library(
             name: "MoonbounceShared",
             targets: ["MoonbounceShared"]),
     ],
@@ -71,6 +74,20 @@ let package = Package(
                 "Net",
 //                "ReplicantSwiftClient",
 //                "ReplicantSwift",
+                "SwiftQueue",
+                "LoggerQueue",
+                "Flower",
+                "Transmission",
+                "InternetProtocols",
+                "TunnelClient",
+                .product(name: "TunnelClientMock", package: "TunnelClient"),
+            ]),
+        .target(
+            name: "MoonbounceAppProxyLibrary",
+            dependencies: [
+                "MoonbounceShared",
+                .product(name: "Logging", package: "swift-log"),
+                "Net",
                 "SwiftQueue",
                 "LoggerQueue",
                 "Flower",
