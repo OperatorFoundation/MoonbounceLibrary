@@ -146,14 +146,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func handleAppMessage(data: Data) -> Data?
     {
-        var responseString = "Nothing to see here!"
-
-        if let logMessage = self.logQueue.dequeue()
-        {
-            responseString = "\n*******\(logMessage)*******\n"
-        }
-
-        return responseString.data
+        return nil
     }
 
     override public func readPacket() throws -> Data

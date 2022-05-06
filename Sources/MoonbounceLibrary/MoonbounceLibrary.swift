@@ -18,14 +18,12 @@ public class MoonbounceLibrary
     let logger = Logger(label: "org.OperatorFoundation.Moonbounce.MacOS")
     let simulation: Simulation
     let universe: MoonbounceUniverse
-    let loggingController: LoggingController
 
     public init()
     {
         let vpnModule = VPNModule()
         self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.display.rawValue, VPNModule.name), userModules: [vpnModule])
         self.universe = MoonbounceUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
-        self.loggingController = LoggingController(universe: self.universe, logger: self.logger)
     }
 
     public func configure(_ config: MoonbounceConfig) throws
@@ -43,13 +41,11 @@ public class MoonbounceLibrary
     public func startVPN() throws
     {
         try self.universe.enable()
-        self.loggingController.startLoggingLoop()
     }
 
     public func stopVPN() throws
     {
         try self.universe.disable()
-        self.loggingController.stopLoggingLoop()
     }
 
     func newProtocolConfiguration(moonbounceConfig: MoonbounceConfig) -> VPNPreferences?

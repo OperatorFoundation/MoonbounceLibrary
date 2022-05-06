@@ -8,7 +8,6 @@
 import Chord
 import Flower
 import Foundation
-import LoggerQueue
 import Logging
 import MoonbounceShared
 import NetworkExtension
@@ -19,16 +18,14 @@ import Universe
 open class MoonbounceNetworkExtensionUniverse: Universe
 {
     let appLog: Logger
-    let logQueue: LoggerQueue
     var network: Transmission.Connection? = nil
     var flower: FlowerConnection? = nil
     let messagesToPacketsQueue = DispatchQueue(label: "clientTunnelConnection: messagesToPackets")
     let packetsToMessagesQueue = DispatchQueue(label: "clientTunnelConnection: packetsToMessages")
 
-    public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger, logQueue: LoggerQueue)
+    public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
         self.appLog = logger
-        self.logQueue = logQueue
 
         super.init(effects: effects, events: events)
     }

@@ -7,7 +7,6 @@
 //
 
 import Flower
-import LoggerQueue
 import Logging
 import Net
 import NetworkExtension
@@ -24,8 +23,6 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     let neModule: NetworkExtensionModule
     let simulation: Simulation
     let universe: MoonbounceNetworkExtensionUniverse
-    let loggerLabel = "org.OperatorFoundation.Moonbounce.MacOS.NetworkExtension"
-    var logQueue: LoggerQueue
     var logger: Logger!
 
     /// The tunnel connection.
@@ -37,24 +34,13 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     public override init()
     {
-        let logQueue = LoggerQueue(label: self.loggerLabel)
-        self.logQueue = logQueue
-
-        LoggingSystem.bootstrap
-        {
-            (label) in
-
-            logQueue.queue.enqueue(LoggerQueueMessage(message: "Bootstrap closure."))
-            return logQueue
-        }
-
-        self.logger = Logger(label: self.loggerLabel)
+        self.logger = Logger(label: "MoonbounceNetworkExtension")
         self.logger.logLevel = .debug
-        self.logQueue.queue.enqueue(LoggerQueueMessage(message: "Initialized PacketTunnelProvider"))
+        self.logger.debug("Initialized MoonbouncePacketTunnelProvider")
 
         self.neModule = NetworkExtensionModule()
         self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule])
-        self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger, logQueue: self.logQueue)
+        self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
 
         super.init()
     }
