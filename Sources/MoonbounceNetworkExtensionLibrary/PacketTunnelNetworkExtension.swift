@@ -20,7 +20,8 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 {
     override public func startTunnel(options: [String: NSObject]?) -> Error?
     {
-        appLog.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
+        self.logger.debug("PacketTunnelNetworkExtension.startTunnel")
+        logger.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
 
         let configuration: NETunnelProviderProtocol
         do
@@ -34,11 +35,11 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
         guard let serverAddress: String = configuration.serverAddress else
         {
-            appLog.error("Unable to get the server address.")
+            logger.error("Unable to get the server address.")
             return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
         }
 
-        self.appLog.debug("Server address: \(serverAddress)")
+        self.logger.debug("Server address: \(serverAddress)")
 
         //        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
         //        {
@@ -60,9 +61,9 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         let host = "128.199.9.9"
         let port = 80
 
-        self.appLog.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
+        self.logger.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
 
-        appLog.debug("2. Connect to server called.")
+        logger.debug("2. Connect to server called.")
 
         //        guard let replicantConnection = ReplicantConnection(type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
         //            log.error("could not initialize replicant connection")
@@ -71,25 +72,25 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
         guard let replicantConnection = TransmissionConnection(host: host, port: port) else
         {
-            appLog.error("could not initialize replicant connection")
+            logger.error("could not initialize replicant connection")
             return MoonbounceUniverseError.connectionFailed
         }
         self.network = replicantConnection
 
         self.flower = FlowerConnection(connection: replicantConnection)
 
-        self.appLog.debug("\n3. 🌲 Connection state is ready 🌲\n")
-        self.appLog.debug("Waiting for IP assignment")
+        self.logger.debug("\n3. 🌲 Connection state is ready 🌲\n")
+        self.logger.debug("Waiting for IP assignment")
         guard let flower = self.flower else
         {
-            self.appLog.error("🛑 Current connection is nil, giving up. 🛑")
+            self.logger.error("🛑 Current connection is nil, giving up. 🛑")
             return TunnelError.disconnected
         }
 
 
-        self.appLog.debug("calling flowerConnection.readMessage()")
+        self.logger.debug("calling flowerConnection.readMessage()")
         let message = flower.readMessage()
-        self.appLog.debug("finished calling flowerConnection.readMessage()")
+        self.logger.debug("finished calling flowerConnection.readMessage()")
 
         let tunnelAddress: TunnelAddress
         switch message
@@ -107,7 +108,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
                 return MoonbounceUniverseError.noIpAssignment
         }
 
-        self.appLog.debug("(setTunnelSettings) host: \(host), tunnelAddress: \(tunnelAddress)")
+        self.logger.debug("(setTunnelSettings) host: \(host), tunnelAddress: \(tunnelAddress)")
 
         do
         {
@@ -124,7 +125,8 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func stopTunnel(with: NEProviderStopReason)
     {
-        appLog.debug("stopTunnel Called")
+        self.logger.debug("PacketTunnelNetworkExtension.stopTunnel")
+        logger.debug("stopTunnel Called")
         self.network?.close()
 
         self.network = nil
@@ -133,6 +135,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func getConfiguration() throws -> NETunnelProviderProtocol
     {
+        self.logger.debug("PacketTunnelNetworkExtension.getConfiguration")
         let response = processEffect(GetConfigurationRequest())
         switch response
         {
@@ -146,11 +149,13 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func handleAppMessage(data: Data) -> Data?
     {
+        self.logger.debug("PacketTunnelNetworkExtension.handleAppMessage")
         return nil
     }
 
     override public func readPacket() throws -> Data
     {
+        self.logger.debug("PacketTunnelNetworkExtension.readPacket")
         let response = processEffect(ReadPacketRequest())
         switch response
         {
@@ -164,6 +169,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func writePacket(_ data: Data) throws
     {
+        self.logger.debug("PacketTunnelNetworkExtension.writePacket")
         let response = processEffect(WritePacketRequest(data))
         switch response
         {
@@ -177,6 +183,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func setNetworkTunnelSettings(_ host: String, _ tunnelAddress: TunnelAddress) throws
     {
+        self.logger.debug("PacketTunnelNetworkExtension.setNetworkTunnelSettings")
         let response = processEffect(SetNetworkTunnelSettingsRequest(host, tunnelAddress))
         switch response
         {

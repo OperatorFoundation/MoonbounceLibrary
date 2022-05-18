@@ -17,7 +17,7 @@ import Universe
 
 open class MoonbounceNetworkExtensionUniverse: Universe
 {
-    let appLog: Logger
+    var logger: Logger!
     var network: Transmission.Connection? = nil
     var flower: FlowerConnection? = nil
     let messagesToPacketsQueue = DispatchQueue(label: "clientTunnelConnection: messagesToPackets")
@@ -25,13 +25,17 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
-        self.appLog = logger
+        self.logger = Logger(label: "MoonbounceNetworkExtension")
+        self.logger.logLevel = .debug
+        self.logger.debug("Initialized MoonbounceNetworkExtensionUniverse")
 
+        self.logger.debug("MoonbounceNetworkExtensionUniverse.init")
         super.init(effects: effects, events: events)
     }
 
     override open func processEvent(_ event: Event)
     {
+        self.logger.debug("MoonbounceNetworkExtensionUniverse.processEvent")
         switch event
         {
             case let startTunnelEvent as StartTunnelEvent:
@@ -44,7 +48,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                         return
 
                     default:
-                        appLog.error("startTunnel bad response: \(response)")
+                        logger.error("startTunnel bad response: \(response)")
                 }
 
             case let stopTunnelEvent as StopTunnelEvent:
@@ -57,7 +61,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                         return
 
                     default:
-                        appLog.error("stopTunnel bad response: \(response)")
+                        logger.error("stopTunnel bad response: \(response)")
                 }
 
             case let appMessageEvent as AppMessageEvent:
@@ -70,11 +74,11 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                         return
 
                     default:
-                        appLog.error("handleAppMessage bad response: \(response)")
+                        logger.error("handleAppMessage bad response: \(response)")
                 }
 
             default:
-                appLog.error("Unknown event \(event)")
+                logger.error("Unknown event \(event)")
                 return
         }
     }
@@ -82,11 +86,12 @@ open class MoonbounceNetworkExtensionUniverse: Universe
     /// Make the initial readPacketsWithCompletionHandler call.
     public func startHandlingPackets()
     {
-        self.appLog.debug("7. Start handling packets called.")
+        self.logger.debug("MoonbounceNetworkExtensionUniverse.startHandlingPackets")
+        self.logger.debug("7. Start handling packets called.")
 
         packetsToMessagesQueue.async
         {
-            self.appLog.debug("calling packetsToMessages async")
+            self.logger.debug("calling packetsToMessages async")
 
             do
             {
@@ -100,7 +105,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
         messagesToPacketsQueue.async
         {
-            self.appLog.debug("calling messagesToPackets async")
+            self.logger.debug("calling messagesToPackets async")
 
             do
             {
