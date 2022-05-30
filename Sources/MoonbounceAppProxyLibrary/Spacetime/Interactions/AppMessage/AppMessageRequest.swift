@@ -14,7 +14,14 @@ public class AppMessageRequest: Effect
 
     public override var description: String
     {
-        return "\(self.module).SendProviderMessageRequest[id: \(self.id), data: \(self.data)]"
+        if let data = data
+        {
+            return "\(self.module).SendProviderMessageRequest[id: \(self.id), data: \(data)]"
+        }
+        else
+        {
+            return "\(self.module).SendProviderMessageRequest[id: \(self.id), data: nil]"
+        }
     }
 
     public init(_ data: Data?)

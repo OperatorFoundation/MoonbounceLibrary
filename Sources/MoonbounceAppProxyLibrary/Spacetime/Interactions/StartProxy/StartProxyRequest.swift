@@ -14,7 +14,14 @@ public class StartProxyRequest: Effect
 
     public override var description: String
     {
-        return "\(self.module).StartProxyRequest[id: \(self.id), maybeError: \(self.maybeError)]"
+        if let error = maybeError
+        {
+            return "\(self.module).StartProxyRequest[id: \(self.id), maybeError: \(error)]"
+        }
+        else
+        {
+            return "\(self.module).StartProxyRequest[id: \(self.id), maybeError: nil]"
+        }
     }
 
     public init(_ maybeError: Error?)
