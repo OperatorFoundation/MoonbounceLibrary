@@ -5,9 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "MoonbounceLibrary",
-    platforms: [.macOS(.v12)],
+    platforms: [.macOS(.v12),
+                .iOS(.v15)],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
+        // Products define the executables and libraries a package produces, and make them visible to other packages.®
         .library(
             name: "MoonbounceLibrary",
             targets: ["MoonbounceLibrary"]),
@@ -34,9 +35,9 @@ let package = Package(
         .package(url: "https://github.com/OperatorFoundation/SwiftHexTools.git", branch: "main"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
         .package(url: "https://github.com/OperatorFoundation/SwiftQueue.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/Transmission.git", from: "1.2.10"),
+        .package(url: "https://github.com/OperatorFoundation/Transmission.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/TransmissionTransport.git", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/Transport.git", from: "2.3.12"),
+        .package(url: "https://github.com/OperatorFoundation/Transport.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/TunnelClient.git", branch: "main"),
         .package(url: "https://github.com/weichsel/ZIPFoundation.git", from: "0.9.11"),
     ],

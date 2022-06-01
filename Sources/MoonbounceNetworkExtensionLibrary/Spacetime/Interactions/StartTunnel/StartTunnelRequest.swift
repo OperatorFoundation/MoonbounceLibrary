@@ -14,7 +14,14 @@ public class StartTunnelRequest: Effect
 
     public override var description: String
     {
-        return "\(self.module).StartTunnelRequest[id: \(self.id), maybeError: \(String(describing: self.maybeError))]"
+        if let error = maybeError
+        {
+            return "\(self.module).StartTunnelRequest[id: \(self.id), maybeError: \(error)]"
+        }
+        else
+        {
+            return "\(self.module).StartTunnelRequest[id: \(self.id), maybeError: nil]"
+        }
     }
 
     public init(_ maybeError: Error?)

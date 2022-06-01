@@ -14,7 +14,14 @@ public class StartProxyEvent: Event
 
     public override var description: String
     {
-        return "\(self.module).StartProxyEvent[options: \(self.options)]"
+        if let options = options
+        {
+            return "\(self.module).StartProxyEvent[options: \(options)]"
+        }
+        else
+        {
+            return "\(self.module).StartProxyEvent[options: nil]"
+        }
     }
 
     public init(options: [String : NSObject]? = nil)

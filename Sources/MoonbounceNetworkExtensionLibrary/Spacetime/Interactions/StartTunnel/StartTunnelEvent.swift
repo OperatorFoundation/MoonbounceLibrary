@@ -14,7 +14,14 @@ public class StartTunnelEvent: Event
 
     public override var description: String
     {
-        return "\(self.module).StartTunnelEvent[options: \(String(describing: self.options))]"
+        if let someOptions = options
+        {
+            return "\(self.module).StartTunnelEvent[options: \(someOptions)]"
+        }
+        else
+        {
+            return "\(self.module).StartTunnelEvent[options: nil]"
+        }
     }
 
     public init(options: [String : NSObject]? = nil)

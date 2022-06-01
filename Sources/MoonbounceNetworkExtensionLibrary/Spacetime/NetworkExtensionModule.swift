@@ -7,6 +7,7 @@
 
 import Chord
 import Foundation
+import Logging
 import NetworkExtension
 import Simulation
 import Spacetime
@@ -23,23 +24,29 @@ public class NetworkExtensionModule: Module
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
     public var connections: [UUID: NWTCPConnectConnection] = [:]
-
+    var logger: Logger!
+    
     let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
     let stopTunnelDispatchQueue = DispatchQueue(label: "StopTunnel")
     let handleAppMessageDispatchQueue = DispatchQueue(label: "HandleAppMessage")
 
     public init()
     {
+        self.logger = Logger(label: "MoonbounceNetworkExtension")
+        self.logger.logLevel = .debug
+        self.logger.debug("Initialized NetworkExtensionModule")
     }
 
     // Public functions
     public func name() -> String
     {
+        self.logger.debug("NetworkExtensionModule.name")
         return NetworkExtensionModule.name
     }
 
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.handleEffect")
         switch effect
         {
             case let startTunnelRequest as StartTunnelRequest:
@@ -80,26 +87,31 @@ public class NetworkExtensionModule: Module
 
     public func handleExternalEvent(_ event: Event)
     {
+        self.logger.debug("NetworkExtensionModule.handleExternalEvent")
         return
     }
 
     public func setConfiguration(_ configuration: NETunnelProviderProtocol)
     {
+        self.logger.debug("NetworkExtensionModule.setConfiguration")
         self.configuration = configuration
     }
 
     public func setProvider(_ provider: NEPacketTunnelProvider)
     {
+        self.logger.debug("NetworkExtensionModule.setProvider")
         self.provider = provider
     }
 
     public func setFlow(_ flow: NEPacketTunnelFlow)
     {
+        self.logger.debug("NetworkExtensionModule.setFlow")
         self.flow = flow
     }
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
+        self.logger.debug("NetworkExtensionModule.startTunnel")
         self.startTunnelDispatchQueue.async
         {
             let event = StartTunnelEvent(options: options)
@@ -112,6 +124,7 @@ public class NetworkExtensionModule: Module
 
     public func stopTunnel(events: BlockingQueue<Event>, reason: NEProviderStopReason, completionHandler: @escaping () -> Void )
     {
+        self.logger.debug("NetworkExtensionModule.stopTunnel")
         self.stopTunnelDispatchQueue.async
         {
             let event = StopTunnelEvent(reason)
@@ -124,6 +137,7 @@ public class NetworkExtensionModule: Module
 
     public func handleAppMessage(events: BlockingQueue<Event>, data: Data, completionHandler: ((Data?) -> Void)?)
     {
+        self.logger.debug("NetworkExtensionModule.handleAppMessage")
         self.handleAppMessageDispatchQueue.async
         {
             let event = AppMessageEvent(data)
@@ -140,24 +154,28 @@ public class NetworkExtensionModule: Module
     // Private functions
     func startTunnelRequestHandler(_ effect: StartTunnelRequest) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.startTunnelRequestHandler")
         startTunnelQueue.enqueue(element: effect.maybeError)
         return StartTunnelResponse(effect.id)
     }
 
     func stopTunnelRequestHandler(_ effect: StopTunnelRequest) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.stopTunnelRequestHandler")
         stopTunnelLock.signal()
         return StopTunnelResponse(effect.id)
     }
 
     func appMessageRequestHandler(_ effect: AppMessageRequest) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.appMessageRequestHandler")
         appMessageQueue.enqueue(element: effect.data)
         return AppMessageResponse(effect.id)
     }
 
     func readPacket(_ effect: ReadPacketRequest) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.readPacket")
         if self.packetBuffer.isEmpty
         {
             guard let flow = self.flow else
@@ -189,6 +207,7 @@ public class NetworkExtensionModule: Module
 
     func writePacket(_ effect: WritePacketRequest) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.writePacket")
         guard let flow = self.flow else
         {
             return Failure(effect.id)
@@ -202,6 +221,7 @@ public class NetworkExtensionModule: Module
 
     func setNetworkTunnelSettings(_ effect: SetNetworkTunnelSettingsRequest) -> Event?
     {
+        self.logger.debug("NetworkExtensionModule.setNetworkTunnelSettings")
         guard let provider = self.provider else
         {
             return Failure(effect.id)
@@ -263,6 +283,8 @@ public class NetworkExtensionModule: Module
     /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".
     func makeNetworkSettings(host: String, tunnelAddress: TunnelAddress) -> NEPacketTunnelNetworkSettings?
     {
+        self.logger.debug("NetworkExtensionModule.makeNetworkSettings")
+        
         let googleDNSipv4 = "8.8.8.8"
         let googleDNS2ipv4 = "8.8.4.4"
         let googleDNSipv6 = "2001:4860:4860::8888"
