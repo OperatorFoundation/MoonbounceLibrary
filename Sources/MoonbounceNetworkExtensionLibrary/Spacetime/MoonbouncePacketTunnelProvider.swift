@@ -47,11 +47,14 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         super.init()
     }
 
-    // NEPacketTunnelProvide
+    // NEPacketTunnelProvider
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
         self.logger.debug("MoonbouncePacketTunnelProvider.startTunnel")
-        self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
+//        self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
+
+        // FIXME - remove, just for testing
+        completionHandler(nil)
     }
 
 

@@ -14,7 +14,7 @@ public class StartTunnelEvent: Event
 
     public override var description: String
     {
-        return "\(self.module).StartTunnelEvent[options: \(self.options)]"
+        return "\(self.module).StartTunnelEvent[options: \(String(describing: self.options))]"
     }
 
     public init(options: [String : NSObject]? = nil)

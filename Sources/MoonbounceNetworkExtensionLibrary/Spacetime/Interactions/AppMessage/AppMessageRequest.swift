@@ -14,7 +14,7 @@ public class AppMessageRequest: Effect
 
     public override var description: String
     {
-        return "\(self.module).SendProviderMessageRequest[id: \(self.id), data: \(self.data)]"
+        return "\(self.module).SendProviderMessageRequest[id: \(self.id), data: \(String(describing: self.data))]"
     }
 
     public init(_ data: Data?)

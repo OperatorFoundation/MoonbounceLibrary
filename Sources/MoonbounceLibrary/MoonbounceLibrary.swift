@@ -57,7 +57,7 @@ public class MoonbounceLibrary
         self.logger.debug("\n----->Setting the providerBundleIdentifier to \(appId).\(moonbounceConfig.providerBundleIdentifier)")
         protocolConfiguration.providerBundleIdentifier = "\(appId).\(moonbounceConfig.providerBundleIdentifier)"
         //        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
-        protocolConfiguration.serverAddress = "127.0.0.1"
+        protocolConfiguration.serverAddress = "206.189.200.18"
         protocolConfiguration.includeAllNetworks = true
 
         // FIXME: Replicant JSON needed here

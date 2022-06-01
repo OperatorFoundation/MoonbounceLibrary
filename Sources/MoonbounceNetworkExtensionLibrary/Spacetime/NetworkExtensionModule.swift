@@ -22,6 +22,7 @@ public class NetworkExtensionModule: Module
     var flow: NEPacketTunnelFlow? = nil
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
+    public var connections: [UUID: NWTCPConnectConnection] = [:]
 
     let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
     let stopTunnelDispatchQueue = DispatchQueue(label: "StopTunnel")
@@ -58,6 +59,18 @@ public class NetworkExtensionModule: Module
 
             case let setNetworkTunnelSettingsRequest as SetNetworkTunnelSettingsRequest:
                 return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
+
+            case let connectRequest as NWTCPConnectRequest:
+                return connect(connectRequest)
+
+            case let writeRequest as NWTCPWriteRequest:
+                return write(writeRequest)
+
+            case let readRequest as NWTCPReadRequest:
+                return read(readRequest)
+
+            case let closeRequest as NWTCPCloseRequest:
+                return close(closeRequest)
 
             default:
                 print("Unknown effect \(effect)")
@@ -211,6 +224,40 @@ public class NetworkExtensionModule: Module
         {
             return SetNetworkTunnelSettingsResponse(effect.id)
         }
+    }
+
+    func connect(_ effect: NWTCPConnectRequest) -> Event?
+    {
+        guard let provider = self.provider else
+        {
+            return Failure(effect.id)
+        }
+
+        let uuid = UUID()
+
+        let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
+        let connection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
+        // FIXME
+//        self.connections[endpoint] = connection
+        return nil
+    }
+
+    func read(_ effect: NWTCPReadRequest) -> Event?
+    {
+        // FIXME
+        return nil
+    }
+
+    func write(_ effect: NWTCPWriteRequest) -> Event?
+    {
+        // FIXME
+        return nil
+    }
+
+    func close(_ effect: NWTCPCloseRequest) -> Event?
+    {
+        // FIXME
+        return nil
     }
 
     /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".

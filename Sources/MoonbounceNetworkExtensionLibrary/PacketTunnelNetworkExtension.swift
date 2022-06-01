@@ -69,7 +69,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         //            return
         //        }
 
-        guard let replicantConnection = TransmissionConnection(host: host, port: port) else
+        guard let replicantConnection = try? connect(host, port) else
         {
             appLog.error("could not initialize replicant connection")
             return MoonbounceUniverseError.connectionFailed
