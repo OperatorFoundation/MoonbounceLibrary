@@ -53,9 +53,8 @@ public class MoonbounceLibrary
         self.logger.debug("VPNPreferencesController.newProtocolConfiguration")
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
-        let appId = Bundle.main.bundleIdentifier!
-        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(appId).\(moonbounceConfig.providerBundleIdentifier)")
-        protocolConfiguration.providerBundleIdentifier = "\(appId).\(moonbounceConfig.providerBundleIdentifier)"
+        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(moonbounceConfig.providerBundleIdentifier)")
+        protocolConfiguration.providerBundleIdentifier = moonbounceConfig.providerBundleIdentifier
         //        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
         protocolConfiguration.serverAddress = "206.189.200.18"
         protocolConfiguration.includeAllNetworks = true
