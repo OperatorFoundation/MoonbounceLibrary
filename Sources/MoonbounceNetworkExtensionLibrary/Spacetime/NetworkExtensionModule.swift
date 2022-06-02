@@ -112,13 +112,17 @@ public class NetworkExtensionModule: Module
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
         self.logger.debug("NetworkExtensionModule.startTunnel")
+        completionHandler(nil)
+        
         self.startTunnelDispatchQueue.async
         {
             let event = StartTunnelEvent(options: options)
             events.enqueue(element: event)
 
-            let response = self.startTunnelQueue.dequeue()
-            completionHandler(response)
+            if let response = self.startTunnelQueue.dequeue() {
+                self.logger.debug("failed to start tunnel: \(response)")
+                // FIXME: should probably stop the tunnel here
+            }
         }
     }
 
