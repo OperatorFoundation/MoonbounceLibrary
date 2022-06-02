@@ -12,17 +12,15 @@ import Spacetime
 public class NWTCPWriteResponse: Event
 {
     public let socketId: UUID
-    public let data: Data
 
     public override var description: String
     {
-        return "\(self.module).NWTCPWriteResponse[effectID: \(String(describing: self.effectId)), data: \(self.data)]"
+        return "\(self.module).NWTCPWriteResponse[effectID: \(String(describing: self.effectId))]"
     }
 
-    public init(_ effectId: UUID, _ socketId: UUID, _ data: Data)
+    public init(_ effectId: UUID, _ socketId: UUID)
     {
         self.socketId = socketId
-        self.data = data
 
         super.init(effectId, module: BuiltinModuleNames.networkConnect.rawValue)
     }

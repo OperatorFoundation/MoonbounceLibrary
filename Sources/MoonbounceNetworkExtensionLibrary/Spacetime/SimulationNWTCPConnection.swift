@@ -137,7 +137,7 @@ fileprivate struct Write
                     return
                 }
 
-                let response = Affected(request.id)
+                let response = NWTCPWriteResponse(request.id, uuid)
                 print(response.description)
                 events.enqueue(element: response)
             }
@@ -151,7 +151,7 @@ fileprivate struct Write
                     return
                 }
 
-                let response = Affected(request.id)
+                let response = NWTCPWriteResponse(request.id, uuid)
                 print(response.description)
                 events.enqueue(element: response)
             }
@@ -185,7 +185,7 @@ fileprivate struct Close
         {
             networkConnection.close()
 
-            let response = Affected(request.id)
+            let response = NWTCPCloseResponse(request.id, socketId: uuid)
             print(response.description)
             events.enqueue(element: response)
 

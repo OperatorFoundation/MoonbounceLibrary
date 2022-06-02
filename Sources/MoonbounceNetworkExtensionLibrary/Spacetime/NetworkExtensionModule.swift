@@ -23,7 +23,7 @@ public class NetworkExtensionModule: Module
     var flow: NEPacketTunnelFlow? = nil
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
-    public var connections: [UUID: NWTCPConnectConnection] = [:]
+    public var connections: [UUID: SimulationNWTCPConnection] = [:]
     var logger: Logger!
     
     let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
@@ -71,13 +71,13 @@ public class NetworkExtensionModule: Module
                 return connect(connectRequest)
 
             case let writeRequest as NWTCPWriteRequest:
-                return write(writeRequest)
+                return write(writeRequest, channel)
 
             case let readRequest as NWTCPReadRequest:
-                return read(readRequest)
+                return read(readRequest, channel)
 
             case let closeRequest as NWTCPCloseRequest:
-                return close(closeRequest)
+                return close(closeRequest, channel)
 
             default:
                 print("Unknown effect \(effect)")
@@ -256,28 +256,57 @@ public class NetworkExtensionModule: Module
         let uuid = UUID()
 
         let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
-        let connection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
-        // FIXME
-//        self.connections[endpoint] = connection
+        let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
+        let transmissionConnection = NWTCPTransmissionConnection(networkConnection)
+        let connection = SimulationNWTCPConnection(transmissionConnection)
+
+        self.connections[uuid] = connection
+
+        return NWTCPConnectResponse(effect.id, socketId: uuid)
+    }
+
+    func read(_ effect: NWTCPReadRequest, _ channel: BlockingQueue<Event>) -> Event?
+    {
+        let uuid = effect.socketId
+        guard let connection = self.connections[uuid] else
+        {
+            let failure = Failure(effect.id)
+            print(failure.description)
+            return failure
+        }
+
+        connection.read(request: effect, channel: channel)
         return nil
     }
 
-    func read(_ effect: NWTCPReadRequest) -> Event?
+    func write(_ effect: NWTCPWriteRequest, _ channel: BlockingQueue<Event>) -> Event?
     {
-        // FIXME
+        let uuid = effect.socketId
+        guard let connection = self.connections[uuid] else
+        {
+            let failure = Failure(effect.id)
+            print(failure.description)
+            return failure
+        }
+
+        connection.write(request: effect, channel: channel)
         return nil
     }
 
-    func write(_ effect: NWTCPWriteRequest) -> Event?
+    func close(_ effect: NWTCPCloseRequest, _ channel: BlockingQueue<Event>) -> Event?
     {
-        // FIXME
-        return nil
-    }
-
-    func close(_ effect: NWTCPCloseRequest) -> Event?
-    {
-        // FIXME
-        return nil
+        let uuid = effect.socketId
+        if let connection = self.connections[uuid]
+        {
+            connection.close(request: effect, state: self, channel: channel)
+            return nil
+        }
+        else
+        {
+            let failure = Failure(effect.id)
+            print(failure.description)
+            return failure
+        }
     }
 
     /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".
