@@ -135,9 +135,10 @@ public class VPNModule: Module
             return Failure(effect.id)
         }
 
-        guard let manager = self.manager else
+        // https://stackoverflow.com/questions/47550706/error-domain-nevpnerrordomain-code-1-null-while-connecting-vpn-server
+        if let error = MainThreadSynchronizer.sync(manager.loadFromPreferences)
         {
-            print("VPNModule.enable - error, no NETunnelProviderManager set")
+            print("VPNModule.enable - loadFromPreferences error: \(error)")
             return Failure(effect.id)
         }
 
