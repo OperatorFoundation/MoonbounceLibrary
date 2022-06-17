@@ -131,7 +131,23 @@ public class VPNModule: Module
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
-            print("VPNModule.enable - error: \(error)")
+            print("VPNModule.enable - saveToPreferences error: \(error)")
+            return Failure(effect.id)
+        }
+
+        guard let manager = self.manager else
+        {
+            print("VPNModule.enable - error, no NETunnelProviderManager set")
+            return Failure(effect.id)
+        }
+
+        do
+        {
+            try manager.connection.startVPNTunnel()
+        }
+        catch
+        {
+            print("VPNModule.enable - startVPNTunnel error: \(error)")
             return Failure(effect.id)
         }
 
