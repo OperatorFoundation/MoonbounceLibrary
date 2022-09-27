@@ -15,9 +15,6 @@ let package = Package(
             name: "MoonbounceNetworkExtensionLibrary",
             targets: ["MoonbounceNetworkExtensionLibrary"]),
         .library(
-            name: "MoonbounceAppProxyLibrary",
-            targets: ["MoonbounceAppProxyLibrary"]),
-        .library(
             name: "MoonbounceShared",
             targets: ["MoonbounceShared"]),
     ],
@@ -63,17 +60,6 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 "Net",
                 "ShadowSwift",
-                "SwiftQueue",
-                "Flower",
-                "Transmission",
-                "InternetProtocols",
-            ]),
-        .target(
-            name: "MoonbounceAppProxyLibrary",
-            dependencies: [
-                "MoonbounceShared",
-                .product(name: "Logging", package: "swift-log"),
-                "Net",
                 "SwiftQueue",
                 "Flower",
                 "Transmission",
