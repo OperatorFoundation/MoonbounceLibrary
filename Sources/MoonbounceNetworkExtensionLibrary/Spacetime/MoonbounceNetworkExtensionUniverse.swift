@@ -25,7 +25,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
-        self.logger = Logger(label: "MoonbounceNetworkExtension")
+        self.logger = Logger(label: "MBLogger.MoonbounceNetworkExtensionUniverse")
         self.logger.logLevel = .debug
         self.logger.debug("Initialized MoonbounceNetworkExtensionUniverse")
 

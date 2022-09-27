@@ -17,7 +17,7 @@ import MoonbounceShared
 
 public class MoonbounceLibrary
 {
-    let logger = Logger(label: "org.OperatorFoundation.Moonbounce.MacOS")
+    let logger = Logger(label: "MBLogger.MoonbounceLibrary")
     let simulation: Simulation
     let universe: MoonbounceUniverse
 

@@ -32,7 +32,7 @@ public class NetworkExtensionModule: Module
 
     public init()
     {
-        self.logger = Logger(label: "MoonbounceNetworkExtension")
+        self.logger = Logger(label: "MBLogger.MoonbouceNetworkExtensionLibrary.NetworkExtensionModule")
         self.logger.logLevel = .debug
         self.logger.debug("Initialized NetworkExtensionModule")
     }

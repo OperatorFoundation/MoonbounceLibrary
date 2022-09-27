@@ -34,7 +34,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     public override init()
     {
-        self.logger = Logger(label: "MoonbounceNetworkExtension")
+        self.logger = Logger(label: "MBLogger.MoonbouncePacketTunnelProvider")
         self.logger.logLevel = .debug
         self.logger.debug("Initialized MoonbouncePacketTunnelProvider")
 
