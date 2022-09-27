@@ -7,16 +7,12 @@
 //
 
 import Foundation
-import TunnelClient
-//import ReplicantSwiftClient
-//import ReplicantSwift
-import Net
 
 public enum Keys: String
 {
     case moonbounceConfigKey = "MoonbounceConfiguration"
     case clientConfigKey = "ClientConfiguration"
-    case replicantConfigKey = "ReplicantConfiguration"
+    case shadowConfigKey = "ShadowConfiguration"
     case tunnelNameKey = "Tunnel Name"
     case portKey = "Port"
     case hostKey = "Host"

@@ -11,6 +11,8 @@ import NetworkExtension
 
 import Flower
 import LoggerQueue
+import MoonbounceShared
+import ShadowSwift
 import Simulation
 import Spacetime
 import Transmission
@@ -42,52 +44,48 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
         self.logger.debug("Server address: \(serverAddress)")
 
-        //        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
-        //        {
-        //            appLog.error("Unable to get moonbounce config from protocol.")
-        //            return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
-        //        }
-
-        //        guard let replicantConfig = moonbounceConfig.replicantConfig
-        //            else
-        //        {
-        //            self.log.debug("start tunnel failed to find a replicant configuration")
-        //            completionHandler(TunnelError.badConfiguration)
-        //            return
-        //        }
-
-        //        let host = moonbounceConfig.replicantConfig?.serverIP
-        //        let port = moonbounceConfig.replicantConfig?.port
-
-        let host = "128.199.9.9"
-        let port = 80
-
-        self.logger.debug("\nReplicant Connection Factory Created.\nHost - \(host)\nPort - \(port)\n")
-
-        logger.debug("2. Connect to server called.")
-
-        //        guard let replicantConnection = ReplicantConnection(type: ConnectionType.tcp, config: replicantConfig, logger: log) else {
-        //            log.error("could not initialize replicant connection")
-        //            return
-        //        }
-
-        guard let replicantConnection = try? connect(host, port) else
+//        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
+//        {
+//            appLog.error("Unable to get moonbounce config from protocol.")
+//            return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
+//        }
+//
+//        guard let replicantConfig = moonbounceConfig.replicantConfig
+//            else
+//        {
+//            self.log.debug("start tunnel failed to find a replicant configuration")
+//            completionHandler(TunnelError.badConfiguration)
+//            return
+//        }
+        
+        guard let shadowConfig = configuration.providerConfiguration?[Keys.shadowConfigKey.rawValue] as? ShadowConfig else
         {
-            logger.error("could not initialize replicant connection")
+            self.logger.error("Failed to get the Shadow config from our configuration.")
+            return MoonbounceUniverseError.noTransportConfig
+        }
+
+        let host = shadowConfig.serverIP
+        let port = shadowConfig.port
+
+        self.logger.debug("2. Connect to server called.\nHost - \(host)\nPort - \(port)\n")
+
+        guard let transmissionConnection = try? connect(host, Int(port)) else
+        {
+            logger.error("could not initialize a transmission connection")
             return MoonbounceUniverseError.connectionFailed
         }
-        self.network = replicantConnection
-
-        self.flower = FlowerConnection(connection: replicantConnection)
+        
+        self.network = transmissionConnection
+        self.flower = FlowerConnection(connection: transmissionConnection)
 
         self.logger.debug("\n3. 🌲 Connection state is ready 🌲\n")
         self.logger.debug("Waiting for IP assignment")
+        
         guard let flower = self.flower else
         {
             self.logger.error("🛑 Current connection is nil, giving up. 🛑")
             return TunnelError.disconnected
         }
-
 
         self.logger.debug("calling flowerConnection.readMessage()")
         let message = flower.readMessage()

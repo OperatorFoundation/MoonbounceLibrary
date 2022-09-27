@@ -7,9 +7,11 @@
 
 import Foundation
 import Logging
+import NetworkExtension
+
+import ShadowSwift
 import Simulation
 import Spacetime
-import NetworkExtension
 import Universe
 import MoonbounceShared
 
@@ -26,13 +28,13 @@ public class MoonbounceLibrary
         self.universe = MoonbounceUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
     }
 
-    public func configure(_ config: MoonbounceConfig) throws
+    public func configure(_ config: ShadowConfig, providerBundleIdentifier: String, tunnelName: String) throws
     {
         let _ = try? self.universe.loadPreferences()
 
-        guard let preferences = newProtocolConfiguration(moonbounceConfig: config) else
+        guard let preferences = newProtocolConfiguration(shadowConfig: config, providerBundleIdentifier: providerBundleIdentifier, tunnelName: tunnelName) else
         {
-            throw MoonbounceLibraryError.badConfig(config)
+            throw MoonbounceLibraryError.badShadowConfig(config)
         }
 
         try self.universe.savePreferences(preferences)
@@ -48,15 +50,14 @@ public class MoonbounceLibrary
         try self.universe.disable()
     }
 
-    func newProtocolConfiguration(moonbounceConfig: MoonbounceConfig) -> VPNPreferences?
+    func newProtocolConfiguration(shadowConfig: ShadowConfig, providerBundleIdentifier: String, tunnelName: String) -> VPNPreferences?
     {
         self.logger.debug("VPNPreferencesController.newProtocolConfiguration")
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
-        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(moonbounceConfig.providerBundleIdentifier)")
-        protocolConfiguration.providerBundleIdentifier = moonbounceConfig.providerBundleIdentifier
-        //        protocolConfiguration.serverAddress = "\(moonbounceConfig.replicantConfig?.serverIP)"
-        protocolConfiguration.serverAddress = "206.189.200.18"
+        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(providerBundleIdentifier)")
+        protocolConfiguration.providerBundleIdentifier = providerBundleIdentifier
+        protocolConfiguration.serverAddress = "\(shadowConfig.serverIP)"
         protocolConfiguration.includeAllNetworks = true
 
         // FIXME: Replicant JSON needed here
@@ -81,10 +82,17 @@ public class MoonbounceLibrary
         //            protocolConfiguration.providerConfiguration = [Keys.clientConfigKey.rawValue: clientConfigJSON]
         //        }
 
-        let replicantConfigString = "{}"
+        let encoder = JSONEncoder()
+        guard let shadowConfigString = try? encoder.encode(shadowConfig) else
+        {
+            self.logger.error("Failed to create a json string from our Shadow config.")
+            return nil
+            
+        }
+        
         protocolConfiguration.providerConfiguration = [
-            Keys.replicantConfigKey.rawValue: replicantConfigString.data,
-            Keys.tunnelNameKey.rawValue: moonbounceConfig.name
+            Keys.shadowConfigKey.rawValue: shadowConfigString.data,
+            Keys.tunnelNameKey.rawValue: tunnelName
         ]
 
         self.logger.info("newProtocolConfiguration: \(String(describing: protocolConfiguration.providerConfiguration))")
@@ -98,4 +106,5 @@ public class MoonbounceLibrary
 public enum MoonbounceLibraryError: Error
 {
     case badConfig(MoonbounceConfig)
+    case badShadowConfig(ShadowConfig)
 }

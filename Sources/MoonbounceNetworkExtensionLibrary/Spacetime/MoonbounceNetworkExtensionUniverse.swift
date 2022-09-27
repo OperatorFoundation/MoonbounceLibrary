@@ -170,6 +170,7 @@ public enum MoonbounceUniverseError: Error
 {
     case failure
     case connectionFailed
+    case noTransportConfig
     case noIpAssignment
     case unimplemented
 }
