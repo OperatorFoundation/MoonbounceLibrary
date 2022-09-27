@@ -10,7 +10,6 @@ import Logging
 import NetworkExtension
 
 import Flower
-import LoggerQueue
 import MoonbounceShared
 import ShadowSwift
 import Simulation
