@@ -236,8 +236,8 @@ public class NetworkExtensionModule: Module
         let maybeError = Synchronizer.sync
         {
             (completionHandler: @escaping (Error?) -> Void) in
-
-            provider.setNetworkSettings(settings, completionHandler: completionHandler)
+            
+            provider.setTunnelNetworkSettings(settings, completionHandler: completionHandler)
         }
 
         if maybeError != nil
