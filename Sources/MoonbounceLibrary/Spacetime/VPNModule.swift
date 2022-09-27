@@ -128,7 +128,13 @@ public class VPNModule: Module
         }
 
         manager.isEnabled = true
-
+        
+        if let error = MainThreadSynchronizer.sync(manager.loadFromPreferences)
+        {
+            print("VPNModule.enable - loadFromPreferences error: \(error)")
+            return Failure(effect.id)
+        }
+        
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.enable - saveToPreferences error: \(error)")
