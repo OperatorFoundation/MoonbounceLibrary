@@ -53,34 +53,12 @@ public class MoonbounceLibrary
     func newProtocolConfiguration(shadowConfig: ShadowConfig, providerBundleIdentifier: String, tunnelName: String) -> VPNPreferences?
     {
         self.logger.debug("VPNPreferencesController.newProtocolConfiguration")
+        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(providerBundleIdentifier)")
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
-        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(providerBundleIdentifier)")
         protocolConfiguration.providerBundleIdentifier = providerBundleIdentifier
         protocolConfiguration.serverAddress = "\(shadowConfig.serverIP)"
         protocolConfiguration.includeAllNetworks = true
-
-        // FIXME: Replicant JSON needed here
-
-        //        if moonbounceConfig.replicantConfig != nil
-        //        {
-        //            guard let replicantConfigJSON = moonbounceConfig.replicantConfig!.createJSON()
-        //                else
-        //            {
-        //                return nil
-        //            }
-        //
-        //            protocolConfiguration.providerConfiguration = [
-        //                Keys.clientConfigKey.rawValue: clientConfigJSON,
-        //                Keys.replicantConfigKey.rawValue: replicantConfigJSON,
-        //                Keys.tunnelNameKey.rawValue: moonbounceConfig.name]
-        //
-        //            appLog.debug("\nproviderConfiguration: \(protocolConfiguration.providerConfiguration!)\n")
-        //        }
-        //        else
-        //        {
-        //            protocolConfiguration.providerConfiguration = [Keys.clientConfigKey.rawValue: clientConfigJSON]
-        //        }
 
         let encoder = JSONEncoder()
         guard let shadowConfigString = try? encoder.encode(shadowConfig) else
