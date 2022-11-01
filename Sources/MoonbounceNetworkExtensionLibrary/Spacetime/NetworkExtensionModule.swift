@@ -47,7 +47,7 @@ public class NetworkExtensionModule: Module
 
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
-        os_log("NetworkExtensionModule.handleEffect")
+        os_log("MoonbounceLibrary: NetworkExtensionModule.handleEffect")
         switch effect
         {
             case let startTunnelRequest as StartTunnelRequest:
@@ -69,8 +69,8 @@ public class NetworkExtensionModule: Module
                 return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
 
             case let getConfigurationRequest as GetConfigurationRequest:
-                os_log("NetworkExtensionModule.handleEffect: received a getConfigurationRequest")
-                return getConfiguration(getConfigurationRequest)
+                os_log("MoonbounceLibrary: NetworkExtensionModule.handleEffect: received a getConfigurationRequest")
+                return getTunnelConfiguration(getConfigurationRequest)
 
             case let connectRequest as NWTCPConnectRequest:
                 return connect(connectRequest)
@@ -86,7 +86,7 @@ public class NetworkExtensionModule: Module
 
             default:
                 print("NetworkExtensionModule: Unknown effect \(effect)")
-                os_log("NetworkExtensionModule: Unknown effect \(effect)")
+                os_log("MoonbounceLibrary: NetworkExtensionModule: Unknown effect \(effect)")
                 return Failure(effect.id)
         }
     }
@@ -99,25 +99,27 @@ public class NetworkExtensionModule: Module
 
     public func setConfiguration(_ configuration: NEVPNProtocol)
     {
-        self.logger.debug("NetworkExtensionModule.setConfiguration")
+        os_log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration")
         self.configuration = configuration
+        os_log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration: configuration exists? - \(configuration != nil)")
+        os_log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration: self.confguration exists? - \(self.configuration != nil)")
     }
 
     public func setProvider(_ provider: NEPacketTunnelProvider)
     {
-        self.logger.debug("NetworkExtensionModule.setProvider")
+        os_log("MoonbounceLibrary: NetworkExtensionModule.setProvider")
         self.provider = provider
     }
 
     public func setFlow(_ flow: NEPacketTunnelFlow)
     {
-        self.logger.debug("NetworkExtensionModule.setFlow")
+        self.logger.debug("MoonbounceLibrary: NetworkExtensionModule.setFlow")
         self.flow = flow
     }
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
-        os_log("NetworkExtensionModule.startTunnel")
+        os_log("MoonbounceLibrary: NetworkExtensionModule.startTunnel")
         self.logger.debug("NetworkExtensionModule.startTunnel")
 
         self.startTunnelDispatchQueue.async
@@ -178,9 +180,9 @@ public class NetworkExtensionModule: Module
         return StopTunnelResponse(effect.id)
     }
 
-    public func getConfiguration(_ effect: GetConfigurationRequest) -> Event?
+    public func getTunnelConfiguration(_ effect: GetConfigurationRequest) -> Event?
     {
-        os_log("NetworkExtensionModule.getConfiguration")
+        os_log("MoonbounceLibrary: NetworkExtensionModule.getConfiguration")
 
         guard let provider = self.provider else
         {
@@ -289,7 +291,7 @@ public class NetworkExtensionModule: Module
 
         let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
         self.logger.debug("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
-        os_log("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        os_log("MoonbounceLibrary: NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
         let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
         let transmissionConnection = NWTCPTransmissionConnection(networkConnection)
         let connection = SimulationNWTCPConnection(transmissionConnection)
