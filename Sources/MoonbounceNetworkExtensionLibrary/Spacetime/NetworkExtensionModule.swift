@@ -68,6 +68,9 @@ public class NetworkExtensionModule: Module
             case let setNetworkTunnelSettingsRequest as SetNetworkTunnelSettingsRequest:
                 return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
 
+            case let getConfigurationRequest as GetConfigurationRequest:
+                return getConfiguration(getConfigurationRequest)
+
             case let connectRequest as NWTCPConnectRequest:
                 return connect(connectRequest)
 
@@ -169,6 +172,19 @@ public class NetworkExtensionModule: Module
         self.logger.debug("NetworkExtensionModule.stopTunnelRequestHandler")
         stopTunnelLock.signal()
         return StopTunnelResponse(effect.id)
+    }
+
+    public func getConfiguration(_ effect: GetConfigurationRequest) -> Event?
+    {
+        self.logger.debug("NetworkExtensionModule.getConfiguration")
+        if let configuration = self.configuration
+        {
+            return GetConfigurationResponse(effect.id, configuration)
+        }
+        else
+        {
+            return Failure(effect.id)
+        }
     }
 
     func appMessageRequestHandler(_ effect: AppMessageRequest) -> Event?
