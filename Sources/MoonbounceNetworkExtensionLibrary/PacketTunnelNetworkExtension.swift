@@ -67,7 +67,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         
         // TODO: Port from config
 //        let port = shadowConfig.port
-        let port = "1234"
+        let port: UInt16 = 1234
 
         self.logger.debug("2. Connect to server called.\nHost - \(host)\nPort - \(port)\n")
 
