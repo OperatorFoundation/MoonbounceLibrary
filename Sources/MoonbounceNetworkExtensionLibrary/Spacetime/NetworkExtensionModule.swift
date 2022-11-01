@@ -18,7 +18,7 @@ public class NetworkExtensionModule: Module
 {
     static public let name = "NetworkExtension"
 
-    var configuration: NETunnelProviderProtocol? = nil
+    var configuration: NEVPNProtocol? = nil
     let startTunnelQueue = BlockingQueue<Error?>()
     let stopTunnelLock = DispatchSemaphore(value: 0)
     let appMessageQueue = BlockingQueue<Data?>()

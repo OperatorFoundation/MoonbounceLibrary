@@ -132,7 +132,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         self.flower = nil
     }
 
-    override public func getConfiguration() throws -> NETunnelProviderProtocol
+    public func getConfiguration() throws -> NEVPNProtocol
     {
         self.logger.debug("PacketTunnelNetworkExtension.getConfiguration")
         let response = processEffect(GetConfigurationRequest())
