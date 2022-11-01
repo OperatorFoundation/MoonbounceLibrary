@@ -11,7 +11,7 @@ public class WritePacketRequest: Effect
 
     public override var description: String
     {
-        return "\(self.module).GetConfigurationRequest[id: \(self.id), data: \(self.data)]"
+        return "\(self.module).WritePacketRequest[id: \(self.id), data: \(self.data)]"
     }
 
     public init(_ data: Data)
