@@ -95,7 +95,7 @@ public class NetworkExtensionModule: Module
         return
     }
 
-    public func setConfiguration(_ configuration: NETunnelProviderProtocol)
+    public func setConfiguration(_ configuration: NEVPNProtocol)
     {
         self.logger.debug("NetworkExtensionModule.setConfiguration")
         self.configuration = configuration

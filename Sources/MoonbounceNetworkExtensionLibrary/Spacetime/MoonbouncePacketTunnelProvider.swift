@@ -47,10 +47,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         super.init()
 
         self.neModule.setProvider(self)
-        if let configuration = self.protocolConfiguration as? NETunnelProviderProtocol
-        {
-            self.neModule.setConfiguration(configuration)
-        }
+        self.neModule.setConfiguration(self.protocolConfiguration)
     }
 
     // NEPacketTunnelProvider
