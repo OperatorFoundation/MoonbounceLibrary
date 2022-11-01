@@ -62,21 +62,19 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
             self.logger.error("Failed to get the Shadow config from our configuration.")
             return MoonbounceUniverseError.noTransportConfig
         }
-
-        let host = shadowConfig.serverIP
         
         // TODO: Port from config
 //        let port = shadowConfig.port
         let port: UInt16 = 1234
 
-        self.logger.debug("2. Connect to server called.\nHost - \(host)\nPort - \(port)\n")
-
-        guard let transmissionConnection = try? connect(host, Int(port)) else
+        self.logger.debug("2. Connect to server called.\nHost - \(serverAddress)\nPort - \(port)\n")
+        
+        guard let transmissionConnection = try? connect(serverAddress, Int(port)) else
         {
             logger.error("could not initialize a transmission connection")
             return MoonbounceUniverseError.connectionFailed
         }
-        
+
         self.network = transmissionConnection
         self.flower = FlowerConnection(connection: transmissionConnection)
 
@@ -109,12 +107,12 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
                 return MoonbounceUniverseError.noIpAssignment
         }
 
-        self.logger.debug("(setTunnelSettings) host: \(host), tunnelAddress: \(tunnelAddress)")
+        self.logger.debug("(setTunnelSettings) host: \(serverAddress), tunnelAddress: \(tunnelAddress)")
 
         do
         {
             // Set the virtual interface settings.
-            try self.setNetworkTunnelSettings(host, tunnelAddress)
+            try self.setNetworkTunnelSettings(serverAddress, tunnelAddress)
         }
         catch
         {

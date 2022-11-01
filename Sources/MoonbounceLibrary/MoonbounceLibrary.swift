@@ -57,7 +57,7 @@ public class MoonbounceLibrary
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
         protocolConfiguration.providerBundleIdentifier = providerBundleIdentifier
-        protocolConfiguration.serverAddress = "\(shadowConfig.serverIP)"
+        protocolConfiguration.serverAddress = shadowConfig.serverIP
         protocolConfiguration.includeAllNetworks = true
 
         let encoder = JSONEncoder()
@@ -65,7 +65,6 @@ public class MoonbounceLibrary
         {
             self.logger.error("Failed to create a json string from our Shadow config.")
             return nil
-            
         }
         
         protocolConfiguration.providerConfiguration = [

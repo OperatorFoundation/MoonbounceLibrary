@@ -5,10 +5,12 @@
 //  Created by Dr. Brandon Wiley on 3/31/22.
 //
 
-import Chord
 import Foundation
 import Logging
 import NetworkExtension
+import os.log
+
+import Chord
 import Simulation
 import Spacetime
 
@@ -24,7 +26,7 @@ public class NetworkExtensionModule: Module
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
     public var connections: [UUID: SimulationNWTCPConnection] = [:]
-    var logger: Logger!
+    var logger = Logger(label: "MBLogger.MoonbouceNetworkExtensionLibrary.NetworkExtensionModule")
     
     let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
     let stopTunnelDispatchQueue = DispatchQueue(label: "StopTunnel")
@@ -32,7 +34,6 @@ public class NetworkExtensionModule: Module
 
     public init()
     {
-        self.logger = Logger(label: "MBLogger.MoonbouceNetworkExtensionLibrary.NetworkExtensionModule")
         self.logger.logLevel = .debug
         self.logger.debug("Initialized NetworkExtensionModule")
     }
@@ -260,6 +261,8 @@ public class NetworkExtensionModule: Module
         let uuid = UUID()
 
         let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
+        self.logger.debug("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        os_log("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
         let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
         let transmissionConnection = NWTCPTransmissionConnection(networkConnection)
         let connection = SimulationNWTCPConnection(transmissionConnection)
