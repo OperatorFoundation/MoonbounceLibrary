@@ -8,6 +8,7 @@
 import Foundation
 import Logging
 import NetworkExtension
+import os.log
 
 import Flower
 import MoonbounceShared
@@ -23,25 +24,30 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
     override public func startTunnel(options: [String: NSObject]?) -> Error?
     {
         self.logger.debug("PacketTunnelNetworkExtension.startTunnel")
-        logger.debug("1. 👾 PacketTunnelProvider startTunnel called 👾")
+        os_log("1. 👾 PacketTunnelNetworkExtension startTunnel called 👾")
 
         let configuration: NETunnelProviderProtocol
         do
         {
+            os_log("👾 PacketTunnelNetworkExtension getting configuration... 👾")
             configuration = try getConfiguration()
+            os_log("👾 PacketTunnelNetworkExtension configuration got 👾")
         }
         catch
         {
+            os_log("PacketTunnelNetworkExtension Failed to get configuration")
             return error
         }
 
         guard let serverAddress: String = configuration.serverAddress else
         {
             logger.error("Unable to get the server address.")
+            os_log("PacketTunnelNetworkExtension: Unable to get the server address.")
             return PacketTunnelProviderError.savedProtocolConfigurationIsInvalid
         }
 
         self.logger.debug("Server address: \(serverAddress)")
+        os_log("PacketTunnelNetworkExtension: Server address: \(serverAddress)")
 
 //        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
 //        {
@@ -134,14 +140,17 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     public func getConfiguration() throws -> NEVPNProtocol
     {
-        self.logger.debug("PacketTunnelNetworkExtension.getConfiguration")
+        os_log("👾 PacketTunnelNetworkExtension: getConfiguration")
         let response = processEffect(GetConfigurationRequest())
+        
         switch response
         {
             case let getConfigurationResponse as GetConfigurationResponse:
+                os_log("👾 PacketTunnelNetworkExtension: returning a configuration... 👾")
                 return getConfigurationResponse.configuration
 
             default:
+                os_log("👾 PacketTunnelNetworkExtension: getConfiguration failed! Received an incorrect response: \(response.description) 👾")
                 throw MoonbounceUniverseError.failure
         }
     }

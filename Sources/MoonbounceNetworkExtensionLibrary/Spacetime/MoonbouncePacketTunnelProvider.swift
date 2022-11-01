@@ -10,6 +10,8 @@ import Flower
 import Logging
 import Net
 import NetworkExtension
+import os.log
+
 //import ReplicantSwift
 //import ReplicantSwiftClient
 import Simulation
@@ -23,7 +25,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     let neModule: NetworkExtensionModule
     let simulation: Simulation
     let universe: MoonbounceNetworkExtensionUniverse
-    var logger: Logger!
+    var logger = Logger(label: "MBLogger.MoonbouncePacketTunnelProvider")
 
     /// The tunnel connection.
     var replicantConnection: Transmission.Connection?
@@ -34,7 +36,6 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     public override init()
     {
-        self.logger = Logger(label: "MBLogger.MoonbouncePacketTunnelProvider")
         self.logger.logLevel = .debug
         self.logger.debug("Initialized MoonbouncePacketTunnelProvider")
 
