@@ -47,7 +47,7 @@ public class NetworkExtensionModule: Module
 
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule.handleEffect")
+        os_log("NetworkExtensionModule.handleEffect")
         switch effect
         {
             case let startTunnelRequest as StartTunnelRequest:
@@ -69,6 +69,7 @@ public class NetworkExtensionModule: Module
                 return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
 
             case let getConfigurationRequest as GetConfigurationRequest:
+                os_log("NetworkExtensionModule.handleEffect: received a getConfigurationRequest")
                 return getConfiguration(getConfigurationRequest)
 
             case let connectRequest as NWTCPConnectRequest:
@@ -84,7 +85,8 @@ public class NetworkExtensionModule: Module
                 return close(closeRequest, channel)
 
             default:
-                print("Unknown effect \(effect)")
+                print("NetworkExtensionModule: Unknown effect \(effect)")
+                os_log("NetworkExtensionModule: Unknown effect \(effect)")
                 return Failure(effect.id)
         }
     }
@@ -115,9 +117,9 @@ public class NetworkExtensionModule: Module
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
+        os_log("NetworkExtensionModule.startTunnel")
         self.logger.debug("NetworkExtensionModule.startTunnel")
-        completionHandler(nil)
-        
+
         self.startTunnelDispatchQueue.async
         {
             let event = StartTunnelEvent(options: options)
@@ -128,6 +130,8 @@ public class NetworkExtensionModule: Module
                 // FIXME: should probably stop the tunnel here
             }
         }
+        
+        completionHandler(nil)
     }
 
     public func stopTunnel(events: BlockingQueue<Event>, reason: NEProviderStopReason, completionHandler: @escaping () -> Void )
@@ -176,13 +180,16 @@ public class NetworkExtensionModule: Module
 
     public func getConfiguration(_ effect: GetConfigurationRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule.getConfiguration")
+        os_log("NetworkExtensionModule.getConfiguration")
+        
         if let configuration = self.configuration
         {
+            os_log("NetworkExtensionModule.getConfiguration returning self.configuration")
             return GetConfigurationResponse(effect.id, configuration)
         }
         else
         {
+            os_log("NetworkExtensionModule.getConfiguration failed")
             return Failure(effect.id)
         }
     }
