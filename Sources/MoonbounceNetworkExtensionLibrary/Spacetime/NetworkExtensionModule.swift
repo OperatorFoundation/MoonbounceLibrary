@@ -181,17 +181,21 @@ public class NetworkExtensionModule: Module
     public func getConfiguration(_ effect: GetConfigurationRequest) -> Event?
     {
         os_log("NetworkExtensionModule.getConfiguration")
-        
-        if let configuration = self.configuration
+
+        guard let provider = self.provider else
         {
-            os_log("NetworkExtensionModule.getConfiguration returning self.configuration")
-            return GetConfigurationResponse(effect.id, configuration)
-        }
-        else
-        {
-            os_log("NetworkExtensionModule.getConfiguration failed")
+            os_log("failure")
             return Failure(effect.id)
         }
+
+        guard let serverAddress = provider.protocolConfiguration.serverAddress else
+        {
+            os_log("failure")
+            return Failure(effect.id)
+        }
+
+        os_log("NetworkExtensionModule.getConfiguration returning self.configuration")
+        return GetConfigurationResponse(effect.id, serverAddress)
     }
 
     func appMessageRequestHandler(_ effect: AppMessageRequest) -> Event?

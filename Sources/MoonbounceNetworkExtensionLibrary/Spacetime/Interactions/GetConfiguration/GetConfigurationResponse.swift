@@ -11,14 +11,14 @@ import Spacetime
 
 public class GetConfigurationResponse: Event
 {
-    let configuration: NEVPNProtocol
+    let configuration: String
 
     public override var description: String
     {
         return "\(self.module).GetConfigurationResponse[effectID: \(String(describing: self.effectId)), configuration: \(self.configuration)]"
     }
 
-    public init(_ effectId: UUID, _ configuration: NEVPNProtocol)
+    public init(_ effectId: UUID, _ configuration: String)
     {
         self.configuration = configuration
 
