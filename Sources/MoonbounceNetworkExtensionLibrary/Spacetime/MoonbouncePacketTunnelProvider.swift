@@ -35,24 +35,24 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     public override init()
     {
-        self.logger.debug("Initialized MoonbouncePacketTunnelProvider")
-
+        self.logger.log("MoonbouncePacketTunnelProvider: init")
+        
         self.neModule = NetworkExtensionModule(logger: self.logger)
         self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule])
         self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
-
-        self.logger.debug("MoonbouncePacketTunnelProvider.init")
 
         super.init()
 
         self.neModule.setProvider(self)
         self.neModule.setConfiguration(self.protocolConfiguration)
+        
+        self.logger.log("MoonbouncePacketTunnelProvider: Initialization complete")
     }
 
     // NEPacketTunnelProvider
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
-        self.logger.debug("MoonbouncePacketTunnelProvider.startTunnel")
+        self.logger.log("MoonbouncePacketTunnelProvider: startTunnel")
         self.neModule.setConfiguration(self.protocolConfiguration)
         self.neModule.startTunnel(events: self.simulation.events, options: options, completionHandler: completionHandler)
     }
@@ -60,21 +60,21 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
     {
-        self.logger.debug("MoonbouncePacketTunnelProvider.stopTunnel")
+        self.logger.log("MoonbouncePacketTunnelProvider: stopTunnel")
         self.neModule.stopTunnel(events: self.simulation.events, reason: reason, completionHandler: completionHandler)
     }
     
     /// Handle IPC messages from the app.
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
     {
-        self.logger.debug("MoonbouncePacketTunnelProvider.handleAppMessage")
+        self.logger.debug("MoonbouncePacketTunnelProvider: handleAppMessage")
         self.neModule.handleAppMessage(events: self.simulation.events, data: messageData, completionHandler: completionHandler)
     }
 
     open override func cancelTunnelWithError(_ error: Error?)
     {
-        self.logger.debug("MoonbouncePacketTunnelProvider.cancelTunnelWithError")
-        logger.error("Closing the tunnel with error: \(String(describing: error))")
+        self.logger.debug("MoonbouncePacketTunnelProvider: cancelTunnelWithError")
+        logger.error("MoonbouncePacketTunnelProvider: Closing the tunnel with error: \(String(describing: error))")
         self.stopTunnel(with: NEProviderStopReason.userInitiated)
         {
             return

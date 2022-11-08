@@ -36,17 +36,21 @@ open class MoonbounceNetworkExtensionUniverse: Universe
         switch event
         {
             case let startTunnelEvent as StartTunnelEvent:
-                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnelEvent")
+                logger.log("MoonbounceNetworkExtensionUniverse: processing StartTunnelEvent")
                 let result = self.startTunnel(options: startTunnelEvent.options)
+                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel result - \(result.debugDescription)")
                 let request = StartTunnelRequest(result)
+                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel request - \(request.description)")
                 let response = self.processEffect(request)
+                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnelResponse \(response.description) ")
+                
                 switch response
                 {
                     case is StartTunnelResponse:
                         return
 
                     default:
-                        logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: startTunnel bad response: \(response)")
+                        logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: startTunnel bad response: \(response.description)")
                 }
 
             case let stopTunnelEvent as StopTunnelEvent:
@@ -120,6 +124,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
     // To be implemented by subclasses
     public func startTunnel(options: [String: NSObject]?) -> Error?
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling startTunnel but it is not implemented.")
         return nil // Success!
     }
 
