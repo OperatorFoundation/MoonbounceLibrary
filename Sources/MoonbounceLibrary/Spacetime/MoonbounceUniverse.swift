@@ -7,7 +7,7 @@
 
 import Chord
 import Foundation
-import Logging
+import os.log
 import MoonbounceShared
 import NetworkExtension
 import Spacetime
@@ -15,13 +15,13 @@ import Universe
 
 public class MoonbounceUniverse: Universe
 {
-    let appLog: Logger
+    let logger: Logger
 
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
-        self.appLog = logger
+        self.logger = logger
 
-        super.init(effects: effects, events: events)
+        super.init(effects: effects, events: events, logger: logger)
     }
 
     public func connectionStatus() throws -> NEVPNStatus

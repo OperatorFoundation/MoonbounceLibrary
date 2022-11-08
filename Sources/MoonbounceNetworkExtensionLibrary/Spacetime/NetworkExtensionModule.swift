@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Logging
 import NetworkExtension
 import os.log
 
@@ -26,15 +25,15 @@ public class NetworkExtensionModule: Module
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
     public var connections: [UUID: SimulationNWTCPConnection] = [:]
-    var logger = Logger(label: "MBLogger.MoonbouceNetworkExtensionLibrary.NetworkExtensionModule")
+    var logger: Logger
     
     let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
     let stopTunnelDispatchQueue = DispatchQueue(label: "StopTunnel")
     let handleAppMessageDispatchQueue = DispatchQueue(label: "HandleAppMessage")
 
-    public init()
+    public init(logger: Logger)
     {
-        self.logger.logLevel = .debug
+        self.logger = logger
         self.logger.debug("Initialized NetworkExtensionModule")
     }
 
@@ -47,7 +46,7 @@ public class NetworkExtensionModule: Module
 
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
-        os_log("MoonbounceLibrary: NetworkExtensionModule.handleEffect")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.handleEffect")
         switch effect
         {
             case let startTunnelRequest as StartTunnelRequest:
@@ -69,8 +68,10 @@ public class NetworkExtensionModule: Module
                 return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
 
             case let getConfigurationRequest as GetConfigurationRequest:
-                os_log("MoonbounceLibrary: NetworkExtensionModule.handleEffect: received a getConfigurationRequest")
-                return getTunnelConfiguration(getConfigurationRequest)
+                logger.log("MoonbounceLibrary: NetworkExtensionModule.handleEffect: received a getConfigurationRequest")
+                let tunnelConfiguration = getTunnelConfiguration(getConfigurationRequest)
+                logger.log("MoonbounceLibrary: NetworkExtensionModule.handleEffect: returning tunnelConfiguration: \(tunnelConfiguration.debugDescription)")
+                return tunnelConfiguration
 
             case let connectRequest as NWTCPConnectRequest:
                 return connect(connectRequest)
@@ -86,7 +87,7 @@ public class NetworkExtensionModule: Module
 
             default:
                 print("NetworkExtensionModule: Unknown effect \(effect)")
-                os_log("MoonbounceLibrary: NetworkExtensionModule: Unknown effect \(effect)")
+                logger.log("MoonbounceLibrary: NetworkExtensionModule: Unknown effect \(effect)")
                 return Failure(effect.id)
         }
     }
@@ -99,15 +100,14 @@ public class NetworkExtensionModule: Module
 
     public func setConfiguration(_ configuration: NEVPNProtocol)
     {
-        os_log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration")
         self.configuration = configuration
-        os_log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration: configuration exists? - \(configuration != nil)")
-        os_log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration: self.confguration exists? - \(self.configuration != nil)")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.setConfiguration: configuration - \(configuration.debugDescription)")
     }
 
     public func setProvider(_ provider: NEPacketTunnelProvider)
     {
-        os_log("MoonbounceLibrary: NetworkExtensionModule.setProvider")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.setProvider")
         self.provider = provider
     }
 
@@ -119,7 +119,7 @@ public class NetworkExtensionModule: Module
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
-        os_log("MoonbounceLibrary: NetworkExtensionModule.startTunnel")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.startTunnel")
         self.logger.debug("NetworkExtensionModule.startTunnel")
 
         self.startTunnelDispatchQueue.async
@@ -127,8 +127,9 @@ public class NetworkExtensionModule: Module
             let event = StartTunnelEvent(options: options)
             events.enqueue(element: event)
 
-            if let response = self.startTunnelQueue.dequeue() {
-                self.logger.debug("failed to start tunnel: \(response)")
+            if let response = self.startTunnelQueue.dequeue()
+            {
+                self.logger.debug("failed to start tunnel: \(response.localizedDescription)")
                 // FIXME: should probably stop the tunnel here
             }
         }
@@ -182,21 +183,21 @@ public class NetworkExtensionModule: Module
 
     public func getTunnelConfiguration(_ effect: GetConfigurationRequest) -> Event?
     {
-        os_log("MoonbounceLibrary: NetworkExtensionModule.getConfiguration")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.getConfiguration")
 
         guard let provider = self.provider else
         {
-            os_log("failure")
+            logger.log("MoonbounceLibrary: failure")
             return Failure(effect.id)
         }
 
         guard let serverAddress = provider.protocolConfiguration.serverAddress else
         {
-            os_log("failure")
+            logger.log("MoonbounceLibrary: failure")
             return Failure(effect.id)
         }
 
-        os_log("NetworkExtensionModule.getConfiguration returning self.configuration")
+        logger.log("MoonbounceLibrary: NetworkExtensionModule.getConfiguration returning serverAddress: \(serverAddress.description)")
         return GetConfigurationResponse(effect.id, serverAddress)
     }
 
@@ -290,8 +291,8 @@ public class NetworkExtensionModule: Module
         let uuid = UUID()
 
         let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
-        self.logger.debug("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
-        os_log("MoonbounceLibrary: NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        self.logger.log("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        self.logger.log("MoonbounceLibrary: NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
         let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
         let transmissionConnection = NWTCPTransmissionConnection(networkConnection)
         let connection = SimulationNWTCPConnection(transmissionConnection)

@@ -23,24 +23,23 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 {
     override public func startTunnel(options: [String: NSObject]?) -> Error?
     {
-        self.logger.debug("PacketTunnelNetworkExtension.startTunnel")
-        os_log("1. 👾 MoonbounceLibrary: PacketTunnelNetworkExtension startTunnel called 👾")
+        logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension startTunnel called 👾")
 
         let serverAddress: String
         do
         {
-            os_log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension getting configuration... 👾")
+            logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension getting configuration... 👾")
             serverAddress = try self.getTunnelConfiguration()
-            os_log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension configuration got 👾")
+            logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension received a configuration: \(serverAddress.description) 👾")
         }
         catch
         {
-            os_log("MoonbounceLibrary: PacketTunnelNetworkExtension Failed to get configuration")
+            logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension Failed to get the configuration 👾")
             return error
         }
 
-        self.logger.debug("Server address: \(serverAddress)")
-        os_log("MoonbounceLibrary: PacketTunnelNetworkExtension: Server address: \(serverAddress)")
+        self.logger.debug("👾 MoonbounceLibrary: Server address: \(serverAddress.description)")
+        logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: Server address: \(serverAddress.description)")
 
 //        guard let moonbounceConfig = NetworkExtensionConfigController.getMoonbounceConfig(fromProtocolConfiguration: configuration) else
 //        {
@@ -66,11 +65,11 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 //        let port = shadowConfig.port
         let port: UInt16 = 1234
 
-        os_log("2. MoonbounceLibrary: Connect to server called.\nHost - \(serverAddress)\nPort - \(port)\n")
+        logger.log("👾\nMoonbounceLibrary: Connect to server called.\nHost - \(serverAddress)\nPort - \(port)\n👾")
         
         guard let transmissionConnection = try? connect(serverAddress, Int(port)) else
         {
-            logger.error("could not initialize a transmission connection")
+            logger.error("PacketTunnelNetworkExtension: could not initialize a transmission connection")
             return MoonbounceUniverseError.connectionFailed
         }
 
@@ -106,7 +105,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
                 return MoonbounceUniverseError.noIpAssignment
         }
 
-        self.logger.debug("(setTunnelSettings) host: \(serverAddress), tunnelAddress: \(tunnelAddress)")
+        self.logger.log("👾 MoonbounceLibrary: (setTunnelSettings) host: \(serverAddress), tunnelAddress: \(tunnelAddress.description)")
 
         do
         {
@@ -123,8 +122,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     override public func stopTunnel(with: NEProviderStopReason)
     {
-        self.logger.debug("PacketTunnelNetworkExtension.stopTunnel")
-        logger.debug("stopTunnel Called")
+        self.logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension stopTunnel")
         self.network?.close()
 
         self.network = nil
@@ -133,17 +131,20 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
     public func getTunnelConfiguration() throws -> String
     {
-        os_log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: getConfiguration")
-        let response = processEffect(GetConfigurationRequest())
+        logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: calling GetConfigurationRequest()")
+        let request = GetConfigurationRequest()
+        logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: ConfigurationRequest: \(request.description)\n👾 calling processEffect()")
+        let response = processEffect(request)
+        logger.log("👾 MoonbounceLibrary: processEffect response: \(response)")
         
         switch response
         {
             case let getConfigurationResponse as GetConfigurationResponse:
-                os_log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: returning a configuration... 👾")
+                logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: returning a configuration... 👾")
                 return getConfigurationResponse.configuration
 
             default:
-                os_log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: getConfiguration failed! Received an incorrect response: \(response.description) 👾")
+                logger.log("👾 MoonbounceLibrary: PacketTunnelNetworkExtension: getConfiguration failed! Received an incorrect response: \(response.description) 👾")
                 throw MoonbounceUniverseError.failure
         }
     }

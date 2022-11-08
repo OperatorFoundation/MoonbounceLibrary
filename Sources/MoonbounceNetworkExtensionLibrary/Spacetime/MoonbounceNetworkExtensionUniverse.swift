@@ -8,7 +8,7 @@
 import Chord
 import Flower
 import Foundation
-import Logging
+import os.log
 import MoonbounceShared
 import NetworkExtension
 import Spacetime
@@ -17,7 +17,7 @@ import Universe
 
 open class MoonbounceNetworkExtensionUniverse: Universe
 {
-    var logger: Logger!
+    var logger: Logger
     var network: Transmission.Connection? = nil
     var flower: FlowerConnection? = nil
     let messagesToPacketsQueue = DispatchQueue(label: "clientTunnelConnection: messagesToPackets")
@@ -25,20 +25,18 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
-        self.logger = Logger(label: "MBLogger.MoonbounceNetworkExtensionUniverse")
-        self.logger.logLevel = .debug
-        self.logger.debug("Initialized MoonbounceNetworkExtensionUniverse")
-
-        self.logger.debug("MoonbounceNetworkExtensionUniverse.init")
+        self.logger = logger
+        self.logger.log("MoonbounceNetworkExtensionUniverse: Initialized MoonbounceNetworkExtensionUniverse")
         super.init(effects: effects, events: events)
     }
 
     override open func processEvent(_ event: Event)
     {
-        self.logger.debug("MoonbounceNetworkExtensionUniverse.processEvent")
+        self.logger.log("MoonbounceNetworkExtensionUniverse: processEvent")
         switch event
         {
             case let startTunnelEvent as StartTunnelEvent:
+                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnelEvent")
                 let result = self.startTunnel(options: startTunnelEvent.options)
                 let request = StartTunnelRequest(result)
                 let response = self.processEffect(request)
@@ -48,10 +46,11 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                         return
 
                     default:
-                        logger.error("startTunnel bad response: \(response)")
+                        logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: startTunnel bad response: \(response)")
                 }
 
             case let stopTunnelEvent as StopTunnelEvent:
+                logger.log("MoonbounceNetworkExtensionUniverse: StopTunnelEvent")
                 self.stopTunnel(with: stopTunnelEvent.reason)
                 let request = StopTunnelRequest()
                 let response = self.processEffect(request)
@@ -61,10 +60,11 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                         return
 
                     default:
-                        logger.error("stopTunnel bad response: \(response)")
+                        logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: stopTunnel bad response: \(response)")
                 }
 
             case let appMessageEvent as AppMessageEvent:
+                logger.log("MoonbounceNetworkExtensionUniverse: AppMessageEvent")
                 let result = self.handleAppMessage(data: appMessageEvent.data)
                 let request = AppMessageRequest(result)
                 let response = self.processEffect(request)
@@ -74,11 +74,11 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                         return
 
                     default:
-                        logger.error("handleAppMessage bad response: \(response)")
+                        logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: handleAppMessage bad response: \(response)")
                 }
 
             default:
-                logger.error("Unknown event \(event)")
+                logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: Unknown event \(event)")
                 return
         }
     }
@@ -86,12 +86,11 @@ open class MoonbounceNetworkExtensionUniverse: Universe
     /// Make the initial readPacketsWithCompletionHandler call.
     public func startHandlingPackets()
     {
-        self.logger.debug("MoonbounceNetworkExtensionUniverse.startHandlingPackets")
-        self.logger.debug("7. Start handling packets called.")
+        self.logger.log("MoonbounceNetworkExtensionUniverse: startHandlingPackets")
 
         packetsToMessagesQueue.async
         {
-            self.logger.debug("calling packetsToMessages async")
+            self.logger.debug("MoonbounceNetworkExtensionUniverse: calling packetsToMessages async")
 
             do
             {
@@ -105,7 +104,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
         messagesToPacketsQueue.async
         {
-            self.logger.debug("calling messagesToPackets async")
+            self.logger.log("MoonbounceNetworkExtensionUniverse: calling messagesToPackets async")
 
             do
             {
@@ -131,37 +130,44 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
     public func getConfiguration() throws -> NETunnelProviderProtocol
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling getConfiguration but it is not implemented.")
         throw MoonbounceUniverseError.unimplemented
     }
 
     public func handleAppMessage(data: Data) -> Data?
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling handleAppMessage but it is not implemented.")
         return nil
     }
 
     public func readPacket() throws -> Data
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling readPacket but it is not implemented.")
         throw MoonbounceUniverseError.unimplemented
     }
 
     public func writePacket(_ data: Data) throws
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling writePacket but it is not implemented.")
         throw MoonbounceUniverseError.unimplemented
     }
 
     public func setNetworkTunnelSettings(_ host: String, _ tunnelAddress: TunnelAddress) throws
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling setNetworkTunnelSettings but it is not implemented.")
         throw MoonbounceUniverseError.unimplemented
     }
 
     /// Handle packets coming from the packet flow.
     func packetsToMessages() throws
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling packetsToMessages but it is not implemented.")
         throw MoonbounceUniverseError.unimplemented
     }
 
     func messagesToPackets() throws
     {
+        self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling messagesToPackets but it is not implemented.")
         throw MoonbounceUniverseError.unimplemented
     }
 }

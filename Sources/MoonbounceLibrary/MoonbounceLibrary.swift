@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Logging
+import os.log
 import NetworkExtension
 
 import ShadowSwift
@@ -17,15 +17,17 @@ import MoonbounceShared
 
 public class MoonbounceLibrary
 {
-    let logger = Logger(label: "MBLogger.MoonbounceLibrary")
+    let logger: Logger
     let simulation: Simulation
     let universe: MoonbounceUniverse
 
-    public init()
+    public init(logger: Logger)
     {
         let vpnModule = VPNModule()
-        self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.display.rawValue, VPNModule.name), userModules: [vpnModule])
-        self.universe = MoonbounceUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
+        
+        self.logger = logger
+        self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.display.rawValue, VPNModule.name), userModules: [vpnModule], logger: logger)
+        self.universe = MoonbounceUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: logger)
     }
 
     public func configure(_ config: ShadowConfig, providerBundleIdentifier: String, tunnelName: String) throws

@@ -7,7 +7,6 @@
 //
 
 import Flower
-import Logging
 import Net
 import NetworkExtension
 import os.log
@@ -25,7 +24,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     let neModule: NetworkExtensionModule
     let simulation: Simulation
     let universe: MoonbounceNetworkExtensionUniverse
-    var logger = Logger(label: "MBLogger.MoonbouncePacketTunnelProvider")
+    var logger = Logger(subsystem: "org.OperatorFoundation.MoonbounceLogger", category: "NetworkExtension")
 
     /// The tunnel connection.
     var replicantConnection: Transmission.Connection?
@@ -36,10 +35,9 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     public override init()
     {
-        self.logger.logLevel = .debug
         self.logger.debug("Initialized MoonbouncePacketTunnelProvider")
 
-        self.neModule = NetworkExtensionModule()
+        self.neModule = NetworkExtensionModule(logger: self.logger)
         self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule])
         self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
 
@@ -99,6 +97,19 @@ public enum TunnelAddress
     case ipV4(IPv4Address)
     case ipV6(IPv6Address)
     case dualStack(IPv4Address, IPv6Address)
+    
+    var description: String
+    {
+        switch self
+        {
+            case .ipV4(let address):
+                return address.debugDescription
+            case .ipV6(let address):
+                return address.debugDescription
+            case .dualStack(let ipv4, let ipv6):
+                return "ipv4: \(ipv4.debugDescription), ipv6: \(ipv6.debugDescription)"
+        }
+    }
 }
 
 enum PacketTunnelProviderError: String, Error
