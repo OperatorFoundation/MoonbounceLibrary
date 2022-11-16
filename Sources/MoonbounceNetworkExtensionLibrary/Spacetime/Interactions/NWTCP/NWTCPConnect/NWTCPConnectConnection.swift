@@ -50,6 +50,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
 
     public func readWithLengthPrefix(prefixSizeInBits: Int) -> Data?
     {
+        self.universe.logger.log("🔌 NWTCPConnectConnection readWithLengthPrefix")
         return self.read(.lengthPrefixSizeInBits(prefixSizeInBits))
     }
 
@@ -65,6 +66,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
 
     public func writeWithLengthPrefix(data: Data, prefixSizeInBits: Int) -> Bool
     {
+        self.universe.logger.log("🔌 NWTCPConnectConnection writeWithLengthPrefix")
         return self.spacetimeWrite(data: data, prefixSizeInBits: prefixSizeInBits)
     }
 
@@ -82,6 +84,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
 
     func read(_ style: NetworkConnectReadStyle) -> Data
     {
+        self.universe.logger.log("🔌 NWTCPConnectConnection read with style: \(style.description)")
         let result = self.universe.processEffect(NWTCPReadRequest(self.uuid, style))
         switch result
         {
@@ -94,6 +97,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
 
     public func spacetimeWrite(data: Data, prefixSizeInBits: Int? = nil) -> Bool
     {
+        self.universe.logger.log("🔌 NWTCPConnectConnection spacetimeWrite with prefixSizeInBits: \(prefixSizeInBits.debugDescription)")
         let result = self.universe.processEffect(NWTCPWriteRequest(self.uuid, data, prefixSizeInBits))
         switch result
         {

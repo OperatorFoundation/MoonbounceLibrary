@@ -7,7 +7,12 @@
 
 import Foundation
 import NetworkExtension
+
+#if os(macOS) || os(iOS)
 import os.log
+#else
+import Logging
+#endif
 
 import Chord
 import Simulation
@@ -34,9 +39,17 @@ public class NetworkExtensionModule: Module
     public init(logger: Logger)
     {
         self.logger = logger
-        self.logger.debug("NetworkExtensionModule: Initialized")
+        self.logger.log("🌐 NetworkExtensionModule: Initialized")
     }
-
+    
+    public func setLogger(logger: Logger?)
+    {
+        if let newLogger = logger
+        {
+            self.logger = newLogger
+        }
+    }
+    
     // Public functions
     public func name() -> String
     {
@@ -45,7 +58,6 @@ public class NetworkExtensionModule: Module
 
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
-        logger.log("NetworkExtensionModule: handleEffect")
         switch effect
         {
             case let startTunnelRequest as StartTunnelRequest:
@@ -67,9 +79,7 @@ public class NetworkExtensionModule: Module
                 return setNetworkTunnelSettings(setNetworkTunnelSettingsRequest)
 
             case let getConfigurationRequest as GetConfigurationRequest:
-                logger.log("NetworkExtensionModule: handleEffect: received a getConfigurationRequest")
                 let tunnelConfiguration = getTunnelConfiguration(getConfigurationRequest)
-                logger.log("NetworkExtensionModule: handleEffect: returning tunnelConfiguration: \(tunnelConfiguration.debugDescription)")
                 return tunnelConfiguration
 
             case let connectRequest as NWTCPConnectRequest:
@@ -85,7 +95,6 @@ public class NetworkExtensionModule: Module
                 return close(closeRequest, channel)
 
             default:
-                print("NetworkExtensionModule: Unknown effect \(effect)")
                 logger.log("NetworkExtensionModule: Unknown effect \(effect)")
                 return Failure(effect.id)
         }
@@ -93,33 +102,29 @@ public class NetworkExtensionModule: Module
 
     public func handleExternalEvent(_ event: Event)
     {
-        self.logger.debug("NetworkExtensionModule: handleExternalEvent")
+        self.logger.debug("🌐 NetworkExtensionModule: handleExternalEvent")
         return
     }
 
     public func setConfiguration(_ configuration: NEVPNProtocol)
     {
-        logger.log("NetworkExtensionModule: setConfiguration")
         self.configuration = configuration
-        logger.log("NetworkExtensionModule: setConfiguration: configuration - \(configuration.debugDescription)")
+        logger.log("🌐 NetworkExtensionModule: setConfiguration: configuration - \(configuration.debugDescription)")
     }
 
     public func setProvider(_ provider: NEPacketTunnelProvider)
     {
-        logger.log("NetworkExtensionModule: setProvider")
         self.provider = provider
     }
 
     public func setFlow(_ flow: NEPacketTunnelFlow)
     {
-        self.logger.debug("NetworkExtensionModule: setFlow")
         self.flow = flow
     }
 
     public func startTunnel(events: BlockingQueue<Event>, options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
     {
-        logger.log("NetworkExtensionModule: startTunnel")
-        self.logger.debug("NetworkExtensionModule: startTunnel")
+        logger.log("🌐 NetworkExtensionModule: startTunnel")
 
         self.startTunnelDispatchQueue.async
         {
@@ -128,7 +133,7 @@ public class NetworkExtensionModule: Module
 
             if let response = self.startTunnelQueue.dequeue()
             {
-                self.logger.debug("failed to start tunnel: \(response.localizedDescription)")
+                self.logger.debug("🌐 failed to start tunnel: \(response.localizedDescription)")
                 // FIXME: should probably stop the tunnel here
             }
         }
@@ -138,7 +143,7 @@ public class NetworkExtensionModule: Module
 
     public func stopTunnel(events: BlockingQueue<Event>, reason: NEProviderStopReason, completionHandler: @escaping () -> Void )
     {
-        self.logger.debug("NetworkExtensionModule: stopTunnel")
+        self.logger.debug("🌐 NetworkExtensionModule: stopTunnel")
         self.stopTunnelDispatchQueue.async
         {
             let event = StopTunnelEvent(reason)
@@ -151,7 +156,7 @@ public class NetworkExtensionModule: Module
 
     public func handleAppMessage(events: BlockingQueue<Event>, data: Data, completionHandler: ((Data?) -> Void)?)
     {
-        self.logger.debug("NetworkExtensionModule: handleAppMessage")
+        self.logger.debug("🌐 NetworkExtensionModule: handleAppMessage")
         self.handleAppMessageDispatchQueue.async
         {
             let event = AppMessageEvent(data)
@@ -168,48 +173,47 @@ public class NetworkExtensionModule: Module
     // Private functions
     func startTunnelRequestHandler(_ effect: StartTunnelRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule: startTunnelRequestHandler")
+        self.logger.debug("🌐 NetworkExtensionModule: startTunnelRequestHandler")
         startTunnelQueue.enqueue(element: effect.maybeError)
         return StartTunnelResponse(effect.id)
     }
 
     func stopTunnelRequestHandler(_ effect: StopTunnelRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule: stopTunnelRequestHandler")
+        self.logger.debug("🌐 NetworkExtensionModule: stopTunnelRequestHandler")
         stopTunnelLock.signal()
         return StopTunnelResponse(effect.id)
     }
 
     public func getTunnelConfiguration(_ effect: GetConfigurationRequest) -> Event?
     {
-        logger.log("NetworkExtensionModule: getConfiguration")
-
         guard let provider = self.provider else
         {
-            logger.log("failure")
+            logger.log("🌐 NetworkExtensionModule: getTunnelConfiguration failure, provider is nil")
             return Failure(effect.id)
         }
 
         guard let serverAddress = provider.protocolConfiguration.serverAddress else
         {
-            logger.log("failure")
+            logger.log("🌐 NetworkExtensionModule: getTunnelConfiguration failure, server address is nil")
             return Failure(effect.id)
         }
 
-        logger.log("NetworkExtensionModule: getConfiguration returning serverAddress: \(serverAddress.description)")
+        logger.log("🌐 NetworkExtensionModule: getConfiguration returning serverAddress: \(serverAddress.description)")
         return GetConfigurationResponse(effect.id, serverAddress)
     }
 
     func appMessageRequestHandler(_ effect: AppMessageRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule: appMessageRequestHandler")
+        self.logger.log("🌐 NetworkExtensionModule: appMessageRequestHandler")
         appMessageQueue.enqueue(element: effect.data)
         return AppMessageResponse(effect.id)
     }
 
     func readPacket(_ effect: ReadPacketRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule: readPacket")
+        self.logger.log("🌐 NetworkExtensionModule: readPacket")
+        
         if self.packetBuffer.isEmpty
         {
             guard let flow = self.flow else
@@ -241,7 +245,7 @@ public class NetworkExtensionModule: Module
 
     func writePacket(_ effect: WritePacketRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule: writePacket")
+        self.logger.log("🌐 NetworkExtensionModule: writePacket")
         guard let flow = self.flow else
         {
             return Failure(effect.id)
@@ -255,7 +259,8 @@ public class NetworkExtensionModule: Module
 
     func setNetworkTunnelSettings(_ effect: SetNetworkTunnelSettingsRequest) -> Event?
     {
-        self.logger.debug("NetworkExtensionModule: setNetworkTunnelSettings")
+        self.logger.log("🌐 NetworkExtensionModule: setNetworkTunnelSettings")
+        
         guard let provider = self.provider else
         {
             return Failure(effect.id)
@@ -288,14 +293,18 @@ public class NetworkExtensionModule: Module
         }
 
         let uuid = UUID()
-
         let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
-        self.logger.log("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
-        self.logger.log("NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        self.logger.log("🌐 NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        
         let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
-        let transmissionConnection = NWTCPTransmissionConnection(networkConnection)
-        let connection = SimulationNWTCPConnection(transmissionConnection)
-
+        
+        guard let transmissionConnection = NWTCPTransmissionConnection(networkConnection, logger: self.logger) else
+        {
+            self.logger.log("🛑 NetworkExtensionModule: failed to create an NWTCPTransmissionConnection")
+            return Failure(effect.id)
+        }
+        
+        let connection = SimulationNWTCPConnection(transmissionConnection, logger: logger)
         self.connections[uuid] = connection
 
         return NWTCPConnectResponse(effect.id, socketId: uuid)
@@ -303,11 +312,13 @@ public class NetworkExtensionModule: Module
 
     func read(_ effect: NWTCPReadRequest, _ channel: BlockingQueue<Event>) -> Event?
     {
+        self.logger.log("🌐 NetworkExtensionModule: read()")
+        
         let uuid = effect.socketId
         guard let connection = self.connections[uuid] else
         {
             let failure = Failure(effect.id)
-            print(failure.description)
+            logger.log("🛑 NetworkExtensionModule: NWTCPReadRequest Failed: \(failure.description, privacy: .public)")
             return failure
         }
 
@@ -317,10 +328,13 @@ public class NetworkExtensionModule: Module
 
     func write(_ effect: NWTCPWriteRequest, _ channel: BlockingQueue<Event>) -> Event?
     {
+        self.logger.log("🌐 NetworkExtensionModule: write()")
+        
         let uuid = effect.socketId
         guard let connection = self.connections[uuid] else
         {
             let failure = Failure(effect.id)
+            logger.log("🛑 NetworkExtensionModule: NWTCPWriteRequest Failed: \(failure.description, privacy: .public)")
             print(failure.description)
             return failure
         }
@@ -331,6 +345,7 @@ public class NetworkExtensionModule: Module
 
     func close(_ effect: NWTCPCloseRequest, _ channel: BlockingQueue<Event>) -> Event?
     {
+        self.logger.log("🌐 NetworkExtensionModule: close()")
         let uuid = effect.socketId
         if let connection = self.connections[uuid]
         {
@@ -348,7 +363,7 @@ public class NetworkExtensionModule: Module
     /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".
     func makeNetworkSettings(host: String, tunnelAddress: TunnelAddress) -> NEPacketTunnelNetworkSettings?
     {
-        self.logger.debug("NetworkExtensionModule: makeNetworkSettings")
+        self.logger.log("🌐 NetworkExtensionModule: makeNetworkSettings")
         
         let googleDNSipv4 = "8.8.8.8"
         let googleDNS2ipv4 = "8.8.4.4"

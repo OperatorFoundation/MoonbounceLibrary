@@ -15,12 +15,8 @@ import Universe
 
 public class MoonbounceUniverse: Universe
 {
-    let logger: Logger
-
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
-        self.logger = logger
-
         super.init(effects: effects, events: events, logger: logger)
     }
 

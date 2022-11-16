@@ -5,6 +5,12 @@
 //  Created by Dr. Brandon Wiley on 3/31/22.
 //
 
+#if os(macOS) || os(iOS)
+import os.log
+#else
+import Logging
+#endif
+
 import Chord
 import Foundation
 import NetworkExtension
@@ -13,8 +19,10 @@ import Spacetime
 
 public class VPNModule: Module
 {
+    
     static public let name = "VPN"
-
+    
+    public var logger: Logger?
     var manager: NETunnelProviderManager? = nil
 
     public init()
@@ -25,7 +33,12 @@ public class VPNModule: Module
     {
         return VPNModule.name
     }
-
+    
+    public func setLogger(logger: Logger?)
+    {
+        self.logger = logger
+    }
+    
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
         switch effect

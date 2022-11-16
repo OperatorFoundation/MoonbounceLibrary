@@ -4,20 +4,25 @@
 //
 //  Created by Dr. Brandon Wiley on 3/31/22.
 //
+import Foundation
+#if os(macOS) || os(iOS)
+import os.log
+#else
+import Logging
+#endif
+
+import Foundation
+import NetworkExtension
 
 import Chord
 import Flower
-import Foundation
-import os.log
 import MoonbounceShared
-import NetworkExtension
 import Spacetime
 import Transmission
 import Universe
 
 open class MoonbounceNetworkExtensionUniverse: Universe
 {
-    var logger: Logger
     var network: Transmission.Connection? = nil
     var flower: FlowerConnection? = nil
     let messagesToPacketsQueue = DispatchQueue(label: "clientTunnelConnection: messagesToPackets")
@@ -25,9 +30,9 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
     public init(effects: BlockingQueue<Effect>, events: BlockingQueue<Event>, logger: Logger)
     {
+        super.init(effects: effects, events: events, logger: logger)
         self.logger = logger
         self.logger.log("MoonbounceNetworkExtensionUniverse: Initialized MoonbounceNetworkExtensionUniverse")
-        super.init(effects: effects, events: events)
     }
 
     override open func processEvent(_ event: Event)
@@ -36,21 +41,24 @@ open class MoonbounceNetworkExtensionUniverse: Universe
         switch event
         {
             case let startTunnelEvent as StartTunnelEvent:
-                logger.log("MoonbounceNetworkExtensionUniverse: processing StartTunnelEvent")
-                let result = self.startTunnel(options: startTunnelEvent.options)
-                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel result - \(result.debugDescription)")
-                let request = StartTunnelRequest(result)
-                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel request - \(request.description)")
-                let response = self.processEffect(request)
-                logger.log("MoonbounceNetworkExtensionUniverse: StartTunnelResponse \(response.description) ")
-                
-                switch response
+                Task
                 {
-                    case is StartTunnelResponse:
-                        return
+                    logger.log("MoonbounceNetworkExtensionUniverse: processing StartTunnelEvent")
+                    let result = await self.startTunnel(options: startTunnelEvent.options)
+                    logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel result - \(result.debugDescription)")
+                    let request = StartTunnelRequest(result)
+                    logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel request - \(request.description)")
+                    let response = self.processEffect(request)
+                    logger.log("MoonbounceNetworkExtensionUniverse: StartTunnelResponse \(response.description) ")
+                    
+                    switch response
+                    {
+                        case is StartTunnelResponse:
+                            return
 
-                    default:
-                        logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: startTunnel bad response: \(response.description)")
+                        default:
+                            logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: startTunnel bad response: \(response.description)")
+                    }
                 }
 
             case let stopTunnelEvent as StopTunnelEvent:
@@ -82,7 +90,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
                 }
 
             default:
-                logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: Unknown event \(event)")
+                logger.log(level: .error, "🛑 MoonbounceNetworkExtensionUniverse: Unknown event \(event)")
                 return
         }
     }
@@ -122,7 +130,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
     }
 
     // To be implemented by subclasses
-    public func startTunnel(options: [String: NSObject]?) -> Error?
+    public func startTunnel(options: [String: NSObject]?) async -> Error?
     {
         self.logger.log(level: .error, "MoonbounceNetworkExtensionUniverse: calling startTunnel but it is not implemented.")
         return nil // Success!

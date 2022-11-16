@@ -38,7 +38,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         self.logger.log("MoonbouncePacketTunnelProvider: init")
         
         self.neModule = NetworkExtensionModule(logger: self.logger)
-        self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule])
+        self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.networkConnect.rawValue, NetworkExtensionModule.name), userModules: [neModule], logger: logger)
         self.universe = PacketTunnelNetworkExtension(effects: self.simulation.effects, events: self.simulation.events, logger: self.logger)
 
         super.init()

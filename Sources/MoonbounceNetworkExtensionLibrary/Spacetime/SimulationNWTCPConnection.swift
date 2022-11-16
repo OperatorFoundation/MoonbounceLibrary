@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os.log
 
 import Chord
 import Spacetime
@@ -13,30 +14,40 @@ import TransmissionTypes
 
 public class SimulationNWTCPConnection
 {
+    public var logger: Logger?
+    
     let networkConnection: TransmissionTypes.Connection
     fileprivate var reads: [UUID: Read] = [:]
     fileprivate var writes: [UUID: Write] = [:]
     fileprivate var closes: [UUID: Close] = [:]
 
-    public init(_ networkConnection: TransmissionTypes.Connection)
+    public init(_ networkConnection: TransmissionTypes.Connection, logger: Logger?)
     {
+        self.logger = logger
         self.networkConnection = networkConnection
+        
+        self.logger?.log("🌝 SimulationNWTCPConnection created")
     }
 
     public func read(request: NWTCPReadRequest, channel: BlockingQueue<Event>)
     {
-        let read = Read(simulationConnection: self, networkConnection: self.networkConnection, request: request, events: channel)
+        self.logger?.log("🌝 SimulationNWTCPConnection.read(): \(request.description, privacy: .public)")
+        
+        let read = Read(simulationConnection: self, networkConnection: self.networkConnection, request: request, events: channel, logger: logger)
         self.reads[read.uuid] = read
     }
 
     public func write(request: NWTCPWriteRequest, channel: BlockingQueue<Event>)
     {
-        let write = Write(simulationConnection: self, networkConnection: self.networkConnection, request: request, events: channel)
+        self.logger?.log("🌝 SimulationNWTCPConnection.write(): \(request.description, privacy: .public)")
+        
+        let write = Write(simulationConnection: self, networkConnection: self.networkConnection, request: request, events: channel, logger: logger)
         self.writes[write.uuid] = write
     }
 
     public func close(request: NWTCPCloseRequest, state: NetworkExtensionModule, channel: BlockingQueue<Event>)
     {
+        self.logger?.log("🌝 SimulationNWTCPConnection.close(): \(request.description, privacy: .public)")
         let close = Close(simulationConnection: self, networkConnection: self.networkConnection, state: state, request: request, events: channel)
         self.closes[close.uuid] = close
     }
@@ -44,6 +55,7 @@ public class SimulationNWTCPConnection
 
 fileprivate struct Read
 {
+    public var logger: Logger? = nil
     let simulationConnection: SimulationNWTCPConnection
     let networkConnection: TransmissionTypes.Connection
     let request: NWTCPReadRequest
@@ -52,12 +64,13 @@ fileprivate struct Read
     let response: NWTCPReadResponse? = nil
     let uuid = UUID()
 
-    public init(simulationConnection: SimulationNWTCPConnection, networkConnection: TransmissionTypes.Connection, request: NWTCPReadRequest, events: BlockingQueue<Event>)
+    public init(simulationConnection: SimulationNWTCPConnection, networkConnection: TransmissionTypes.Connection, request: NWTCPReadRequest, events: BlockingQueue<Event>, logger: Logger?)
     {
         self.simulationConnection = simulationConnection
         self.networkConnection = networkConnection
         self.request = request
         self.events = events
+        self.logger = logger
 
         let uuid = self.uuid
 
@@ -90,6 +103,7 @@ fileprivate struct Read
                     print(response.description)
                     events.enqueue(element: response)
                 case .lengthPrefixSizeInBits(let prefixSize):
+                    logger?.log("SimulationNWTCPConnection.Read: lengthPrefixSizeInBits connection is a \(type(of: networkConnection), privacy: .public)")
                     guard let result = networkConnection.readWithLengthPrefix(prefixSizeInBits: prefixSize) else
                     {
                         let failure = Failure(request.id)
@@ -110,6 +124,7 @@ fileprivate struct Read
 
 fileprivate struct Write
 {
+    public var logger: Logger? = nil
     let simulationConnection: SimulationNWTCPConnection
     let networkConnection: TransmissionTypes.Connection
     let request: NWTCPWriteRequest
@@ -117,12 +132,13 @@ fileprivate struct Write
     let queue = DispatchQueue(label: "SimulationConnection.Write")
     let uuid = UUID()
 
-    public init(simulationConnection: SimulationNWTCPConnection, networkConnection: TransmissionTypes.Connection, request: NWTCPWriteRequest, events: BlockingQueue<Event>)
+    public init(simulationConnection: SimulationNWTCPConnection, networkConnection: TransmissionTypes.Connection, request: NWTCPWriteRequest, events: BlockingQueue<Event>, logger: Logger? = nil)
     {
         self.simulationConnection = simulationConnection
         self.networkConnection = networkConnection
         self.request = request
         self.events = events
+        self.logger = logger
 
         let uuid = self.uuid
 
