@@ -82,7 +82,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
         }
     }
 
-    func read(_ style: NetworkConnectReadStyle) -> Data
+    func read(_ style: NetworkConnectReadStyle) -> Data?
     {
         self.universe.logger.log("🔌 NWTCPConnectConnection read with style: \(style.description)")
         let result = self.universe.processEffect(NWTCPReadRequest(self.uuid, style))
@@ -90,8 +90,9 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
         {
             case let response as NWTCPReadResponse:
                 return response.data
+
             default:
-                return Data()
+                return nil
         }
     }
 

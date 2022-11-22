@@ -112,6 +112,37 @@ public class NWTCPTransmissionConnection: TransmissionTypes.Connection
         return maybeData
     }
 
+    public func unsafeRead(size: Int) -> Data?
+    {
+        let (maybeData, maybeError): (Data?, Error?) = Synchronizer.sync2
+        {
+            callback in
+
+            self.connection.readLength(size)
+            {
+                maybeData, maybeError in
+
+                callback(maybeData, maybeError)
+            }
+        }
+
+        if maybeError != nil
+        {
+            return nil
+        }
+
+        // If we get an empty data return nil
+        if let someData = maybeData
+        {
+            if someData.isEmpty
+            {
+                return nil
+            }
+        }
+
+        return maybeData
+    }
+
     public func read(maxSize: Int) -> Data?
     {
         self.readGroup.enter()
