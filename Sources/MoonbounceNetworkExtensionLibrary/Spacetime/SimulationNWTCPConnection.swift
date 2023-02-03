@@ -90,6 +90,20 @@ fileprivate struct Read
                     let response = NWTCPReadResponse(request.id, request.socketId, result)
                     print(response.description)
                     events.enqueue(element: response)
+                    
+                case .unsafeExactSize(let size):
+                    guard let result = networkConnection.unsafeRead(size: size) else
+                    {
+                        let failure = Failure(request.id)
+                        print(failure.description)
+                        events.enqueue(element: failure)
+                        return
+                    }
+
+                    let response = NWTCPReadResponse(request.id, request.socketId, result)
+                    print(response.description)
+                    events.enqueue(element: response)
+                    
                 case .maxSize(let size):
                     guard let result = networkConnection.read(maxSize: size) else
                     {

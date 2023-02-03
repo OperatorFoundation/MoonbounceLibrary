@@ -14,6 +14,7 @@ import Universe
 
 public class NWTCPConnectConnection: TransmissionTypes.Connection
 {
+    
     public let universe: Universe
     public let uuid: UUID
 
@@ -94,6 +95,11 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
             default:
                 return nil
         }
+    }
+    
+    public func unsafeRead(size: Int) -> Data?
+    {
+        return self.read(.unsafeExactSize(size))
     }
 
     public func spacetimeWrite(data: Data, prefixSizeInBits: Int? = nil) -> Bool

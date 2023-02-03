@@ -37,7 +37,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
     override open func processEvent(_ event: Event)
     {
-        self.logger.log("MoonbounceNetworkExtensionUniverse: processEvent")
+        self.logger.log("🌒 MoonbounceNetworkExtensionUniverse: processEvent \(event.description)")
         switch event
         {
             case let startTunnelEvent as StartTunnelEvent:
