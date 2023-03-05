@@ -92,7 +92,7 @@ public enum TunnelError: Error
     case internalError
 }
 
-public enum TunnelAddress
+public enum TunnelAddress: Codable
 {
     case ipV4(IPv4Address)
     case ipV6(IPv6Address)

@@ -40,11 +40,11 @@ open class MoonbounceNetworkExtensionUniverse: Universe
         self.logger.log("🌒 MoonbounceNetworkExtensionUniverse: processEvent \(event.description)")
         switch event
         {
-            case let startTunnelEvent as StartTunnelEvent:
+            case is StartTunnelEvent:
                 Task
                 {
                     logger.log("MoonbounceNetworkExtensionUniverse: processing StartTunnelEvent")
-                    let result = await self.startTunnel(options: startTunnelEvent.options)
+                    let result = await self.startTunnel(options: nil)
                     logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel result - \(result.debugDescription)")
                     let request = StartTunnelRequest(result)
                     logger.log("MoonbounceNetworkExtensionUniverse: StartTunnel request - \(request.description)")
@@ -63,7 +63,7 @@ open class MoonbounceNetworkExtensionUniverse: Universe
 
             case let stopTunnelEvent as StopTunnelEvent:
                 logger.log("MoonbounceNetworkExtensionUniverse: StopTunnelEvent")
-                self.stopTunnel(with: stopTunnelEvent.reason)
+                self.stopTunnel(with: stopTunnelEvent.reason.reason)
                 let request = StopTunnelRequest()
                 let response = self.processEffect(request)
                 switch response

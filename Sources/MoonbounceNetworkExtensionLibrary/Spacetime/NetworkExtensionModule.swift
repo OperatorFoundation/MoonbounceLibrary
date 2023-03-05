@@ -23,7 +23,7 @@ public class NetworkExtensionModule: Module
     static public let name = "NetworkExtension"
 
     var configuration: NEVPNProtocol? = nil
-    let startTunnelQueue = BlockingQueue<Error?>()
+    let startTunnelQueue = BlockingQueue<String?>()
     let stopTunnelLock = DispatchSemaphore(value: 0)
     let appMessageQueue = BlockingQueue<Data?>()
     var flow: NEPacketTunnelFlow? = nil
@@ -126,14 +126,19 @@ public class NetworkExtensionModule: Module
     {
         logger.log("🌐 NetworkExtensionModule: startTunnel")
 
+        if let options
+        {
+            print("WARNING: Ignoring options \(options)")
+        }
+
         self.startTunnelDispatchQueue.async
         {
-            let event = StartTunnelEvent(options: options)
+            let event = StartTunnelEvent()
             events.enqueue(element: event)
 
             if let response = self.startTunnelQueue.dequeue()
             {
-                self.logger.debug("🌐 failed to start tunnel: \(response.localizedDescription)")
+                self.logger.debug("🌐 failed to start tunnel: \(response.debugDescription)")
                 // FIXME: should probably stop the tunnel here
             }
         }
@@ -174,7 +179,8 @@ public class NetworkExtensionModule: Module
     func startTunnelRequestHandler(_ effect: StartTunnelRequest) -> Event?
     {
         self.logger.debug("🌐 NetworkExtensionModule: startTunnelRequestHandler")
-        startTunnelQueue.enqueue(element: effect.maybeError)
+        let maybeError: String? = effect.maybeError
+        startTunnelQueue.enqueue(element: maybeError)
         return StartTunnelResponse(effect.id)
     }
 

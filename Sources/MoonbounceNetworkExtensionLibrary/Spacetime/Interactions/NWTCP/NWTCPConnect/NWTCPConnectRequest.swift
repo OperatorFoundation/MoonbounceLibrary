@@ -27,4 +27,24 @@ public class NWTCPConnectRequest: Effect
 
         super.init(module: NetworkExtensionModule.name)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case id
+        case host
+        case port
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(UUID.self, forKey: .id)
+        let host = try container.decode(String.self, forKey: .host)
+        let port = try container.decode(Int.self, forKey: .port)
+
+        self.host = host
+        self.port = port
+
+        super.init(id: id, module: NetworkExtensionModule.name)
+    }
 }

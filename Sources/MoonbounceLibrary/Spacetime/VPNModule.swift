@@ -120,7 +120,26 @@ public class VPNModule: Module
             return Failure(effect.id)
         }
 
-        manager.protocolConfiguration = effect.preferences.protocolConfiguration
+        guard let protocolConfiguration = self.manager?.protocolConfiguration else
+        {
+            return Failure(effect.id)
+        }
+
+        guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
+        {
+            return Failure(effect.id)
+        }
+
+        typedProtocolConfiguration.providerBundleIdentifier = effect.preferences.providerBundleIdentifier
+
+        guard var providerConfiguration = typedProtocolConfiguration.providerConfiguration else
+        {
+            return Failure(effect.id)
+        }
+        providerConfiguration["serverAddress"] = effect.preferences.serverAddress
+        typedProtocolConfiguration.providerConfiguration = providerConfiguration
+
+        manager.protocolConfiguration = typedProtocolConfiguration
         manager.localizedDescription = effect.preferences.description
         manager.isEnabled = effect.preferences.enabled
 
@@ -204,7 +223,7 @@ public class VPNModule: Module
             return Failure(effect.id)
         }
 
-        return ConnectionStatusResponse(effect.id, session.status)
+        return ConnectionStatusResponse(effect.id, session.status.vpnStatus)
     }
 
     func sendProviderMessage(_ effect: SendProviderMessageRequest) -> Event?

@@ -24,4 +24,21 @@ public class LoadPreferencesResponse: Event
         
         super.init(effectId, module: VPNModule.name)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case effectId
+        case preferences
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let effectId = try container.decode(UUID.self, forKey: .effectId)
+        let preferences = try container.decode(VPNPreferences.self, forKey: .preferences)
+
+        self.preferences = preferences
+
+        super.init(effectId, module: VPNModule.name)
+    }
 }

@@ -8,15 +8,17 @@
 import Foundation
 import NetworkExtension
 
-public struct VPNPreferences
+public struct VPNPreferences: Codable
 {
-    let protocolConfiguration: NETunnelProviderProtocol
+    let serverAddress: String
+    let providerBundleIdentifier: String
     let description: String
     let enabled: Bool
 
     public init(protocolConfiguration: NETunnelProviderProtocol, description: String, enabled: Bool)
     {
-        self.protocolConfiguration = protocolConfiguration
+        self.serverAddress = protocolConfiguration.providerConfiguration!["serverAddress"]! as! String
+        self.providerBundleIdentifier = protocolConfiguration.providerBundleIdentifier!
         self.description = description
         self.enabled = enabled
     }

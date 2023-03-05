@@ -29,4 +29,27 @@ public class NWTCPWriteRequest: Effect
 
         super.init(module: BuiltinModuleNames.networkConnect.rawValue)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case id
+        case socketId
+        case data
+        case lengthPrefixSizeInBits
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(UUID.self, forKey: .id)
+        let socketId = try container.decode(UUID.self, forKey: .socketId)
+        let data = try container.decode(Data.self, forKey: .data)
+        let lengthPrefixSizeInBits = try container.decode(Int?.self, forKey: .lengthPrefixSizeInBits)
+
+        self.socketId = socketId
+        self.data = data
+        self.lengthPrefixSizeInBits = lengthPrefixSizeInBits
+
+        super.init(id: id, module: NetworkExtensionModule.name)
+    }
 }

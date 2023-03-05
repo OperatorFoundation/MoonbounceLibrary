@@ -24,4 +24,21 @@ public class SendProviderMessageResponse: Event
 
         super.init(effectId, module: VPNModule.name)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case effectId
+        case message
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let effectId = try container.decode(UUID.self, forKey: .effectId)
+        let message = try container.decode(Data.self, forKey: .message)
+
+        self.message = message
+
+        super.init(effectId, module: VPNModule.name)
+    }
 }

@@ -2,13 +2,12 @@ import XCTest
 @testable import MoonbounceLibrary
 @testable import MoonbounceNetworkExtensionLibrary
 
+import os.log
+
 import Chord
 import Flower
 import MoonbounceShared
 import Transmission
-import TunnelClient
-import TunnelClientMacOS
-import TunnelClientMock
 import NetworkExtension
 //import ReplicantSwift
 
@@ -106,7 +105,8 @@ final class MoonbounceLibraryTests: XCTestCase
     
     func testLoadPreferences()
     {
-        let moonbounce = MoonbounceLibrary()
+        let logger = Logger()
+        let moonbounce = MoonbounceLibrary(logger: logger)
         do
         {
             let moonbounceConfig = MoonbounceConfig(name: "default", providerBundleIdentifier: "NetworkExtension")

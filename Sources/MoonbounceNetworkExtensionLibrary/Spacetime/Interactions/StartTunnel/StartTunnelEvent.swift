@@ -10,24 +10,29 @@ import Spacetime
 
 public class StartTunnelEvent: Event
 {
-    let options: [String : NSObject]?
+    // FIXME - no way to make this Codable. Do we actually use this?
+    // let options: [String : NSObject]?
 
     public override var description: String
     {
-        if let someOptions = options
-        {
-            return "\(self.module).StartTunnelEvent[options: \(someOptions)]"
-        }
-        else
-        {
-            return "\(self.module).StartTunnelEvent[options: nil]"
-        }
+        return "\(self.module).StartTunnelEvent"
     }
 
-    public init(options: [String : NSObject]? = nil)
+    public init()
     {
-        self.options = options
-
         super.init(module: NetworkExtensionModule.name)
+    }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case effectId
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let effectId = try container.decode(UUID.self, forKey: .effectId)
+
+        super.init(effectId, module: NetworkExtensionModule.name)
     }
 }

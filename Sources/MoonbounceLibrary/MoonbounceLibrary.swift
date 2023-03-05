@@ -30,7 +30,7 @@ public class MoonbounceLibrary
         self.universe = MoonbounceUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: logger)
     }
 
-    public func configure(_ config: ShadowConfig, providerBundleIdentifier: String, tunnelName: String) throws
+    public func configure(_ config: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) throws
     {
         let _ = try? self.universe.loadPreferences()
 
@@ -52,14 +52,14 @@ public class MoonbounceLibrary
         try self.universe.disable()
     }
 
-    func newProtocolConfiguration(shadowConfig: ShadowConfig, providerBundleIdentifier: String, tunnelName: String) -> VPNPreferences?
+    func newProtocolConfiguration(shadowConfig: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) -> VPNPreferences?
     {
         self.logger.debug("VPNPreferencesController.newProtocolConfiguration")
         self.logger.debug("\n----->Setting the providerBundleIdentifier to \(providerBundleIdentifier)")
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
         protocolConfiguration.providerBundleIdentifier = providerBundleIdentifier
-        protocolConfiguration.serverAddress = shadowConfig.serverIP
+        protocolConfiguration.serverAddress = shadowConfig.serverAddress
         protocolConfiguration.includeAllNetworks = true
 
         let encoder = JSONEncoder()
@@ -85,5 +85,5 @@ public class MoonbounceLibrary
 public enum MoonbounceLibraryError: Error
 {
     case badConfig(MoonbounceConfig)
-    case badShadowConfig(ShadowConfig)
+    case badShadowConfig(ShadowConfig.ShadowClientConfig)
 }

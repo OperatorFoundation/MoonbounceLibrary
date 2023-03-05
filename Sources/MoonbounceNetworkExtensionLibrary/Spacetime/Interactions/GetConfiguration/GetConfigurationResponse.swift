@@ -24,4 +24,21 @@ public class GetConfigurationResponse: Event
 
         super.init(effectId, module: NetworkExtensionModule.name)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case effectId
+        case configuration
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let effectId = try container.decode(UUID.self, forKey: .effectId)
+        let configuration = try container.decode(String.self, forKey: .configuration)
+
+        self.configuration = configuration
+
+        super.init(effectId, module: NetworkExtensionModule.name)
+    }
 }

@@ -24,4 +24,21 @@ public class NWTCPWriteResponse: Event
 
         super.init(effectId, module: BuiltinModuleNames.networkConnect.rawValue)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case effectId
+        case socketId
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let effectId = try container.decode(UUID.self, forKey: .effectId)
+        let socketId = try container.decode(UUID.self, forKey: .socketId)
+
+        self.socketId = socketId
+
+        super.init(effectId, module: BuiltinModuleNames.networkConnect.rawValue)
+    }
 }

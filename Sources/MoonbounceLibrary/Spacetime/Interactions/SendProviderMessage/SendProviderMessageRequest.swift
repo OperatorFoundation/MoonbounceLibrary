@@ -23,4 +23,21 @@ public class SendProviderMessageRequest: Effect
 
         super.init(module: VPNModule.name)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case id
+        case message
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(UUID.self, forKey: .id)
+        let message = try container.decode(Data.self, forKey: .message)
+
+        self.message = message
+
+        super.init(id: id, module: VPNModule.name)
+    }
 }

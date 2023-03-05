@@ -20,7 +20,7 @@ public class MoonbounceUniverse: Universe
         super.init(effects: effects, events: events, logger: logger)
     }
 
-    public func connectionStatus() throws -> NEVPNStatus
+    public func connectionStatus() throws -> VPNStatus
     {
         let response = processEffect(ConnectionStatusRequest())
         switch response

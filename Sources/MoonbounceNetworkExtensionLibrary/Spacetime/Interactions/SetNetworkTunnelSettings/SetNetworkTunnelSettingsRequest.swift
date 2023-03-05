@@ -23,5 +23,25 @@ public class SetNetworkTunnelSettingsRequest: Effect
 
         super.init(module: NetworkExtensionModule.name)
     }
+
+    public enum CodingKeys: String, CodingKey
+    {
+        case id
+        case host
+        case tunnelAddress
+    }
+
+    public required init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(UUID.self, forKey: .id)
+        let host = try container.decode(String.self, forKey: .host)
+        let tunnelAddress = try container.decode(TunnelAddress.self, forKey: .tunnelAddress)
+
+        self.host = host
+        self.tunnelAddress = tunnelAddress
+
+        super.init(id: id, module: NetworkExtensionModule.name)
+    }
 }
 
