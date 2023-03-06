@@ -77,6 +77,7 @@ public class MoonbounceUniverse: Universe
     public func savePreferences(_ preferences: VPNPreferences) throws
     {
         let response = processEffect(SavePreferencesRequest(preferences))
+        print("SavePreferencesRequest response: \(response)")
         switch response
         {
             case is SavePreferencesResponse:
