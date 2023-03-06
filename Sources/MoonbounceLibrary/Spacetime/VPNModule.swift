@@ -117,6 +117,8 @@ public class VPNModule: Module
 
     func savePreferences(_ effect: SavePreferencesRequest) -> Event?
     {
+        print("VPNModule savePreferences() called")
+        
         guard let manager = self.manager else
         {
             return Failure(effect.id)
@@ -150,8 +152,10 @@ public class VPNModule: Module
             print("VPNModule.savePreferences - error: \(error)")
             return Failure(effect.id)
         }
-
-        return SavePreferencesResponse(effect.id)
+        
+        let result = SavePreferencesResponse(effect.id)
+        print("VPNModule savePreferences returning: \(result)")
+        return result
     }
 
     func enable(_ effect: EnableRequest) -> Event?
