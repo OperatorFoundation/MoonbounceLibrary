@@ -10,16 +10,32 @@ import NetworkExtension
 
 public struct VPNPreferences: Codable
 {
-    let serverAddress: String
-    let providerBundleIdentifier: String
+    var serverAddress: String? = nil
+    var providerBundleIdentifier: String? = nil
     let description: String
     let enabled: Bool
 
     public init(protocolConfiguration: NETunnelProviderProtocol, description: String, enabled: Bool)
     {
-        self.serverAddress = protocolConfiguration.providerConfiguration!["serverAddress"]! as! String
-        self.providerBundleIdentifier = protocolConfiguration.providerBundleIdentifier!
         self.description = description
         self.enabled = enabled
+        self.providerBundleIdentifier = protocolConfiguration.providerBundleIdentifier
+        
+        guard let providerConfiguration = protocolConfiguration.providerConfiguration else
+        {
+            return
+        }
+        
+        guard let serverAddressAny = providerConfiguration["serverAddress"] else
+        {
+            return
+        }
+            
+        guard let serverAddressString = serverAddressAny as? String else
+        {
+            return
+        }
+        
+        self.serverAddress = serverAddressString
     }
 }
