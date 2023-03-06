@@ -74,6 +74,7 @@ public class VPNModule: Module
 
     func loadPreferences(_ effect: LoadPreferencesRequest) -> Event?
     {
+        print("VPNModule loadPreferences called")
         if self.manager == nil
         {
             let manager = NETunnelProviderManager()
@@ -84,7 +85,8 @@ public class VPNModule: Module
                 print("VPNModule.savePreferences - error: \(error)")
                 return Failure(effect.id)
             }
-
+            
+            print("manager loaded: \(manager)")
             self.manager = manager
         }
 
