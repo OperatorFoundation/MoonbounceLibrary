@@ -20,4 +20,5 @@ public enum Keys: String
     case vpnType = "VPNType"
     case vpnSubType = "VPNSubType"
     case providerBundleIDConfigKey = "ProviderBundleIdentifier"
+    case serverAddress = "serverAddress"
 }

@@ -75,6 +75,7 @@ public class MoonbounceLibrary
         }
         
         protocolConfiguration.providerConfiguration = [
+            Keys.serverAddress.rawValue: shadowConfig.serverAddress,
             Keys.shadowConfigKey.rawValue: shadowConfigString.data,
             Keys.tunnelNameKey.rawValue: tunnelName
         ]
