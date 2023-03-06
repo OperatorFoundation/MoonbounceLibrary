@@ -32,14 +32,18 @@ public class MoonbounceLibrary
 
     public func configure(_ config: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) throws
     {
+        print("MoonbounceLibrary configure() called")
         let _ = try? self.universe.loadPreferences()
+        print("MoonbounceLibrary loadPreferences() finished")
 
         guard let preferences = newProtocolConfiguration(shadowConfig: config, providerBundleIdentifier: providerBundleIdentifier, tunnelName: tunnelName) else
         {
             throw MoonbounceLibraryError.badShadowConfig(config)
         }
 
+        print("MoonbounceLibrary configure() calling savePreferences()")
         try self.universe.savePreferences(preferences)
+        print("MoonbounceLibrary configure() finished calling savePreferences()")
     }
 
     public func startVPN() throws
