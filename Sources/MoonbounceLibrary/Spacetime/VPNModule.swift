@@ -121,16 +121,19 @@ public class VPNModule: Module
         
         guard let manager = self.manager else
         {
+            print("VPNModule savePreferences falied to set manager")
             return Failure(effect.id)
         }
 
         guard let protocolConfiguration = self.manager?.protocolConfiguration else
         {
+            print("VPNModule savePreferences falied to set protocolConfiguration")
             return Failure(effect.id)
         }
 
         guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
         {
+            print("VPNModule savePreferences falied to set typedProtocolConfiguration")
             return Failure(effect.id)
         }
 
@@ -138,6 +141,7 @@ public class VPNModule: Module
 
         guard var providerConfiguration = typedProtocolConfiguration.providerConfiguration else
         {
+            print("VPNModule savePreferences falied to set providerConfiguration")
             return Failure(effect.id)
         }
         providerConfiguration["serverAddress"] = effect.preferences.serverAddress
