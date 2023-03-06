@@ -44,6 +44,7 @@ public class MoonbounceLibrary
 
     public func startVPN() throws
     {
+        print("startVPN called")
         try self.universe.enable()
     }
 

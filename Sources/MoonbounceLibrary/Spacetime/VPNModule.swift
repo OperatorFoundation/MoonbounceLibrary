@@ -154,8 +154,10 @@ public class VPNModule: Module
 
     func enable(_ effect: EnableRequest) -> Event?
     {
+        print("VPNModule enable called")
         guard let manager = self.manager else
         {
+            print("could not get manager")
             return Failure(effect.id)
         }
 
@@ -190,6 +192,7 @@ public class VPNModule: Module
             return Failure(effect.id)
         }
 
+        print("VPNModule enable success")
         return EnableResponse(effect.id)
     }
 
