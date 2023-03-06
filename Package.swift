@@ -23,6 +23,7 @@ let package = Package(
         .package(url: "https://github.com/OperatorFoundation/Datable", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Flower.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/InternetProtocols.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/KeychainCli.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Net.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/ShadowSwift.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Spacetime", branch: "main"),
@@ -76,7 +77,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "MoonbounceLibraryTests",
-            dependencies: ["MoonbounceLibrary", "MoonbounceNetworkExtensionLibrary"]),
+            dependencies: ["MoonbounceLibrary", "MoonbounceNetworkExtensionLibrary", "KeychainCli"]),
     ],
     swiftLanguageVersions: [.v5]
 )

@@ -6,7 +6,10 @@ import os.log
 
 import Chord
 import Flower
+import Gardener
+import KeychainCli
 import MoonbounceShared
+import ShadowSwift
 import Transmission
 import NetworkExtension
 //import ReplicantSwift
@@ -109,8 +112,13 @@ final class MoonbounceLibraryTests: XCTestCase
         let moonbounce = MoonbounceLibrary(logger: logger)
         do
         {
-            let moonbounceConfig = MoonbounceConfig(name: "default", providerBundleIdentifier: "NetworkExtension")
-            try moonbounce.configure(moonbounceConfig)
+            guard let shadowConfig = ShadowConfig.ShadowClientConfig(path: File.homeDirectory().appendingPathComponent("ShadowClientConfig.json").path) else
+            {
+                XCTFail()
+                return
+            }
+            
+            try moonbounce.configure(shadowConfig, providerBundleIdentifier: "NetworkExtension", tunnelName: "default")
         }
         catch
         {
@@ -120,4 +128,14 @@ final class MoonbounceLibraryTests: XCTestCase
         print("configuration complete")
     }
     
+    func testDeserializeConfig()
+    {
+        try? ShadowConfig.createNewConfigFiles(inDirectory: File.homeDirectory(), serverAddress: "127.0.0.1", cipher: .DARKSTAR)
+        
+        guard let shadowConfig = ShadowConfig.ShadowClientConfig(path: File.homeDirectory().appendingPathComponent("ShadowClientConfig.json").path) else
+        {
+            XCTFail()
+            return
+        }
+    }
 }
