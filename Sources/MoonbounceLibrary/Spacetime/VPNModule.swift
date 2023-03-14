@@ -94,23 +94,28 @@ public class VPNModule: Module
         {
             return Failure(effect.id)
         }
+        print("VPNModule loadPreferences() protocolConifugation: \(protocolConfiguration)")
 
         guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
         {
             return Failure(effect.id)
         }
+        print("VPNModule loadPreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
 
         guard let description = self.manager?.localizedDescription else
         {
             return Failure(effect.id)
         }
+        print("VPNModule loadPreferences() description: \(description)")
 
         guard let enabled = self.manager?.isEnabled else
         {
             return Failure(effect.id)
         }
+        print("VPNModule loadPreferences() enabled: \(enabled)")
 
         let preferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: description, enabled: enabled)
+        print("VPNModule loadPreferences() preferences: \(preferences)")
 
         return LoadPreferencesResponse(effect.id, preferences)
     }
@@ -124,18 +129,21 @@ public class VPNModule: Module
             print("VPNModule savePreferences falied to set manager")
             return Failure(effect.id)
         }
-
-        guard let protocolConfiguration = self.manager?.protocolConfiguration else
+        print("VPNModule savePreferences() manager: \(manager)")
+        
+        guard let protocolConfiguration = manager.protocolConfiguration else
         {
             print("VPNModule savePreferences falied to set protocolConfiguration")
             return Failure(effect.id)
         }
+        print("VPNModule savePreferences() protocolConfiguration: \(protocolConfiguration)")
 
         guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
         {
             print("VPNModule savePreferences falied to set typedProtocolConfiguration")
             return Failure(effect.id)
         }
+        print("VPNModule savePreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
 
         typedProtocolConfiguration.providerBundleIdentifier = effect.preferences.providerBundleIdentifier
 
@@ -144,6 +152,8 @@ public class VPNModule: Module
             print("VPNModule savePreferences falied to set providerConfiguration")
             return Failure(effect.id)
         }
+        
+        print("VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
         providerConfiguration["serverAddress"] = effect.preferences.serverAddress
         typedProtocolConfiguration.providerConfiguration = providerConfiguration
 
