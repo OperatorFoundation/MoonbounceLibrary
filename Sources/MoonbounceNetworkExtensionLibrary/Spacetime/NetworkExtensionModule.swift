@@ -58,6 +58,7 @@ public class NetworkExtensionModule: Module
 
     public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
     {
+        self.logger.log("NetworkExtensionModule.handleEffect() effect: \(effect)")
         switch effect
         {
             case let startTunnelRequest as StartTunnelRequest:
@@ -89,6 +90,7 @@ public class NetworkExtensionModule: Module
                 return write(writeRequest, channel)
 
             case let readRequest as NWTCPReadRequest:
+                self.logger.log("NetworkExtensionModule.handleEffect() read case reached")
                 return read(readRequest, channel)
 
             case let closeRequest as NWTCPCloseRequest:
