@@ -301,6 +301,7 @@ public class NetworkExtensionModule: Module
         let uuid = UUID()
         let endpoint = NWHostEndpoint(hostname: effect.host, port: effect.port.string)
         self.logger.log("🌐 NetworkExtensionModule: creating a TCP connection to \(effect.host):\(effect.port)")
+        self.logger.log("🌐 NetworkExtensionModule.connect() endpoint: \(endpoint)")
         
         let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
         
