@@ -74,11 +74,19 @@ public class VPNModule: Module
 
     func loadPreferences(_ effect: LoadPreferencesRequest) -> Event?
     {
+        let manager: NETunnelProviderManager
+    
         print("VPNModule loadPreferences called")
-        if self.manager == nil
+        if let actualManager = self.manager
         {
+            print("-> NETunnelProviderManager already exists")
+            manager = actualManager
+        }
+        else
+        {
+            
             print("-> Creating a new NETunnelProviderManager")
-            let manager = NETunnelProviderManager()
+            manager = NETunnelProviderManager()
 
             let maybeError = MainThreadSynchronizer.sync(manager.loadFromPreferences)
             if let error = maybeError
@@ -90,42 +98,11 @@ public class VPNModule: Module
             print("manager loaded: \(manager)")
             self.manager = manager
         }
-        else
-        {
-            print("-> NETunnelProviderManager already exists")
-        }
         
-        let typedProtocolConfiguration = NETunnelProviderProtocol()
-        let incompletePreferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: "Moonbounce", enabled: false)
-        
-        guard let protocolConfiguration = self.manager?.protocolConfiguration else
-        {
-            print("-> self.manager does not have a protocol configuration")
-            return LoadPreferencesResponse(effect.id, incompletePreferences)
-        }
-        print("VPNModule loadPreferences() protocolConifugation: \(protocolConfiguration)")
-
-        guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
-        {
-            return LoadPreferencesResponse(effect.id, incompletePreferences)
-        }
-        print("VPNModule loadPreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
-        
-        guard let description = self.manager?.localizedDescription else
-        {
-            return LoadPreferencesResponse(effect.id, incompletePreferences)
-        }
-        print("VPNModule loadPreferences() description: \(description)")
-        
-        guard let enabled = self.manager?.isEnabled else
-        {
-            let partialPreferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: description, enabled: false)
-            return LoadPreferencesResponse(effect.id, partialPreferences)
-        }
-        print("VPNModule loadPreferences() enabled: \(enabled)")
-
-        let completePreferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: description, enabled: enabled)
-        print("VPNModule loadPreferences() preferences: \(incompletePreferences)")
+        let description = manager.localizedDescription ?? "Moonbounce"
+        let enabled = manager.isEnabled
+        let protocolConfiguration = (manager.protocolConfiguration as? NETunnelProviderProtocol) ?? NETunnelProviderProtocol()
+        let completePreferences = VPNPreferences(protocolConfiguration: protocolConfiguration, description: description, enabled: enabled)
 
         return LoadPreferencesResponse(effect.id, completePreferences)
     }
