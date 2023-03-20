@@ -162,6 +162,7 @@ public class VPNModule: Module
         
         print("-> VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
         providerConfiguration["serverAddress"] = effect.preferences.serverAddress
+        typedProtocolConfiguration.serverAddress = effect.preferences.serverAddress
         typedProtocolConfiguration.providerConfiguration = providerConfiguration
 
         manager.protocolConfiguration = typedProtocolConfiguration
