@@ -58,7 +58,7 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         self.network = transmissionConnection
         self.flower = FlowerConnection(connection: transmissionConnection, log: logger)
 
-        self.logger.debug("🌲 Connection state is ready 🌲\n")
+        self.logger.log("🌲 Connection state is ready 🌲\n")
         
         guard let flower = self.flower else
         {
@@ -67,9 +67,9 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         }
         
         // TODO: Send IPv4 Request
-        self.logger.debug("👾 PacketTunnelNetworkExtension: Sending an IP assignment request")
+        self.logger.log("👾 PacketTunnelNetworkExtension: Sending an IP assignment request")
         flower.writeMessage(message: .IPRequestV4)
-        self.logger.debug("👾 PacketTunnelNetworkExtension: Finished Sending an IP assignment request")
+        self.logger.log("👾 PacketTunnelNetworkExtension: Finished Sending an IP assignment request")
         sleep(5)
 
 //        self.logger.debug("👾 PacketTunnelNetworkExtension: Trying to read an IP assignment from flowerConnection")
