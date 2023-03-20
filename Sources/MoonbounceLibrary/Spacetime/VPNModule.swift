@@ -104,6 +104,11 @@ public class VPNModule: Module
         let protocolConfiguration = (manager.protocolConfiguration as? NETunnelProviderProtocol) ?? NETunnelProviderProtocol()
         let completePreferences = VPNPreferences(protocolConfiguration: protocolConfiguration, description: description, enabled: enabled)
 
+        if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
+        {
+            print("VPNModule.loadPreferences - error: \(error)")
+        }
+        
         return LoadPreferencesResponse(effect.id, completePreferences)
     }
 
