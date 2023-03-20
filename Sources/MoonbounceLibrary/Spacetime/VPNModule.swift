@@ -114,6 +114,8 @@ public class VPNModule: Module
             protocolConfiguration.serverAddress = ""
         }
         
+        manager.protocolConfiguration = protocolConfiguration
+        
         let completePreferences = VPNPreferences(protocolConfiguration: protocolConfiguration, description: description, enabled: enabled)
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
