@@ -102,6 +102,18 @@ public class VPNModule: Module
         let description = manager.localizedDescription ?? "Moonbounce"
         let enabled = manager.isEnabled
         let protocolConfiguration = (manager.protocolConfiguration as? NETunnelProviderProtocol) ?? NETunnelProviderProtocol()
+        if protocolConfiguration.providerBundleIdentifier == nil {
+            protocolConfiguration.providerBundleIdentifier = ""
+        }
+        
+        if protocolConfiguration.providerConfiguration == nil {
+            protocolConfiguration.providerConfiguration = [:]
+        }
+        
+        if protocolConfiguration.serverAddress == nil {
+            protocolConfiguration.serverAddress = ""
+        }
+        
         let completePreferences = VPNPreferences(protocolConfiguration: protocolConfiguration, description: description, enabled: enabled)
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
