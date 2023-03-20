@@ -31,6 +31,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
         .package(url: "https://github.com/OperatorFoundation/SwiftQueue.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Transmission.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/TransmissionBase.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/TransmissionTransport.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Transport.git", branch: "main"),
     ],
@@ -67,6 +68,7 @@ let package = Package(
                 "SwiftQueue",
                 "Flower",
                 "Transmission",
+                "TransmissionBase",
                 "InternetProtocols",
             ]),
         .target(
