@@ -81,6 +81,7 @@ public class NWTCPTransmissionConnection: BaseConnection
 
     override public func networkRead(size: Int) throws -> Data
     {
+        logger.log("NWTCPTransmissionConnection.networkRead(size: \(size)) called")
         let (maybeData, maybeError): (Data?, Error?) = Synchronizer.sync2
         {
             callback in

@@ -52,6 +52,8 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
             logger.error("PacketTunnelNetworkExtension: could not initialize a transmission connection")
             return MoonbounceUniverseError.connectionFailed
         }
+        
+        logger.log("PacketTunnelNetworkExtension.startTunnel() got TransmissionConnection")
 
         self.network = transmissionConnection
         self.flower = FlowerConnection(connection: transmissionConnection, log: logger)
