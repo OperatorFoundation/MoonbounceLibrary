@@ -40,13 +40,14 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
 
         logger.log("👾 PacketTunnelNetworkExtension: Server address: \(serverAddress.description)")
         
-        // TODO: Port from config
-//        let port = shadowConfig.port
-        let port: UInt16 = 1234
+        let serverAddressList = serverAddress.components(separatedBy: ":")
+        let host = serverAddressList[0]
+        let portString = serverAddressList[1]
+        let port = UInt16(string: portString)
 
-        logger.log("👾 PacketTunnelNetworkExtension: Connect to server called.\nHost - \(serverAddress)\nPort - \(port)👾")
+        logger.log("👾 PacketTunnelNetworkExtension: Connect to server called.\nHost - \(host)\nPort - \(port)👾")
         
-        guard let transmissionConnection = try? connect(serverAddress, Int(port)) else
+        guard let transmissionConnection = try? connect(host, Int(port)) else
         {
             logger.error("PacketTunnelNetworkExtension: could not initialize a transmission connection")
             return MoonbounceUniverseError.connectionFailed
