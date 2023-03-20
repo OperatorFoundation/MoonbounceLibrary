@@ -77,6 +77,7 @@ public class VPNModule: Module
         print("VPNModule loadPreferences called")
         if self.manager == nil
         {
+            print("-> Creating a new NETunnelProviderManager")
             let manager = NETunnelProviderManager()
 
             let maybeError = MainThreadSynchronizer.sync(manager.loadFromPreferences)
@@ -89,51 +90,61 @@ public class VPNModule: Module
             print("manager loaded: \(manager)")
             self.manager = manager
         }
-
+        else
+        {
+            print("-> NETunnelProviderManager already exists")
+        }
+        
+        let typedProtocolConfiguration = NETunnelProviderProtocol()
+        let incompletePreferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: "Moonbounce", enabled: false)
+        
         guard let protocolConfiguration = self.manager?.protocolConfiguration else
         {
-            return Failure(effect.id)
+            print("-> self.manager does not have a protocol configuration")
+            return LoadPreferencesResponse(effect.id, incompletePreferences)
         }
         print("VPNModule loadPreferences() protocolConifugation: \(protocolConfiguration)")
 
         guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
         {
-            return Failure(effect.id)
+            return LoadPreferencesResponse(effect.id, incompletePreferences)
         }
         print("VPNModule loadPreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
-
+        
         guard let description = self.manager?.localizedDescription else
         {
-            return Failure(effect.id)
+            return LoadPreferencesResponse(effect.id, incompletePreferences)
         }
         print("VPNModule loadPreferences() description: \(description)")
-
+        
         guard let enabled = self.manager?.isEnabled else
         {
-            return Failure(effect.id)
+            let partialPreferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: description, enabled: false)
+            return LoadPreferencesResponse(effect.id, partialPreferences)
         }
         print("VPNModule loadPreferences() enabled: \(enabled)")
 
-        let preferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: description, enabled: enabled)
-        print("VPNModule loadPreferences() preferences: \(preferences)")
+        let completePreferences = VPNPreferences(protocolConfiguration: typedProtocolConfiguration, description: description, enabled: enabled)
+        print("VPNModule loadPreferences() preferences: \(incompletePreferences)")
 
-        return LoadPreferencesResponse(effect.id, preferences)
+        return LoadPreferencesResponse(effect.id, completePreferences)
     }
 
     func savePreferences(_ effect: SavePreferencesRequest) -> Event?
     {
-        print("VPNModule savePreferences() called")
-        
+        print("-> VPNModule savePreferences() called")
         guard let manager = self.manager else
         {
-            print("VPNModule savePreferences falied to set manager")
+            print("VPNModule savePreferences failed to set manager")
             return Failure(effect.id)
         }
         print("VPNModule savePreferences() manager: \(manager)")
         
+        // FIXME: Need to give manager a protocolConfiguration (used to be in savePreferencesRequest)
+        
         guard let protocolConfiguration = manager.protocolConfiguration else
         {
-            print("VPNModule savePreferences falied to set protocolConfiguration")
+            print("VPNModule savePreferences failed to set protocolConfiguration")
             return Failure(effect.id)
         }
         print("VPNModule savePreferences() protocolConfiguration: \(protocolConfiguration)")
@@ -149,11 +160,11 @@ public class VPNModule: Module
 
         guard var providerConfiguration = typedProtocolConfiguration.providerConfiguration else
         {
-            print("VPNModule savePreferences falied to set providerConfiguration")
+            print("-> VPNModule savePreferences falied to set providerConfiguration")
             return Failure(effect.id)
         }
         
-        print("VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
+        print("-> VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
         providerConfiguration["serverAddress"] = effect.preferences.serverAddress
         typedProtocolConfiguration.providerConfiguration = providerConfiguration
 
