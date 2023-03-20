@@ -5,9 +5,16 @@
 //  Created by Dr. Brandon Wiley on 2/4/22.
 //
 
+import Foundation
+
+#if os(macOS) || os(iOS)
+import os.log
+#else
+import Logging
+#endif
+
 import Chord
 import Datable
-import Foundation
 import Spacetime
 import TransmissionTypes
 import Universe
@@ -17,6 +24,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
     
     public let universe: Universe
     public let uuid: UUID
+    public let logger: Logger
 
     public convenience init?(universe: Universe, address: String, port: Int)
     {
@@ -37,6 +45,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
     {
         self.universe = universe
         self.uuid = uuid
+        self.logger = universe.logger
     }
 
     public func read(size: Int) -> Data?
@@ -87,6 +96,7 @@ public class NWTCPConnectConnection: TransmissionTypes.Connection
     {
         self.universe.logger.log("🔌 NWTCPConnectConnection read with style: \(style.description)")
         let result = self.universe.processEffect(NWTCPReadRequest(self.uuid, style))
+        self.universe.logger.log("🔌 NWTCPConnectConnection read with style result: \(result)")
         switch result
         {
             case let response as NWTCPReadResponse:
