@@ -79,7 +79,8 @@ public class NWTCPTransmissionConnection: BaseConnection
         super.init(id: id)
     }
 
-    public func networkRead(size: Int) throws -> Data
+    // FIXME: remove the override keyword
+    override public func networkRead(size: Int) throws -> Data
     {
         self.logger.log("NWTCPTransmissionConnection.networkRead(size: \(size)) called")
         let (maybeData, maybeError): (Data?, Error?) = Synchronizer.sync2

@@ -6,7 +6,6 @@
 //  Copyright © 2019 operatorfoundation.org. All rights reserved.
 //
 
-import Flower
 import Net
 import NetworkExtension
 import os.log
@@ -28,7 +27,6 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
     /// The tunnel connection.
     var replicantConnection: Transmission.Connection?
-    open var flowerConnection: FlowerConnection?
     
     /// The address of the tunnel server.
     open var remoteHost: String?

@@ -21,7 +21,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/OperatorFoundation/Chord.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Datable", branch: "main"),
-        .package(url: "https://github.com/OperatorFoundation/Flower.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/InternetProtocols.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/KeychainCli.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Net.git", branch: "main"),
@@ -41,7 +40,6 @@ let package = Package(
             dependencies: [
                 "Chord",
                 "Datable",
-                "Flower",
                 "InternetProtocols",
                 .product(name: "Logging", package: "swift-log"),
                 "MoonbounceShared",
@@ -66,7 +64,6 @@ let package = Package(
                 .product(name: "Spacetime", package: "Spacetime"),
                 .product(name: "Universe", package: "Spacetime"),
                 "SwiftQueue",
-                "Flower",
                 "Transmission",
                 "TransmissionBase",
                 "InternetProtocols",

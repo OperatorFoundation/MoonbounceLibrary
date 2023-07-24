@@ -15,7 +15,6 @@ import Foundation
 import NetworkExtension
 
 import Chord
-import Flower
 import MoonbounceShared
 import Spacetime
 import Transmission
@@ -24,7 +23,6 @@ import Universe
 open class MoonbounceNetworkExtensionUniverse: Universe
 {
     var network: Transmission.Connection? = nil
-    var flower: FlowerConnection? = nil
     let messagesToPacketsQueue = DispatchQueue(label: "clientTunnelConnection: messagesToPackets")
     let packetsToMessagesQueue = DispatchQueue(label: "clientTunnelConnection: packetsToMessages")
 

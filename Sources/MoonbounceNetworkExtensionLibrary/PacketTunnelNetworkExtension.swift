@@ -10,7 +10,6 @@ import Logging
 import NetworkExtension
 import os.log
 
-import Flower
 import MoonbounceShared
 import ShadowSwift
 import Simulation
@@ -56,56 +55,18 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         logger.log("PacketTunnelNetworkExtension.startTunnel() got TransmissionConnection")
 
         self.network = transmissionConnection
-        self.flower = FlowerConnection(connection: transmissionConnection, log: logger)
 
         self.logger.log("🌲 Connection state is ready 🌲\n")
-        
-        guard let flower = self.flower else
-        {
-            self.logger.error("🛑 Current connection is nil, giving up. 🛑")
-            return TunnelError.disconnected
-        }
-        
-        // TODO: Send IPv4 Request
-        self.logger.log("👾 PacketTunnelNetworkExtension: Sending an IP assignment request")
-        flower.writeMessage(message: .IPRequestV4)
-        self.logger.log("👾 PacketTunnelNetworkExtension: Finished Sending an IP assignment request")
-        sleep(5)
 
-//        self.logger.debug("👾 PacketTunnelNetworkExtension: Trying to read an IP assignment from flowerConnection")
-//        let message = flower.readMessage()
-//
-//        let tunnelAddress: TunnelAddress
-//        switch message
-//        {
-//            case .IPAssignV4(let ipv4Address):
-//                self.logger.debug("👾 PacketTunnelNetworkExtension: received an IPV4 assignment flower message")
-//                tunnelAddress = .ipV4(ipv4Address)
-//
-//            case .IPAssignV6(let ipv6Address):
-//                self.logger.debug("👾 PacketTunnelNetworkExtension: received an IPV6 assignment flower message")
-//                tunnelAddress = .ipV6(ipv6Address)
-//
-//            case .IPAssignDualStack(let ipv4Address, let ipv6Address):
-//                self.logger.debug("👾 PacketTunnelNetworkExtension: received a dual stack IP assignment flower message")
-//                tunnelAddress = .dualStack(ipv4Address, ipv6Address)
-//
-//            default:
-//                self.logger.debug("👾 PacketTunnelNetworkExtension: received a flower message that was not an IP assignment: \(message.debugDescription, privacy: .public)")
-//                return MoonbounceUniverseError.noIpAssignment
-//        }
-//
-//        self.logger.log("👾 MoonbounceLibrary: (setTunnelSettings) host: \(serverAddress), tunnelAddress: \(tunnelAddress.description)")
-//
-//        do
-//        {
-//            // Set the virtual interface settings.
-//            try self.setNetworkTunnelSettings(serverAddress, tunnelAddress)
-//        }
-//        catch
-//        {
-//            return MoonbounceUniverseError.failure
-//        }
+        do
+        {
+            // Set the virtual interface settings.
+            try self.setNetworkTunnelSettings(serverAddress, TunnelAddress.ipV4(IPv4Address("10.0.0.1")!))
+        }
+        catch
+        {
+            return MoonbounceUniverseError.failure
+        }
 
         return nil // Success!
     }
@@ -116,7 +77,6 @@ open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
         self.network?.close()
 
         self.network = nil
-        self.flower = nil
     }
 
     public func getTunnelConfiguration() throws -> String
