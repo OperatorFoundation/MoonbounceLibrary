@@ -12,13 +12,10 @@ import os.log
 
 import MoonbounceShared
 import ShadowSwift
-import Simulation
-import Spacetime
 import Transmission
-import Universe
 
 // this is where the actual application logic is
-open class PacketTunnelNetworkExtension: MoonbounceNetworkExtensionUniverse
+open class PacketTunnelNetworkExtension
 {
     override public func startTunnel(options: [String: NSObject]?) async -> Error?
     {

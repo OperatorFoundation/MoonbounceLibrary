@@ -8,32 +8,24 @@
 import Foundation
 import os.log
 import NetworkExtension
-
 import ShadowSwift
-import Simulation
-import Spacetime
-import Universe
 import MoonbounceShared
 
 public class MoonbounceLibrary
 {
     let logger: Logger
-    let simulation: Simulation
-    let universe: MoonbounceUniverse
+    let vpn: VPNModule
 
     public init(logger: Logger)
-    {
-        let vpnModule = VPNModule()
-        
+    {        
         self.logger = logger
-        self.simulation = Simulation(capabilities: Capabilities(BuiltinModuleNames.display.rawValue, VPNModule.name), userModules: [vpnModule], logger: logger)
-        self.universe = MoonbounceUniverse(effects: self.simulation.effects, events: self.simulation.events, logger: logger)
+        self.vpn = VPNModule(logger: logger)
     }
 
     public func configure(_ config: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) throws
     {
         print("MoonbounceLibrary configure() called")
-        let _ = try? self.universe.loadPreferences()
+        let _ = try? self.vpn.loadPreferences()
         print("MoonbounceLibrary loadPreferences() finished")
 
         guard let preferences = newProtocolConfiguration(shadowConfig: config, providerBundleIdentifier: providerBundleIdentifier, tunnelName: tunnelName) else
@@ -42,19 +34,19 @@ public class MoonbounceLibrary
         }
 
         print("MoonbounceLibrary configure() calling savePreferences()")
-        try self.universe.savePreferences(preferences)
+        try self.vpn.savePreferences(preferences)
         print("MoonbounceLibrary configure() finished calling savePreferences()")
     }
 
     public func startVPN() throws
     {
         print("startVPN called")
-        try self.universe.enable()
+        try self.vpn.enable()
     }
 
     public func stopVPN() throws
     {
-        try self.universe.disable()
+        try self.vpn.disable()
     }
 
     func newProtocolConfiguration(shadowConfig: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) -> VPNPreferences?

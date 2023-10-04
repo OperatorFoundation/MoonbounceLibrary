@@ -14,19 +14,18 @@ import Logging
 import Chord
 import Foundation
 import NetworkExtension
-import Simulation
-import Spacetime
 
-public class VPNModule: Module
+public class VPNModule
 {
     
     static public let name = "VPN"
     
-    public var logger: Logger?
+    public var logger: Logger
     var manager: NETunnelProviderManager? = nil
 
-    public init()
+    public init(logger: Logger)
     {
+        self.logger = logger
     }
 
     public func name() -> String
@@ -34,45 +33,7 @@ public class VPNModule: Module
         return VPNModule.name
     }
     
-    public func setLogger(logger: Logger?)
-    {
-        self.logger = logger
-    }
-    
-    public func handleEffect(_ effect: Effect, _ channel: BlockingQueue<Event>) -> Event?
-    {
-        switch effect
-        {
-            case let loadPreferencesRequest as LoadPreferencesRequest:
-                return loadPreferences(loadPreferencesRequest)
-
-            case let savePreferencesRequest as SavePreferencesRequest:
-                return savePreferences(savePreferencesRequest)
-
-            case let enableRequest as EnableRequest:
-                return enable(enableRequest)
-
-            case let disableRequest as DisableRequest:
-                return disable(disableRequest)
-
-            case let connectionStatusRequest as ConnectionStatusRequest:
-                return connectionStatus(connectionStatusRequest)
-
-            case let sendProviderMessageRequest as SendProviderMessageRequest:
-                return sendProviderMessage(sendProviderMessageRequest)
-
-            default:
-                print("Unknown effect \(effect)")
-                return Failure(effect.id)
-        }
-    }
-
-    public func handleExternalEvent(_ event: Event)
-    {
-        return
-    }
-
-    func loadPreferences(_ effect: LoadPreferencesRequest) -> Event?
+    func loadPreferences() throws -> VPNPreferences
     {
         let manager: NETunnelProviderManager
     
@@ -92,7 +53,7 @@ public class VPNModule: Module
             if let error = maybeError
             {
                 print("VPNModule.savePreferences - error: \(error)")
-                return Failure(effect.id)
+                throw error
             }
             
             print("manager loaded: \(manager)")
@@ -123,16 +84,16 @@ public class VPNModule: Module
             print("VPNModule.loadPreferences - error: \(error)")
         }
         
-        return LoadPreferencesResponse(effect.id, completePreferences)
+        return completePreferences
     }
 
-    func savePreferences(_ effect: SavePreferencesRequest) -> Event?
+    func savePreferences(_ preferences: VPNPreferences) throws
     {
         print("-> VPNModule savePreferences() called")
         guard let manager = self.manager else
         {
             print("VPNModule savePreferences failed to set manager")
-            return Failure(effect.id)
+            throw VPNModuleError.managerIsNil
         }
         print("VPNModule savePreferences() manager: \(manager)")
         
@@ -141,52 +102,48 @@ public class VPNModule: Module
         guard let protocolConfiguration = manager.protocolConfiguration else
         {
             print("VPNModule savePreferences failed to set protocolConfiguration")
-            return Failure(effect.id)
+            throw VPNModuleError.protocolConfigurationIsNil
         }
         print("VPNModule savePreferences() protocolConfiguration: \(protocolConfiguration)")
 
         guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
         {
             print("VPNModule savePreferences falied to set typedProtocolConfiguration")
-            return Failure(effect.id)
+            throw VPNModuleError.typedProtocolConfigurationIsNil
         }
         print("VPNModule savePreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
 
-        typedProtocolConfiguration.providerBundleIdentifier = effect.preferences.providerBundleIdentifier
+        typedProtocolConfiguration.providerBundleIdentifier = preferences.providerBundleIdentifier
 
         guard var providerConfiguration = typedProtocolConfiguration.providerConfiguration else
         {
             print("-> VPNModule savePreferences falied to set providerConfiguration")
-            return Failure(effect.id)
+            throw VPNModuleError.providerConfigurationIsNil
         }
         
         print("-> VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
-        providerConfiguration["serverAddress"] = effect.preferences.serverAddress
-        typedProtocolConfiguration.serverAddress = effect.preferences.serverAddress
+        providerConfiguration["serverAddress"] = preferences.serverAddress
+        typedProtocolConfiguration.serverAddress = preferences.serverAddress
         typedProtocolConfiguration.providerConfiguration = providerConfiguration
 
         manager.protocolConfiguration = typedProtocolConfiguration
-        manager.localizedDescription = effect.preferences.description
-        manager.isEnabled = effect.preferences.enabled
+        manager.localizedDescription = preferences.description
+        manager.isEnabled = preferences.enabled
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.savePreferences - error: \(error)")
-            return Failure(effect.id)
+            throw error
         }
-        
-        let result = SavePreferencesResponse(effect.id)
-        print("VPNModule savePreferences returning: \(result)")
-        return result
     }
 
-    func enable(_ effect: EnableRequest) -> Event?
+    func enable() throws
     {
         print("VPNModule enable called")
         guard let manager = self.manager else
         {
             print("could not get manager")
-            return Failure(effect.id)
+            throw VPNModuleError.managerIsNil
         }
 
         manager.isEnabled = true
@@ -194,20 +151,20 @@ public class VPNModule: Module
         if let error = MainThreadSynchronizer.sync(manager.loadFromPreferences)
         {
             print("VPNModule.enable - loadFromPreferences error: \(error)")
-            return Failure(effect.id)
+            throw error
         }
         
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.enable - saveToPreferences error: \(error)")
-            return Failure(effect.id)
+            throw error
         }
 
         // https://stackoverflow.com/questions/47550706/error-domain-nevpnerrordomain-code-1-null-while-connecting-vpn-server
         if let error = MainThreadSynchronizer.sync(manager.loadFromPreferences)
         {
             print("VPNModule.enable - loadFromPreferences error: \(error)")
-            return Failure(effect.id)
+            throw error
         }
 
         do
@@ -217,18 +174,17 @@ public class VPNModule: Module
         catch
         {
             print("VPNModule.enable - startVPNTunnel error: \(error)")
-            return Failure(effect.id)
+            throw error
         }
 
         print("VPNModule enable success")
-        return EnableResponse(effect.id)
     }
 
-    func disable(_ effect: DisableRequest) -> Event?
+    func disable() throws
     {
         guard let manager = self.manager else
         {
-            return Failure(effect.id)
+            throw VPNModuleError.managerIsNil
         }
 
         manager.isEnabled = false
@@ -236,55 +192,52 @@ public class VPNModule: Module
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
             print("VPNModule.disable - error: \(error)")
-            return Failure(effect.id)
+            throw error
         }
-
-        return DisableResponse(effect.id)
     }
 
-    func connectionStatus(_ effect: ConnectionStatusRequest) -> Event?
+    func connectionStatus() throws -> NEVPNStatus
     {
         guard let manager = self.manager else
         {
-            return Failure(effect.id)
+            throw VPNModuleError.managerIsNil
         }
 
         guard let session = manager.connection as? NETunnelProviderSession else
         {
-            return Failure(effect.id)
+            throw VPNModuleError.managerConnectionIsWrongType
         }
 
-        return ConnectionStatusResponse(effect.id, session.status.vpnStatus)
+        return session.status
     }
 
-    func sendProviderMessage(_ effect: SendProviderMessageRequest) -> Event?
+    func sendProviderMessage(_ data: Data) throws -> Data
     {
         guard let manager = self.manager else
         {
-            return Failure(effect.id)
+            throw VPNModuleError.managerIsNil
         }
 
         guard let session = manager.connection as? NETunnelProviderSession else
         {
-            return Failure(effect.id)
+            throw VPNModuleError.managerConnectionIsWrongType
         }
 
-        let maybeResponse: Data?
-        do
-        {
-            maybeResponse = try Synchronizer.syncThrows({completion in return try session.sendProviderMessage(effect.message, responseHandler: completion)})
-        }
-        catch
-        {
-            NSLog("Failed to send a message to the provider \(error)")
-            return Failure(effect.id)
-        }
 
-        guard let response = maybeResponse else
+        guard let response = try Synchronizer.syncThrows({completion in return try session.sendProviderMessage(data, responseHandler: completion)}) else
         {
-            return Failure(effect.id)
+            throw VPNModuleError.providerMessageResponseIsNil
         }
-
-        return SendProviderMessageResponse(effect.id, response)
+        
+        return response
     }
+}
+
+public enum VPNModuleError: Error {
+    case managerIsNil
+    case protocolConfigurationIsNil
+    case typedProtocolConfigurationIsNil
+    case providerConfigurationIsNil
+    case managerConnectionIsWrongType
+    case providerMessageResponseIsNil
 }
