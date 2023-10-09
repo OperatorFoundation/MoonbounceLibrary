@@ -141,7 +141,7 @@ public class NetworkExtensionModule
         return serverAddress
     }
 
-    func readPacket() throws
+    func readPacket() throws -> NEPacket
     {
         self.logger.log("🌐 NetworkExtensionModule: readPacket")
         
@@ -162,11 +162,13 @@ public class NetworkExtensionModule
             packets = [NEPacket](packets[1...])
 
             self.packetBuffer.append(contentsOf: packets)
+            return packet
         }
         else
         {
             let packet = self.packetBuffer[0]
             self.packetBuffer = [NEPacket](self.packetBuffer[1...])
+            return packet
         }
     }
 

@@ -21,7 +21,7 @@ final class MoonbounceLibraryTests: XCTestCase
         let expectation = XCTestExpectation(description: "connected")
         Task {
             let logger = Logger(label: "MoonbounceTest")
-            let connection = try await AsyncTcpSocketConnection("137.184.52.124", 7, logger)
+            let _ = try await AsyncTcpSocketConnection("137.184.52.124", 7, logger)
             expectation.fulfill()
         }
         await fulfillment(of: [expectation], timeout: 5)
@@ -120,7 +120,7 @@ final class MoonbounceLibraryTests: XCTestCase
     {
         let _ = ShadowConfig.createNewConfigFiles(inDirectory: File.homeDirectory(), serverAddress: "127.0.0.1", cipher: .DARKSTAR)
         
-        guard let shadowConfig = ShadowConfig.ShadowClientConfig(path: File.homeDirectory().appendingPathComponent("ShadowClientConfig.json").path) else
+        guard let _ = ShadowConfig.ShadowClientConfig(path: File.homeDirectory().appendingPathComponent("ShadowClientConfig.json").path) else
         {
             XCTFail()
             return
