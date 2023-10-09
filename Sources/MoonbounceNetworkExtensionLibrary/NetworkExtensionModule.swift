@@ -27,7 +27,6 @@ public class NetworkExtensionModule
     var flow: NEPacketTunnelFlow? = nil
     var packetBuffer: [NEPacket] = []
     var provider: NEPacketTunnelProvider? = nil
-    public var connections: [UUID: SimulationNWTCPConnection] = [:]
     var logger: Logger
     
     let startTunnelDispatchQueue = DispatchQueue(label: "StartTunnel")
@@ -123,7 +122,7 @@ public class NetworkExtensionModule
         stopTunnelLock.signal()
     }
 
-    public func getTunnelConfiguration() throws
+    public func getTunnelConfiguration() throws -> String
     {
         guard let provider = self.provider else
         {
@@ -138,6 +137,8 @@ public class NetworkExtensionModule
         }
 
         logger.log("🌐 NetworkExtensionModule: getConfiguration returning serverAddress: \(serverAddress.description)")
+        
+        return serverAddress
     }
 
     func readPacket() throws
@@ -202,74 +203,6 @@ public class NetworkExtensionModule
         if let error = maybeError
         {
             throw error
-        }
-    }
-
-    func connect(host: String, port: String) throws
-    {
-        guard let provider = self.provider else
-        {
-            throw NEModuleError.providerIsNil
-        }
-
-        let uuid = UUID()
-        let endpoint = NWHostEndpoint(hostname: host, port: port)
-        self.logger.log("🌐 NetworkExtensionModule: creating a TCP connection to \(host):\(port)")
-        self.logger.log("🌐 NetworkExtensionModule.connect() endpoint: \(endpoint)")
-        
-        let networkConnection = provider.createTCPConnection(to: endpoint, enableTLS: false, tlsParameters: nil, delegate: nil)
-        
-        guard let transmissionConnection = NWTCPTransmissionConnection(networkConnection, logger: self.logger) else
-        {
-            self.logger.log("🛑 NetworkExtensionModule: failed to create an NWTCPTransmissionConnection")
-            throw NEModuleError.connectionFailure
-        }
-        
-        let connection = SimulationNWTCPConnection(transmissionConnection, logger: logger)
-        self.connections[uuid] = connection
-    }
-
-    func read(uuid: UUID, size: Int) throws -> Data
-    {
-        self.logger.log("🌐 NetworkExtensionModule: read()")
-        
-        guard let connection = self.connections[uuid] else
-        {
-            logger.log("🛑 NetworkExtensionModule: NWTCPReadRequest failed")
-            throw NEModuleError.connectionFailure
-        }
-
-        guard let readResult = connection.networkConnection.read(size: size) else
-        {
-            throw NEModuleError.readFailed
-        }
-        
-        return readResult
-    }
-
-    func write(uuid: UUID, data: Data) throws -> Bool
-    {
-        self.logger.log("🌐 NetworkExtensionModule: write()")
-        
-        guard let connection = self.connections[uuid] else
-        {
-            logger.log("🛑 NetworkExtensionModule: NWTCPWriteRequest failed")
-            throw NEModuleError.connectionFailure
-        }
-
-        return connection.networkConnection.write(data: data)
-    }
-
-    func close(uuid: UUID) throws
-    {
-        self.logger.log("🌐 NetworkExtensionModule: close()")
-        if let connection = self.connections[uuid]
-        {
-            connection.networkConnection.close()
-        }
-        else
-        {
-            throw NEModuleError.connectionFailure
         }
     }
 

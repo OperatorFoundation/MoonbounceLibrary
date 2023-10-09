@@ -19,7 +19,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     var logger = Logger(subsystem: "org.OperatorFoundation.MoonbounceLogger", category: "NetworkExtension")
 
     /// The tunnel connection.
-    var replicantConnection: Transmission.Connection?
+    var network: Transmission.Connection?
     
     /// The address of the tunnel server.
     open var remoteHost: String?
@@ -41,14 +41,64 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
     {
         self.logger.log("MoonbouncePacketTunnelProvider: startTunnel")
+        
+        let serverAddress: String
+        do
+        {
+            logger.log("👾 PacketTunnelNetworkExtension: getting configuration... 👾")
+            serverAddress = try neModule.getTunnelConfiguration()
+            logger.log("👾 PacketTunnelNetworkExtension: received a configuration: \(serverAddress.description) 👾")
+        }
+        catch
+        {
+            logger.log("👾 PacketTunnelNetworkExtension: Failed to get the configuration 👾")
+            completionHandler(error)
+            return
+        }
+
+        logger.log("👾 PacketTunnelNetworkExtension: Server address: \(serverAddress.description)")
+
+        let serverAddressList = serverAddress.components(separatedBy: ":")
+        let host = serverAddressList[0]
+        let portString = serverAddressList[1]
+        let port = UInt16(string: portString)
+
+        logger.log("👾 PacketTunnelNetworkExtension: Connect to server called.\nHost - \(host)\nPort - \(port)👾")
+
+        guard let transmissionConnection = TCPConnection(host: host, port: Int(port), logger: logger) else {
+            self.logger.log("Error: Failed to make a TCP connection")
+            completionHandler(PacketTunnelProviderError.tcpConnectionFailed)
+            return
+        }
+
+        logger.log("PacketTunnelNetworkExtension.startTunnel() got TransmissionConnection")
+
+        self.network = transmissionConnection
+
+        self.logger.log("🌲 Connection state is ready 🌲\n")
+
+        do
+        {
+            // Set the virtual interface settings.
+            try neModule.setNetworkTunnelSettings(host: host, tunnelAddress: TunnelAddress.ipV4(IPv4Address("10.0.0.1")!))
+        }
+        catch
+        {
+            completionHandler(error)
+            return
+        }
+        
         self.neModule.setConfiguration(self.protocolConfiguration)
         self.neModule.startTunnel(options: options, completionHandler: completionHandler)
+        completionHandler(nil)
     }
 
 
     public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
     {
         self.logger.log("MoonbouncePacketTunnelProvider: stopTunnel")
+        self.network?.close()
+        self.network = nil
         self.neModule.stopTunnel(reason: reason, completionHandler: completionHandler)
     }
     
@@ -107,4 +157,5 @@ enum PacketTunnelProviderError: String, Error
     case couldNotStartBackend
     case couldNotDetermineFileDescriptor
     case couldNotSetNetworkSettings
+    case tcpConnectionFailed
 }
