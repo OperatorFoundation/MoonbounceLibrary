@@ -22,6 +22,7 @@ let package = Package(
         .package(url: "https://github.com/OperatorFoundation/Chord.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Datable", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/InternetProtocols.git", branch: "main"),
+        .package(url: "https://github.com/OperatorFoundation/Keychain.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/KeychainCli.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/Net.git", branch: "main"),
         .package(url: "https://github.com/OperatorFoundation/ShadowSwift.git", branch: "main"),
@@ -42,6 +43,7 @@ let package = Package(
                 "Datable",
                 "InternetProtocols",
                 .product(name: "Logging", package: "swift-log"),
+                "Keychain",
                 "MoonbounceShared",
                 "Net",
                 "ShadowSwift",
@@ -72,6 +74,7 @@ let package = Package(
             name: "MoonbounceShared",
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
+                "Keychain",
                 "Net",
             ]),
         .testTarget(
