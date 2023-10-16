@@ -176,9 +176,11 @@ public class NetworkExtensionModule
         let maybeError = Synchronizer.sync
         {
             (completionHandler: @escaping (Error?) -> Void) in
-            
+            self.logger.log("starting setTunnelNetworkSettings")
             provider.setTunnelNetworkSettings(settings, completionHandler: completionHandler)
+            self.logger.log("finished setNetworkTunnelSettings")
         }
+        self.logger.log("finished setNetworkTunnelSettings sync")
 
         if let error = maybeError
         {
