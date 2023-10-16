@@ -69,28 +69,6 @@ public class NetworkExtensionModule
         self.flow = flow
     }
 
-    public func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void)
-    {
-        logger.log("🌐 NetworkExtensionModule: startTunnel")
-
-        if let options
-        {
-            print("WARNING: Ignoring options \(options)")
-        }
-
-        self.startTunnelDispatchQueue.async
-        {
-
-            if let response = self.startTunnelQueue.dequeue()
-            {
-                self.logger.debug("🌐 failed to start tunnel: \(response.debugDescription)")
-                // FIXME: should probably stop the tunnel here
-            }
-        }
-        
-        completionHandler(nil)
-    }
-
     public func stopTunnel(reason: NEProviderStopReason, completionHandler: @escaping () -> Void )
     {
         self.logger.debug("🌐 NetworkExtensionModule: stopTunnel")

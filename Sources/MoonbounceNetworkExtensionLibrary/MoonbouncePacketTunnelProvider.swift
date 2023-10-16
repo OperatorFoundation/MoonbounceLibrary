@@ -87,9 +87,9 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             completionHandler(error)
             return
         }
-        
+        logger.log("finished setting network tunnel settings")
         self.neModule.setConfiguration(self.protocolConfiguration)
-        self.neModule.startTunnel(options: options, completionHandler: completionHandler)
+        logger.log("finished setting networkExtensinModule configuration")
         completionHandler(nil)
     }
 
