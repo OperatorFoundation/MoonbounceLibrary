@@ -69,29 +69,6 @@ public class NetworkExtensionModule
         self.flow = flow
     }
 
-    public func stopTunnel(reason: NEProviderStopReason, completionHandler: @escaping () -> Void )
-    {
-        self.logger.debug("🌐 NetworkExtensionModule: stopTunnel")
-        self.stopTunnelDispatchQueue.async
-        {
-            self.stopTunnelLock.wait()
-            completionHandler()
-        }
-    }
-
-    public func handleAppMessage(data: Data, completionHandler: ((Data?) -> Void)?)
-    {
-        self.logger.debug("🌐 NetworkExtensionModule: handleAppMessage")
-        self.handleAppMessageDispatchQueue.async
-        {
-            let response = self.appMessageQueue.dequeue()
-            if let handler = completionHandler
-            {
-                handler(response)
-            }
-        }
-    }
-
     // Private functions
 
     func stopTunnelRequestHandler()
@@ -162,7 +139,7 @@ public class NetworkExtensionModule
         flow.writePacketObjects([packet])
     }
 
-    func setNetworkTunnelSettings(host: String, tunnelAddress: TunnelAddress) throws
+    func setNetworkTunnelSettings(host: String, tunnelAddress: TunnelAddress) async throws
     {
         self.logger.log("🌐 NetworkExtensionModule: setNetworkTunnelSettings")
         
@@ -172,20 +149,10 @@ public class NetworkExtensionModule
         }
 
         let settings = self.makeNetworkSettings(host: host, tunnelAddress: tunnelAddress)
-
-        let maybeError = Synchronizer.sync
-        {
-            (completionHandler: @escaping (Error?) -> Void) in
-            self.logger.log("starting setTunnelNetworkSettings")
-            provider.setTunnelNetworkSettings(settings, completionHandler: completionHandler)
-            self.logger.log("finished setNetworkTunnelSettings")
-        }
+        self.logger.log("starting setTunnelNetworkSettings")
+        try await provider.setTunnelNetworkSettings(settings)
+        self.logger.log("finished setNetworkTunnelSettings")
         self.logger.log("finished setNetworkTunnelSettings sync")
-
-        if let error = maybeError
-        {
-            throw error
-        }
     }
 
     /// host must be an ipv4 address and port "ipAddress:port". For example: "127.0.0.1:1234".

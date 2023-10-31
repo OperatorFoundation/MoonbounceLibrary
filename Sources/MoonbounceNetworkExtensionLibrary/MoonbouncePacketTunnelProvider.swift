@@ -15,6 +15,8 @@ import Transmission
 
 open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 {
+    static let lengthPrefixSize = 32
+    
     let neModule: NetworkExtensionModule
     var logger = Logger(subsystem: "org.OperatorFoundation.MoonbounceLogger", category: "NetworkExtension")
 
@@ -38,24 +40,15 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     }
 
     // NEPacketTunnelProvider
-    public override func startTunnel(options: [String : NSObject]? = nil, completionHandler: @escaping (Error?) -> Void)
+    public override func startTunnel(options: [String : NSObject]? = nil) async throws
     {
         self.logger.log("MoonbouncePacketTunnelProvider: startTunnel")
         
         let serverAddress: String
-        do
-        {
-            logger.log("👾 PacketTunnelNetworkExtension: getting configuration... 👾")
-            serverAddress = try neModule.getTunnelConfiguration()
-            logger.log("👾 PacketTunnelNetworkExtension: received a configuration: \(serverAddress.description) 👾")
-        }
-        catch
-        {
-            logger.log("👾 PacketTunnelNetworkExtension: Failed to get the configuration 👾")
-            completionHandler(error)
-            return
-        }
-
+        
+        logger.log("👾 PacketTunnelNetworkExtension: getting configuration... 👾")
+        serverAddress = try neModule.getTunnelConfiguration()
+        logger.log("👾 PacketTunnelNetworkExtension: received a configuration: \(serverAddress.description) 👾")
         logger.log("👾 PacketTunnelNetworkExtension: Server address: \(serverAddress.description)")
 
         let serverAddressList = serverAddress.components(separatedBy: ":")
@@ -67,8 +60,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
         guard let transmissionConnection = TCPConnection(host: host, port: Int(port), logger: logger) else {
             self.logger.log("Error: Failed to make a TCP connection")
-            completionHandler(PacketTunnelProviderError.tcpConnectionFailed)
-            return
+            throw PacketTunnelProviderError.tcpConnectionFailed
         }
 
         logger.log("PacketTunnelNetworkExtension.startTunnel() got TransmissionConnection")
@@ -77,36 +69,36 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 
         self.logger.log("🌲 Connection state is ready 🌲\n")
 
-        do
-        {
-            // Set the virtual interface settings.
-            try neModule.setNetworkTunnelSettings(host: host, tunnelAddress: TunnelAddress.ipV4(IPv4Address("10.0.0.1")!))
-        }
-        catch
-        {
-            completionHandler(error)
-            return
-        }
+        // Set the virtual interface settings.
+        try await neModule.setNetworkTunnelSettings(host: host, tunnelAddress: TunnelAddress.ipV4(IPv4Address("10.0.0.1")!))
+
         logger.log("finished setting network tunnel settings")
         self.neModule.setConfiguration(self.protocolConfiguration)
         logger.log("finished setting networkExtensinModule configuration")
-        completionHandler(nil)
+        
+        Task {
+            await vpnToServer()
+        }
+        
+        Task {
+            serverToVPN()
+        }
     }
 
 
-    public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void)
+    public override func stopTunnel(with reason: NEProviderStopReason) async
     {
         self.logger.log("MoonbouncePacketTunnelProvider: stopTunnel")
         self.network?.close()
         self.network = nil
-        self.neModule.stopTunnel(reason: reason, completionHandler: completionHandler)
     }
     
     /// Handle IPC messages from the app.
-    public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?)
+    public override func handleAppMessage(_ messageData: Data) async -> Data?
     {
         self.logger.debug("MoonbouncePacketTunnelProvider: handleAppMessage")
-        self.neModule.handleAppMessage(data: messageData, completionHandler: completionHandler)
+        // TODO: add data processing at a later time
+        return nil
     }
 
     open override func cancelTunnelWithError(_ error: Error?)
@@ -119,6 +111,51 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         }
     }
     // End NEPacketTunnelProvider
+    
+    private func vpnToServer() async {
+        while true {
+            guard let connection = self.network else {
+                return
+            }
+            
+            guard let flow = self.neModule.flow else {
+                return
+            }
+            
+            let (bytesRead, nsNumber) = await flow.readPackets()
+            let list = zip(bytesRead, nsNumber)
+            
+            for unzipped in list {
+                let (data, ipVersion) = unzipped
+                
+                guard (ipVersion == NSNumber(value: 4)) else {
+                    continue
+                }
+                
+                guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else {
+                    return
+                }
+            }
+        }
+    }
+    
+    private func serverToVPN() {
+        while true {
+            guard let connection = self.network else {
+                return
+            }
+            
+            guard let bytesRead = connection.readWithLengthPrefix(prefixSizeInBits: Self.lengthPrefixSize) else {
+                return
+            }
+            
+            guard let flow = self.neModule.flow else {
+                return
+            }
+            
+            flow.writePackets([bytesRead], withProtocols: [NSNumber(value: 4)])
+        }
+    }
 }
 
 public enum TunnelError: Error
