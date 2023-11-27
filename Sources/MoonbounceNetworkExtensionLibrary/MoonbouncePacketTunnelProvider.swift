@@ -163,7 +163,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             }
             
             logger.log("serverToVPN read \(bytesRead.count) bytes")
-            logger.log("starting serverToVPN write")
+            logger.log("starting serverToVPN write: \(bytesRead.hex)")
             flow.writePackets([bytesRead], withProtocols: [NSNumber(value: 2)])
             logger.log("serverToVPN wrote \(bytesRead.count) bytes")
         }
