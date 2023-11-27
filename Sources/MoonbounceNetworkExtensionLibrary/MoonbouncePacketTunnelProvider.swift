@@ -124,7 +124,6 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             logger.log("vpnToServer flow set")
             logger.log("starting vpnToServer read")
             let (bytesRead, nsNumber) = await flow.readPackets()
-            logger.log("finished reading \(bytesRead.count) bytes")
             let list = zip(bytesRead, nsNumber)
             
             for unzipped in list {
@@ -134,12 +133,13 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                     continue
                 }
                 
+                logger.log("vpnToServer finished reading \(bytesRead.count) bytes")
                 logger.log("starting vpnTpServer write")
                 guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else {
                     logger.log("vpnToServer write failed")
                     return
                 }
-                logger.log("finished writing \(data.count) bytes")
+                logger.log("vpnToServer finished writing \(data.count) bytes")
             }
         }
     }
