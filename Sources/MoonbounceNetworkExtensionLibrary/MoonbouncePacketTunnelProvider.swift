@@ -130,6 +130,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 let (data, ipVersion) = unzipped
                 
                 guard (ipVersion == NSNumber(value: 4)) else {
+                    logger.log("IP version \(ipVersion)")
                     continue
                 }
                 
