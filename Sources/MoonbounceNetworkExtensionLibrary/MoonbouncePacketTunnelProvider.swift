@@ -120,11 +120,8 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 return
             }
             
-            guard let flow = self.neModule.flow else {
-                logger.log("vpnToServer flow not set")
-                return
-            }
-            
+            let flow = self.packetFlow
+            logger.log("vpnToServer flow set")
             logger.log("starting vpnToServer read")
             let (bytesRead, nsNumber) = await flow.readPackets()
             logger.log("finished reading \(bytesRead.count) bytes")
@@ -156,11 +153,8 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 return
             }
             
-            guard let flow = self.neModule.flow else {
-                logger.log("servertoVPN failed to set flow")
-                return
-            }
-            
+            let flow = self.packetFlow
+            logger.log("serverToVPN flow set")
             logger.log("starting serverToVPN read")
             
             guard let bytesRead = connection.readWithLengthPrefix(prefixSizeInBits: Self.lengthPrefixSize) else {
