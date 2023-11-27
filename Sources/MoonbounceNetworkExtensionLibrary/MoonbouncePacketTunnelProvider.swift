@@ -116,10 +116,12 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         logger.log("vpnToServer called.")
         while true {
             guard let connection = self.network else {
+                logger.log("vpnToServer connection failed")
                 return
             }
             
             guard let flow = self.neModule.flow else {
+                logger.log("vpnToServer flow not set")
                 return
             }
             
@@ -132,6 +134,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 let (data, ipVersion) = unzipped
                 
                 guard (ipVersion == NSNumber(value: 4)) else {
+                    logger.log("vpnToServer ip version not 4")
                     continue
                 }
                 
@@ -149,21 +152,23 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         logger.log("serverToVPN called")
         while true {
             guard let connection = self.network else {
+                logger.log("serverToVPN connection failed")
+                return
+            }
+            
+            guard let flow = self.neModule.flow else {
+                logger.log("servertoVPN failed to set flow")
                 return
             }
             
             logger.log("starting serverToVPN read")
             
             guard let bytesRead = connection.readWithLengthPrefix(prefixSizeInBits: Self.lengthPrefixSize) else {
+                logger.log("serverToVPN read failed")
                 return
             }
             
             logger.log("serverToVPN read \(bytesRead.count) bytes")
-            
-            guard let flow = self.neModule.flow else {
-                return
-            }
-            
             logger.log("starting serverToVPN write")
             flow.writePackets([bytesRead], withProtocols: [NSNumber(value: 4)])
             logger.log("serverToVPN wrote \(bytesRead.count) bytes")
