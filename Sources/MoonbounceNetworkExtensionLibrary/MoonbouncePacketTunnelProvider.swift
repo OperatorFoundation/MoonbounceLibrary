@@ -113,6 +113,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     // End NEPacketTunnelProvider
     
     private func vpnToServer() async {
+        logger.log("vpnToServer called.")
         while true {
             guard let connection = self.network else {
                 return
@@ -122,7 +123,9 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 return
             }
             
+            logger.log("starting vpnToServer read")
             let (bytesRead, nsNumber) = await flow.readPackets()
+            logger.log("finished reading \(bytesRead.count) bytes")
             let list = zip(bytesRead, nsNumber)
             
             for unzipped in list {
@@ -132,28 +135,38 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                     continue
                 }
                 
+                logger.log("starting vpnTpServer write")
                 guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else {
+                    logger.log("vpnToServer write failed")
                     return
                 }
+                logger.log("finished writing \(data.count) bytes")
             }
         }
     }
     
     private func serverToVPN() {
+        logger.log("serverToVPN called")
         while true {
             guard let connection = self.network else {
                 return
             }
             
+            logger.log("starting serverToVPN read")
+            
             guard let bytesRead = connection.readWithLengthPrefix(prefixSizeInBits: Self.lengthPrefixSize) else {
                 return
             }
+            
+            logger.log("serverToVPN read \(bytesRead.count) bytes")
             
             guard let flow = self.neModule.flow else {
                 return
             }
             
+            logger.log("starting serverToVPN write")
             flow.writePackets([bytesRead], withProtocols: [NSNumber(value: 4)])
+            logger.log("serverToVPN wrote \(bytesRead.count) bytes")
         }
     }
 }
