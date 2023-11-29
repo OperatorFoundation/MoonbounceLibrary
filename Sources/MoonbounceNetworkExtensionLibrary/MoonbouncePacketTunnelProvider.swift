@@ -141,6 +141,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 
                 //logger.log("vpnToServer finished reading \(bytesRead.count) bytes")
                 //logger.log("starting vpnTpServer write")
+                logger.log("vpnToServer write data: \(data.hex)")
                 guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else {
                     logger.log("vpnToServer write failed")
                     return
