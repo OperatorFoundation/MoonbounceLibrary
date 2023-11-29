@@ -51,14 +51,19 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         logger.log("👾 PacketTunnelNetworkExtension: received a configuration: \(serverAddress.description) 👾")
         logger.log("👾 PacketTunnelNetworkExtension: Server address: \(serverAddress.description)")
 
-        let serverAddressList = serverAddress.components(separatedBy: ":")
+        let serverAddressList = serverAddress.replacingOccurrences(of: " ", with: "").components(separatedBy: ":")
         let host = serverAddressList[0]
         let portString = serverAddressList[1]
-        let port = UInt16(string: portString)
+        guard let port = UInt16(portString) else
+        {
+            self.logger.log("Error: Failed to start a tunnel, the server port is invalid: \(portString)")
+            throw PacketTunnelProviderError.couldNotSetNetworkSettings
+        }
 
         logger.log("👾 PacketTunnelNetworkExtension: Connect to server called.\nHost - \(host)\nPort - \(port)👾")
 
-        guard let transmissionConnection = TCPConnection(host: host, port: Int(port), logger: logger) else {
+        guard let transmissionConnection = TCPConnection(host: host, port: Int(port), logger: logger) else 
+        {
             self.logger.log("Error: Failed to make a TCP connection")
             throw PacketTunnelProviderError.tcpConnectionFailed
         }
