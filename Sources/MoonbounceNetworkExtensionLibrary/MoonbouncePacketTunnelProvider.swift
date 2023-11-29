@@ -134,7 +134,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             for unzipped in list {
                 let (data, ipVersion) = unzipped
                 
-                guard (ipVersion == NSNumber(value: 2)) else {
+                guard (ipVersion == NSNumber(value: AF_INET)) else {
                     //logger.log("IP version \(ipVersion)")
                     continue
                 }
@@ -170,7 +170,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             
             logger.log("serverToVPN read \(bytesRead.count) bytes")
             logger.log("starting serverToVPN write: \(bytesRead.hex)")
-            flow.writePackets([bytesRead], withProtocols: [NSNumber(value: 2)])
+            flow.writePackets([bytesRead], withProtocols: [NSNumber(value: AF_INET)])
             logger.log("serverToVPN wrote \(bytesRead.count) bytes")
         }
     }
