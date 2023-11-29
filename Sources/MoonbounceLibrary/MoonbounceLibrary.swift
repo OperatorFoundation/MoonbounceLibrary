@@ -24,35 +24,34 @@ public class MoonbounceLibrary
 
     public func configure(_ config: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) throws
     {
-        print("MoonbounceLibrary configure() called")
         let _ = try? self.vpn.loadPreferences()
-        print("MoonbounceLibrary loadPreferences() finished")
+        print("✶ MoonbounceLibrary loadPreferences() returned")
 
         guard let preferences = newProtocolConfiguration(shadowConfig: config, providerBundleIdentifier: providerBundleIdentifier, tunnelName: tunnelName) else
         {
             throw MoonbounceLibraryError.badShadowConfig(config)
         }
 
-        print("MoonbounceLibrary configure() calling savePreferences()")
         try self.vpn.savePreferences(preferences)
-        print("MoonbounceLibrary configure() finished calling savePreferences()")
+        print("✶ MoonbounceLibrary.configure() returned from savePreferences()")
     }
 
     public func startVPN() throws
     {
-        print("startVPN called")
+        print("✶ startVPN called")
         try self.vpn.enable()
     }
 
     public func stopVPN() throws
     {
+        print("✶ stopVPN called")
         try self.vpn.disable()
     }
 
     func newProtocolConfiguration(shadowConfig: ShadowConfig.ShadowClientConfig, providerBundleIdentifier: String, tunnelName: String) -> VPNPreferences?
     {
-        self.logger.debug("VPNPreferencesController.newProtocolConfiguration")
-        self.logger.debug("\n----->Setting the providerBundleIdentifier to \(providerBundleIdentifier)")
+        self.logger.debug("✶ VPNPreferencesController.newProtocolConfiguration")
+        self.logger.debug("\n✶ ----->Setting the providerBundleIdentifier to \(providerBundleIdentifier)")
 
         let protocolConfiguration: NETunnelProviderProtocol = NETunnelProviderProtocol()
         protocolConfiguration.providerBundleIdentifier = providerBundleIdentifier
@@ -62,7 +61,7 @@ public class MoonbounceLibrary
         let encoder = JSONEncoder()
         guard let shadowConfigString = try? encoder.encode(shadowConfig) else
         {
-            self.logger.error("Failed to create a json string from our Shadow config.")
+            self.logger.error("✶ Failed to create a json string from our Shadow config.")
             return nil
         }
         
@@ -72,7 +71,7 @@ public class MoonbounceLibrary
             Keys.tunnelNameKey.rawValue: tunnelName
         ]
 
-        self.logger.info("newProtocolConfiguration: \(String(describing: protocolConfiguration.providerConfiguration))")
+        self.logger.info("✶ newProtocolConfiguration: \(String(describing: protocolConfiguration.providerConfiguration))")
 
         let preferences = VPNPreferences(protocolConfiguration: protocolConfiguration, description: "Moonbounce", enabled: true)
 

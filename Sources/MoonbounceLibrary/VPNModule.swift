@@ -17,7 +17,6 @@ import NetworkExtension
 
 public class VPNModule
 {
-    
     static public let name = "VPN"
     
     public var logger: Logger
@@ -37,26 +36,26 @@ public class VPNModule
     {
         let manager: NETunnelProviderManager
     
-        print("VPNModule loadPreferences called")
+        print("✶ VPNModule loadPreferences called")
         if let actualManager = self.manager
         {
-            print("-> NETunnelProviderManager already exists")
+            print("✶ NETunnelProviderManager already exists")
             manager = actualManager
         }
         else
         {
             
-            print("-> Creating a new NETunnelProviderManager")
+            print("✶ Creating a new NETunnelProviderManager")
             manager = NETunnelProviderManager()
 
             let maybeError = MainThreadSynchronizer.sync(manager.loadFromPreferences)
             if let error = maybeError
             {
-                print("VPNModule.savePreferences - error: \(error)")
+                print("✶ VPNModule.savePreferences - error: \(error)")
                 throw error
             }
             
-            print("manager loaded: \(manager)")
+            print("✶ NETunnelProviderManager loaded: \(manager)")
             self.manager = manager
         }
         
@@ -81,7 +80,7 @@ public class VPNModule
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
-            print("VPNModule.loadPreferences - error: \(error)")
+            print("✶ VPNModule.loadPreferences - error: \(error)")
         }
         
         return completePreferences
@@ -89,39 +88,39 @@ public class VPNModule
 
     func savePreferences(_ preferences: VPNPreferences) throws
     {
-        print("-> VPNModule savePreferences() called")
+        print("✶ VPNModule savePreferences() called")
         guard let manager = self.manager else
         {
-            print("VPNModule savePreferences failed to set manager")
+            print("✶ VPNModule savePreferences failed to set manager")
             throw VPNModuleError.managerIsNil
         }
-        print("VPNModule savePreferences() manager: \(manager)")
+        print("✶ VPNModule savePreferences() manager: \(manager)")
         
         // FIXME: Need to give manager a protocolConfiguration (used to be in savePreferencesRequest)
         
         guard let protocolConfiguration = manager.protocolConfiguration else
         {
-            print("VPNModule savePreferences failed to set protocolConfiguration")
+            print("✶ VPNModule savePreferences failed to set protocolConfiguration")
             throw VPNModuleError.protocolConfigurationIsNil
         }
-        print("VPNModule savePreferences() protocolConfiguration: \(protocolConfiguration)")
+        print("✶ VPNModule savePreferences() protocolConfiguration: \(protocolConfiguration)")
 
         guard let typedProtocolConfiguration = protocolConfiguration as? NETunnelProviderProtocol else
         {
-            print("VPNModule savePreferences falied to set typedProtocolConfiguration")
+            print("✶ VPNModule savePreferences falied to set typedProtocolConfiguration")
             throw VPNModuleError.typedProtocolConfigurationIsNil
         }
-        print("VPNModule savePreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
+        print("✶ VPNModule savePreferences() typedProtocolConfiguration: \(typedProtocolConfiguration)")
 
         typedProtocolConfiguration.providerBundleIdentifier = preferences.providerBundleIdentifier
 
         guard var providerConfiguration = typedProtocolConfiguration.providerConfiguration else
         {
-            print("-> VPNModule savePreferences falied to set providerConfiguration")
+            print("✶ VPNModule savePreferences falied to set providerConfiguration")
             throw VPNModuleError.providerConfigurationIsNil
         }
         
-        print("-> VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
+        print("✶ VPNModule savePreferences() providerConFiguration: \(providerConfiguration)")
         providerConfiguration["serverAddress"] = preferences.serverAddress
         typedProtocolConfiguration.serverAddress = preferences.serverAddress
         typedProtocolConfiguration.providerConfiguration = providerConfiguration
@@ -132,17 +131,17 @@ public class VPNModule
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
-            print("VPNModule.savePreferences - error: \(error)")
+            print("✶ VPNModule.savePreferences - error: \(error)")
             throw error
         }
     }
 
     func enable() throws
     {
-        print("VPNModule enable called")
+        print("✶ VPNModule enable called")
         guard let manager = self.manager else
         {
-            print("could not get manager")
+            print("✶ Failed to enable the VPNModule, the NETunnelProviderManager is nil.")
             throw VPNModuleError.managerIsNil
         }
 
@@ -150,38 +149,39 @@ public class VPNModule
         
         if let error = MainThreadSynchronizer.sync(manager.loadFromPreferences)
         {
-            print("VPNModule.enable - loadFromPreferences error: \(error)")
+            print("✶ VPNModule.enable - loadFromPreferences error: \(error)")
             throw error
         }
         
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
-            print("VPNModule.enable - saveToPreferences error: \(error)")
+            print("✶ VPNModule.enable - saveToPreferences error: \(error)")
             throw error
         }
 
         // https://stackoverflow.com/questions/47550706/error-domain-nevpnerrordomain-code-1-null-while-connecting-vpn-server
         if let error = MainThreadSynchronizer.sync(manager.loadFromPreferences)
         {
-            print("VPNModule.enable - loadFromPreferences error: \(error)")
+            print("✶ VPNModule.enable - loadFromPreferences error: \(error)")
             throw error
         }
 
         do
         {
             try manager.connection.startVPNTunnel()
+            print("✶ VPNModule.enable complete.")
         }
         catch
         {
-            print("VPNModule.enable - startVPNTunnel error: \(error)")
+            print("✶ VPNModule.enable - startVPNTunnel error: \(error)")
             throw error
         }
-
-        print("VPNModule enable success")
     }
 
     func disable() throws
     {
+        print("✶ VPNModule.disable called.")
+        
         guard let manager = self.manager else
         {
             throw VPNModuleError.managerIsNil
@@ -191,7 +191,7 @@ public class VPNModule
 
         if let error = MainThreadSynchronizer.sync(manager.saveToPreferences)
         {
-            print("VPNModule.disable - error: \(error)")
+            print("✶ VPNModule.disable - error: \(error)")
             throw error
         }
     }
@@ -207,7 +207,8 @@ public class VPNModule
         {
             throw VPNModuleError.managerConnectionIsWrongType
         }
-
+        
+        print("✶ VPNModule.connectionStatus: \(session.status)")
         return session.status
     }
 
@@ -229,6 +230,7 @@ public class VPNModule
             throw VPNModuleError.providerMessageResponseIsNil
         }
         
+        print("✶ VPNModule.sendProviderMessage returning: \(response.string)")
         return response
     }
 }
