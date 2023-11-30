@@ -125,10 +125,10 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 return
             }
             
-            let flow = self.packetFlow
+//            let flow = self.packetFlow
             //logger.log("vpnToServer flow set")
             //logger.log("starting vpnToServer read")
-            let (bytesRead, nsNumber) = await flow.readPackets()
+            let (bytesRead, nsNumber) = await packetFlow.readPackets()
             let list = zip(bytesRead, nsNumber)
             
             for unzipped in list 
@@ -165,7 +165,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 return
             }
             
-            let flow = self.packetFlow
+//            let flow = self.packetFlow
 //            logger.log("serverToVPN flow set")
             logger.log("✩ starting serverToVPN read")
             
@@ -175,7 +175,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             }
             logger.log("✩ serverToVPN read \(bytesRead.count) bytes: \(bytesRead.hex)")
             
-            flow.writePackets([bytesRead], withProtocols: [NSNumber(value: AF_INET)])
+            packetFlow.writePackets([bytesRead], withProtocols: [NSNumber(value: AF_INET)])
             logger.log("✩ serverToVPN wrote the bytes read (\(bytesRead.count) bytes)")
         }
     }
