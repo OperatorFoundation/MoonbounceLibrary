@@ -124,10 +124,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 logger.log("✩ vpnToServer connection failed")
                 return
             }
-            
-//            let flow = self.packetFlow
-            //logger.log("vpnToServer flow set")
-            //logger.log("starting vpnToServer read")
+
             let (bytesRead, nsNumber) = await packetFlow.readPackets()
             let list = zip(bytesRead, nsNumber)
             
@@ -137,12 +134,10 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 
                 guard (ipVersion == NSNumber(value: AF_INET)) else 
                 {
-                    //logger.log("IP version \(ipVersion)")
                     continue
                 }
                 
                 logger.log("✩ vpnToServer read \(data.count) bytes: \(data.hex)")
-                //logger.log("starting vpnTpServer write")
                 
                 guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else {
                     logger.log("✩ vpnToServer write failed")
@@ -164,11 +159,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 logger.log("✩ serverToVPN connection failed")
                 return
             }
-            
-//            let flow = self.packetFlow
-//            logger.log("serverToVPN flow set")
-            logger.log("✩ starting serverToVPN read")
-            
+                        
             guard let bytesRead = connection.readWithLengthPrefix(prefixSizeInBits: Self.lengthPrefixSize) else {
                 logger.log("✩ serverToVPN read failed")
                 return
