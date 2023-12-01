@@ -116,35 +116,56 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     
     private func vpnToServer() async 
     {
-        logger.log("✩ vpnToServer called.")
-        while true 
+        logger.log("★ vpnToServer called.")
+        while true
         {
             guard let connection = self.network else
             {
-                logger.log("✩ vpnToServer connection failed")
+                logger.log("★ vpnToServer connection failed")
                 return
             }
 
-            let (bytesRead, nsNumber) = await packetFlow.readPackets()
-            let list = zip(bytesRead, nsNumber)
+            let (bytesRead, protocols) = await packetFlow.readPackets()
             
-            for unzipped in list 
+            for (index, packet) in bytesRead.enumerated()
             {
-                let (data, ipVersion) = unzipped
-                
-                guard (ipVersion == NSNumber(value: AF_INET)) else 
+                guard protocols[index] == NSNumber(value: AF_INET) else
                 {
+                    logger.log("★ vpnToServer read a packet with an unsupported protocol. Skipping.")
                     continue
                 }
+                logger.log("★ vpnToServer read \(packet.count) bytes: \(packet.string)")
                 
-                logger.log("✩ vpnToServer read \(data.count) bytes: \(data.hex)")
-                
-                guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else {
-                    logger.log("✩ vpnToServer write failed")
+                guard connection.writeWithLengthPrefix(data: packet, prefixSizeInBits: Self.lengthPrefixSize) else
+                {
+                    logger.log("★ vpnToServer write failed")
                     return
                 }
-                logger.log("✩ vpnToServer wrote \(data.count) bytes: \(data.hex)")
+                
+                logger.log("★ vpnToServer wrote \(packet.count) bytes: \(packet.string)")
             }
+            
+//            let list = zip(bytesRead, nsNumber)
+//            
+//            for unzipped in list 
+//            {
+//                let (data, ipVersion) = unzipped
+//                
+//                guard (ipVersion == NSNumber(value: AF_INET)) else 
+//                {
+//                    continue
+//                }
+//                
+//                logger.log("✩ vpnToServer read \(data.count) bytes: \(data.hex)")
+//                
+//                guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else 
+//                {
+//                    logger.log("✩ vpnToServer write failed")
+//                    return
+//                }
+//                
+//                logger.log("✩ vpnToServer wrote \(data.count) bytes: \(data.hex)")
+//            }
         }
     }
     
