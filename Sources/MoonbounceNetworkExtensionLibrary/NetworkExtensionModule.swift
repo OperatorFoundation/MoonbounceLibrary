@@ -176,29 +176,29 @@ public class NetworkExtensionModule
         // dnsSettings.matchDomains = [""] // All DNS queries must first go through the tunnel's DNS
         networkSettings.dnsSettings = dnsSettings
 
-        switch tunnelAddress
-        {
-            case .ipV4(let tunIPv4Address):
-                let ipv4Settings = NEIPv4Settings(addresses: ["\(tunIPv4Address)"], subnetMasks: [tunIPSubnetMask])
-                // No routes specified, use the default route.
-                ipv4Settings.includedRoutes = [NEIPv4Route.default()]
-                networkSettings.ipv4Settings = ipv4Settings
-            case .ipV6(let tunIPv6Address):
-                let ipv6Settings = NEIPv6Settings(addresses: ["\(tunIPv6Address)"], networkPrefixLengths: [64])
-                ipv6Settings.includedRoutes = [NEIPv6Route.default()]
-                networkSettings.ipv6Settings = ipv6Settings
-            case .dualStack(let tunIPv4Address, let tunIPv6Address):
-                // IPv4
-                let ipv4Settings = NEIPv4Settings(addresses: ["\(tunIPv4Address)"], subnetMasks: [tunIPSubnetMask])
-                // No routes specified, use the default route.
-                ipv4Settings.includedRoutes = [NEIPv4Route.default()]
-                networkSettings.ipv4Settings = ipv4Settings
-
-                // IPv6
-                let ipv6Settings = NEIPv6Settings(addresses: ["\(tunIPv6Address)"], networkPrefixLengths: [64])
-                ipv6Settings.includedRoutes = [NEIPv6Route.default()]
-                networkSettings.ipv6Settings = ipv6Settings
-        }
+//        switch tunnelAddress
+//        {
+//            case .ipV4(let tunIPv4Address):
+//                let ipv4Settings = NEIPv4Settings(addresses: ["\(tunIPv4Address)"], subnetMasks: [tunIPSubnetMask])
+//                // No routes specified, use the default route.
+//                ipv4Settings.includedRoutes = [NEIPv4Route.default()]
+//                networkSettings.ipv4Settings = ipv4Settings
+//            case .ipV6(let tunIPv6Address):
+//                let ipv6Settings = NEIPv6Settings(addresses: ["\(tunIPv6Address)"], networkPrefixLengths: [64])
+//                ipv6Settings.includedRoutes = [NEIPv6Route.default()]
+//                networkSettings.ipv6Settings = ipv6Settings
+//            case .dualStack(let tunIPv4Address, let tunIPv6Address):
+//                // IPv4
+//                let ipv4Settings = NEIPv4Settings(addresses: ["\(tunIPv4Address)"], subnetMasks: [tunIPSubnetMask])
+//                // No routes specified, use the default route.
+//                ipv4Settings.includedRoutes = [NEIPv4Route.default()]
+//                networkSettings.ipv4Settings = ipv4Settings
+//
+//                // IPv6
+//                let ipv6Settings = NEIPv6Settings(addresses: ["\(tunIPv6Address)"], networkPrefixLengths: [64])
+//                ipv6Settings.includedRoutes = [NEIPv6Route.default()]
+//                networkSettings.ipv6Settings = ipv6Settings
+//        }
 
         // FIXME: These should be set later when we have a ReplicantConnection
         //    // This should be derived from the specific polish specified by the replicant config
