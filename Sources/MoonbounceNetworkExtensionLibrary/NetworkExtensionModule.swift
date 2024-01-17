@@ -136,6 +136,8 @@ public class NetworkExtensionModule
         }
 
         let packet = NEPacket(data: data, protocolFamily: 4) // FIXME - support IPv6
+        self.logger.log("🌐 NetworkExtensionModule: writePacket packet metadata: \(packet.metadata)")
+        self.logger.log("🌐 NetworkExtensionModule: writePacket packet data (\(packet.data.count) bytes): \(packet.data.hex)")
         flow.writePacketObjects([packet])
     }
 
