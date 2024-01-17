@@ -15,6 +15,7 @@ import Logging
 #endif
 
 import Chord
+import InternetProtocols
 
 public class NetworkExtensionModule
 {
@@ -138,6 +139,13 @@ public class NetworkExtensionModule
         let packet = NEPacket(data: data, protocolFamily: 4) // FIXME - support IPv6
         self.logger.log("🌐 NetworkExtensionModule: writePacket packet metadata: \(packet.metadata)")
         self.logger.log("🌐 NetworkExtensionModule: writePacket packet data (\(packet.data.count) bytes): \(packet.data.hex)")
+        let ipv4packet = Packet(ipv4Bytes: data, timestamp: Date(), debugPrints: true)
+        if let ipv4packetproperty = ipv4packet.ipv4
+        {
+            let destination = ipv4packetproperty.destinationAddress.hex
+            self.logger.log("🌐 NetworkExtensionModule: writePacket DEBUG created an IPv4Packet with destination: \(destination)")
+        }
+        
         flow.writePacketObjects([packet])
     }
 
