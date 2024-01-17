@@ -128,12 +128,12 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     // Original is commented out below
     private func vpnToServer() async
     {
-        logger.log("⬆ vpnToServer called.")
+        logger.log("⛵️ vpnToServer called.")
         while true
         {
             guard let connection = self.network else
             {
-                logger.log("⬆ vpnToServer connection failed")
+                logger.log("⛵️ vpnToServer connection failed")
                 return
             }
             
@@ -143,20 +143,20 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
             {
                 guard connection.writeWithLengthPrefix(data: packet.data, prefixSizeInBits: Self.lengthPrefixSize) else
                 {
-                    logger.log("⬆ vpnToServer write failed")
+                    logger.log("⛵️ vpnToServer write failed")
                     return
                 }
                 
-                self.logger.log("⬆ vpnToServer: packet metadata: \(packet.metadata)")
+                self.logger.log("⛵️ vpnToServer: packet metadata: \(packet.metadata)")
                 
                 let ipv4packet = Packet(ipv4Bytes: packet.data, timestamp: Date(), debugPrints: true)
                 if let ipv4packetproperty = ipv4packet.ipv4
                 {
-                    let destination = ipv4packetproperty.destinationAddress.string
-                    self.logger.log("★ vpnToServer: writePacket DEBUG created an IPv4Packet with destination: \(destination)")
+                    let destination = ipv4packetproperty.destinationAddress.hex
+                    self.logger.log("⛵️ vpnToServer: writePacket DEBUG created an IPv4Packet with destination: \(destination)")
                 }
                 
-                self.logger.log("⬆ vpnToServer: received and wrote (\(packet.data.count) bytes): \(packet.data.hex)")
+                self.logger.log("⛵️ vpnToServer: received and wrote (\(packet.data.count) bytes): \(packet.data.hex)")
             }
         }
     }
@@ -197,24 +197,24 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     
     private func serverToVPN() 
     {
-        logger.log("⬇ serverToVPN called")
+        logger.log("🏡 serverToVPN called")
         
         while true
         {
             guard let connection = self.network else
             {
-                logger.log("⬇ serverToVPN connection failed")
+                logger.log("🏡 serverToVPN connection failed")
                 return
             }
                         
             guard let bytesRead = connection.readWithLengthPrefix(prefixSizeInBits: Self.lengthPrefixSize) else {
-                logger.log("⬇ serverToVPN read failed")
+                logger.log("🏡 serverToVPN read failed")
                 return
             }
             
             
             packetFlow.writePackets([bytesRead], withProtocols: [NSNumber(value: AF_INET)])
-            logger.log("⬇ serverToVPN read and wrote \(bytesRead.count) bytes: \(bytesRead.hex)")
+            logger.log("🏡 serverToVPN read and wrote \(bytesRead.count) bytes: \(bytesRead.hex)")
         }
     }
 }
