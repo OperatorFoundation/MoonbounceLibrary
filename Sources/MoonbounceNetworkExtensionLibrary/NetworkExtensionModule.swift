@@ -165,7 +165,7 @@ public class NetworkExtensionModule
         let googleDNSipv6 = "2001:4860:4860::8888"
         let googleDNS2ipv6 = "2001:4860:4860::8844"
 //        let tunIPSubnetMask = "0.0.0.0"
-        let tunIPSubnetMask = "255.255.255.255"
+        let tunIPSubnetMask = "255.0.0.0"
 //        let tunIPv6RouteAddress = ""
 
         let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: host)
