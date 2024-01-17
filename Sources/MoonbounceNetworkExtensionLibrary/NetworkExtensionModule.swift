@@ -96,7 +96,8 @@ public class NetworkExtensionModule
         
         return serverAddress
     }
-
+    
+    // FIXME: Not being called
     func readPacket() throws -> NEPacket
     {
         self.logger.log("🌐 NetworkExtensionModule: readPacket")
@@ -127,7 +128,8 @@ public class NetworkExtensionModule
             return packet
         }
     }
-
+    
+    // FIXME: Not being called
     func writePacket(data: Data) throws
     {
         self.logger.log("🌐 NetworkExtensionModule: writePacket")

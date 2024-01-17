@@ -12,6 +12,7 @@ import os.log
 
 import SwiftQueue
 import Transmission
+import InternetProtocols
 
 open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
 {
@@ -122,7 +123,10 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
     }
     // End NEPacketTunnelProvider
     
-    private func vpnToServer() async 
+    
+    // FIXME: Experimental version of this function.
+    // Original is commented out below
+    private func vpnToServer() async
     {
         logger.log("★ vpnToServer called.")
         while true
@@ -132,50 +136,65 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                 logger.log("★ vpnToServer connection failed")
                 return
             }
-
-            let (bytesRead, protocols) = await packetFlow.readPackets()
             
-            for (index, packet) in bytesRead.enumerated()
+            let packets: [NEPacket] = await packetFlow.readPacketObjects()
+            
+            for packet in packets
             {
-                guard protocols[index] == NSNumber(value: AF_INET) else
-                {
-                    logger.log("★ vpnToServer read a packet with an unsupported protocol. Skipping.")
-                    continue
-                }
-                logger.log("★ vpnToServer read \(packet.count) bytes.")
-                
-                guard connection.writeWithLengthPrefix(data: packet, prefixSizeInBits: Self.lengthPrefixSize) else
+                logger.log("★ vpnToServer read \(packet.data.count) bytes.")
+                guard connection.writeWithLengthPrefix(data: packet.data, prefixSizeInBits: Self.lengthPrefixSize) else
                 {
                     logger.log("★ vpnToServer write failed")
                     return
                 }
                 
-                logger.log("★ vpnToServer wrote \(packet.count) bytes.")
+                self.logger.log("★ vpnToServer: packet metadata: \(packet.metadata)")
+                self.logger.log("★ vpnToServer: packet data (\(packet.data.count) bytes): \(packet.data.hex)")
+                let ipv4packet = Packet(ipv4Bytes: packet.data, timestamp: Date(), debugPrints: true)
+                if let ipv4packetproperty = ipv4packet.ipv4
+                {
+                    let destination = ipv4packetproperty.destinationAddress.hex
+                    self.logger.log("★ vpnToServer: writePacket DEBUG created an IPv4Packet with destination: \(destination)")
+                }
+                
+                logger.log("★ vpnToServer wrote \(packet.data.count) bytes.")
             }
-            
-//            let list = zip(bytesRead, nsNumber)
-//            
-//            for unzipped in list 
+        }
+    }
+    
+//    private func vpnToServer() async 
+//    {
+//        logger.log("★ vpnToServer called.")
+//        while true
+//        {
+//            guard let connection = self.network else
 //            {
-//                let (data, ipVersion) = unzipped
-//                
-//                guard (ipVersion == NSNumber(value: AF_INET)) else 
+//                logger.log("★ vpnToServer connection failed")
+//                return
+//            }
+//
+//            let (bytesRead, protocols) = await packetFlow.readPackets()
+//            
+//            for (index, packet) in bytesRead.enumerated()
+//            {
+//                guard protocols[index] == NSNumber(value: AF_INET) else
 //                {
+//                    logger.log("★ vpnToServer read a packet with an unsupported protocol. Skipping.")
 //                    continue
 //                }
+//                logger.log("★ vpnToServer read \(packet.count) bytes.")
 //                
-//                logger.log("✩ vpnToServer read \(data.count) bytes: \(data.hex)")
-//                
-//                guard connection.writeWithLengthPrefix(data: data, prefixSizeInBits: Self.lengthPrefixSize) else 
+//                guard connection.writeWithLengthPrefix(data: packet, prefixSizeInBits: Self.lengthPrefixSize) else
 //                {
-//                    logger.log("✩ vpnToServer write failed")
+//                    logger.log("★ vpnToServer write failed")
 //                    return
 //                }
 //                
-//                logger.log("✩ vpnToServer wrote \(data.count) bytes: \(data.hex)")
+//                logger.log("★ vpnToServer wrote \(packet.count) bytes.")
 //            }
-        }
-    }
+//            
+//        }
+//    }
     
     private func serverToVPN() 
     {
