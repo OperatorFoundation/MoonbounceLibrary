@@ -75,16 +75,24 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
         self.logger.log("🌲 Connection state is ready 🌲\n")
 
         // Set the virtual interface settings.
-        try await neModule.setNetworkTunnelSettings(host: host, tunnelAddress: TunnelAddress.ipV4(IPv4Address("10.0.0.1")!))
-        self.neModule.setConfiguration(self.protocolConfiguration)
-        
-        Task {
-            await vpnToServer()
+        do
+        {
+            try await neModule.setNetworkTunnelSettings(host: host, tunnelAddress: TunnelAddress.ipV4(IPv4Address("10.0.0.1")!))
+            self.neModule.setConfiguration(self.protocolConfiguration)
+            
+            Task {
+                await vpnToServer()
+            }
+            
+            Task {
+                serverToVPN()
+            }
+        }
+        catch (let error)
+        {
+            self.logger.error("‼️Received an error while setting NetworkTunnelSettings: \(error)‼️")
         }
         
-        Task {
-            serverToVPN()
-        }
     }
 
 
