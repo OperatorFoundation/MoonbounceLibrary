@@ -173,7 +173,7 @@ public class NetworkExtensionModule
         // These are the Google DNS Settings, we will use these for now
         let dnsServerStrings = [googleDNSipv4, googleDNS2ipv4, googleDNSipv6, googleDNS2ipv6]
         let dnsSettings = NEDNSSettings(servers: dnsServerStrings)
-         dnsSettings.matchDomains = [""] // All DNS queries must first go through the tunnel's DNS
+//        dnsSettings.matchDomains = [""] // All DNS queries must first go through the tunnel's DNS
         networkSettings.dnsSettings = dnsSettings
 
         switch tunnelAddress
