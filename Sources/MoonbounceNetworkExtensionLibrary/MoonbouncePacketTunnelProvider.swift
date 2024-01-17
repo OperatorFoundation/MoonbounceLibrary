@@ -147,7 +147,10 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                     return
                 }
                 
-                self.logger.log("⛵️ vpnToServer: packet metadata: \(packet.metadata)")
+                if let metadata = packet.metadata
+                {
+                    self.logger.log("⛵️ vpnToServer: packet metadata: \(metadata)")
+                }
                 
                 let ipv4packet = Packet(ipv4Bytes: packet.data, timestamp: Date(), debugPrints: true)
                 if let ipv4packetproperty = ipv4packet.ipv4
