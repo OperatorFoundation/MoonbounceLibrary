@@ -230,7 +230,7 @@ public class VPNModule
             throw VPNModuleError.providerMessageResponseIsNil
         }
         
-        print("✶ VPNModule.sendProviderMessage returning: \(response.string)")
+        print("✶ VPNModule.sendProviderMessage returning \(response.count) bytes.")
         return response
     }
 }

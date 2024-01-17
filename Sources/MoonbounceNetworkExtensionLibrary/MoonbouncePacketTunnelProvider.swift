@@ -142,7 +142,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                     logger.log("★ vpnToServer read a packet with an unsupported protocol. Skipping.")
                     continue
                 }
-                logger.log("★ vpnToServer read \(packet.count) bytes: \(packet.string)")
+                logger.log("★ vpnToServer read \(packet.count) bytes.")
                 
                 guard connection.writeWithLengthPrefix(data: packet, prefixSizeInBits: Self.lengthPrefixSize) else
                 {
@@ -150,7 +150,7 @@ open class MoonbouncePacketTunnelProvider: NEPacketTunnelProvider
                     return
                 }
                 
-                logger.log("★ vpnToServer wrote \(packet.count) bytes: \(packet.string)")
+                logger.log("★ vpnToServer wrote \(packet.count) bytes.")
             }
             
 //            let list = zip(bytesRead, nsNumber)
